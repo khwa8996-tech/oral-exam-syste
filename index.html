@@ -376,11 +376,36 @@
     let examTimer = null;
     let secondsLeft = 45;
 
-    document.getElementById('students-file').addEventListener('change', (e) => {
-        document.getElementById('students-status').innerText = `✓ تم إرفاق ${e.target.files.length} ملف لأسماء الطلاب بنجاح.`;
+    let cachedStudentsText = "";
+    let cachedLectureText = "";
+
+    // قراءة الملفات فور اختيارها وتخزينها مؤقتاً لتجنب التأخير
+    document.getElementById('students-file').addEventListener('change', async (e) => {
+        const files = e.target.files;
+        if (files.length > 0) {
+            document.getElementById('students-status').innerText = `⏳ جاري معالجة ملف الأسماء...`;
+            let combined = "";
+            for (let f of files) {
+                let txt = f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f);
+                combined += txt + "\n";
+            }
+            cachedStudentsText = combined;
+            document.getElementById('students-status').innerText = `✓ تم تجهيز ملف أسماء الطلاب بنجاح.`;
+        }
     });
-    document.getElementById('lecture-file').addEventListener('change', (e) => {
-        document.getElementById('lecture-status').innerText = `✓ تم إرفاق ${e.target.files.length} ملف للمحاضرات بنجاح.`;
+
+    document.getElementById('lecture-file').addEventListener('change', async (e) => {
+        const files = e.target.files;
+        if (files.length > 0) {
+            document.getElementById('lecture-status').innerText = `⏳ جاري معالجة ملفات المحاضرات...`;
+            let combined = "";
+            for (let f of files) {
+                let txt = f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f);
+                combined += txt + "\n";
+            }
+            cachedLectureText = combined;
+            document.getElementById('lecture-status').innerText = `✓ تم تجهيز ملفات المحاضرات بنجاح.`;
+        }
     });
 
     function playAudioTone(isSuccess) {
@@ -456,25 +481,18 @@
     }
 
     async function startExamSession() {
-        const studentFiles = document.getElementById('students-file').files;
-        const lectureFiles = document.getElementById('lecture-file').files;
         const manualStudents = document.getElementById('students-manual').value.trim();
         const manualLecture = document.getElementById('lecture-manual').value.trim();
 
         let rawNames = manualStudents ? manualStudents.split('\n') : [];
         let rawLectures = manualLecture ? manualLecture : "";
 
-        if (studentFiles.length > 0) {
-            for (let f of studentFiles) {
-                let txt = f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f);
-                rawNames = rawNames.concat(cleanNames(txt));
-            }
+        if (cachedStudentsText) {
+            rawNames = rawNames.concat(cleanNames(cachedStudentsText));
         }
 
-        if (lectureFiles.length > 0) {
-            for (let f of lectureFiles) {
-                rawLectures += (f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f)) + '\n';
-            }
+        if (cachedLectureText) {
+            rawLectures += cachedLectureText + '\n';
         }
 
         studentsList = [...new Set(rawNames.map(s => s.trim()).filter(s => s.length > 3))];
@@ -497,11 +515,11 @@
         });
 
         if (studentsList.length === 0) {
-            alert("يرجى إرفاق ملف أسماء الطلاب أو إدخالهم يدوياً!");
+            alert("يرجى الانتظار حتى اكتمال تحميل ملف أسماء الطلاب أو إدخالهم يدوياً!");
             return;
         }
         if (questionsList.length === 0) {
-            alert("يرجى إرفاق ملف المحاضرة أو إدخاله يدوياً!");
+            alert("يرجى الانتظار حتى اكتمال تحميل ملف المحاضرة أو إدخاله يدوياً!");
             return;
         }
 
@@ -625,6 +643,8 @@
         document.getElementById('lecture-file').value = "";
         document.getElementById('students-status').innerText = "";
         document.getElementById('lecture-status').innerText = "";
+        cachedStudentsText = "";
+        cachedLectureText = "";
     }
 
     function resetAndReturnRooms() {
