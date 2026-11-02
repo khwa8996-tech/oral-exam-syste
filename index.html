@@ -101,7 +101,6 @@
 
         textarea { resize: vertical; height: 80px; margin-top: 8px; }
 
-        /* تصميم عداد التقدم الشريطي */
         .progress-container {
             width: 100%;
             background-color: #e2e8f0;
@@ -354,7 +353,7 @@
     let cachedStudentsText = "";
     let cachedLectureText = "";
 
-    // معالجة ملفات الطلاب مع عداد التقتم (Progress Bar)
+    // معالجة ملفات الطلاب مع عداد التقدم
     document.getElementById('students-file').addEventListener('change', async (e) => {
         const files = e.target.files;
         if (files.length > 0) {
@@ -374,11 +373,11 @@
                 progBar.innerText = percent + "%";
             }
             cachedStudentsText = combined;
-            document.getElementById('students-status').innerText = `✓ تم تجهيز وفلترة ملف أسماء الطلاب بنجاح.`;
+            document.getElementById('students-status').innerText = `✓ تم قراءة ملف أسماء الطلاب بنجاح.`;
         }
     });
 
-    // معالجة ملفات المحاضرات مع عداد التقدم (Progress Bar)
+    // معالجة ملفات المحاضرات مع عداد التقدم
     document.getElementById('lecture-file').addEventListener('change', async (e) => {
         const files = e.target.files;
         if (files.length > 0) {
@@ -463,15 +462,22 @@
         });
     }
 
+    // دالة مرنة ومطورة جداً لاستخراج الأسماء بدون أي قيود معقدة
     function cleanNames(text) {
-        return text.split('\n')
-            .map(l => l.trim())
-            .filter(l => l.length > 5 && 
-                !l.includes("إدارة") && !l.includes("الدراسي") && !l.includes("الصف") && 
-                !l.includes("المدرسين") && !l.includes("السعي") && !l.includes("ثانوية") && 
-                !l.includes("المتفوقين") && !l.includes("الفصل") && !l.includes("المادة"))
-            .map(l => l.replace(/^[\d\-\–\.\s١٢٣٤٥٦٧٨٩٠]+/, '').trim())
-            .filter(n => n.length > 4);
+        let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 4);
+        let valid = [];
+        for (let l of lines) {
+            // استبعاد ترويسات الوزارة والمدرسة فقط لتنظيف القائمة
+            if (!l.includes("ثانوية") && !l.includes("المتفوقين") && !l.includes("سجل") && 
+                !l.includes("العام الدراسي") && !l.includes("المادة") && !l.includes("الصف")) {
+                // إزالة الأرقام المسلسلة البسيطة من البداية
+                let cleaned = l.replace(/^[\d\-\–\.\s١٢٣٤٥٦٧٨٩٠]+/, '').trim();
+                if (cleaned.length > 3) {
+                    valid.push(cleaned);
+                }
+            }
+        }
+        return valid.length > 0 ? valid : lines; // إذا لم يجد تطابقاً يأخذ الأسطر مباشرة
     }
 
     async function startExamSession() {
@@ -489,10 +495,10 @@
             rawLectures += cachedLectureText + '\n';
         }
 
-        studentsList = [...new Set(rawNames.map(s => s.trim()).filter(s => s.length > 3))];
+        studentsList = [...new Set(rawNames.map(s => s.trim()).filter(s => s.length > 2))];
 
-        let sentences = rawLectures.split('.').map(s => s.trim()).filter(s => s.length > 15);
-        if (sentences.length < 3) sentences = rawLectures.split('\n').map(s => s.trim()).filter(s => s.length > 15);
+        let sentences = rawLectures.split('.').map(s => s.trim()).filter(s => s.length > 10);
+        if (sentences.length < 3) sentences = rawLectures.split('\n').map(s => s.trim()).filter(s => s.length > 10);
 
         questionsList = sentences.map(s => {
             let correctOption = s.length > 35 ? s.substring(0, 35) + "..." : s;
@@ -509,17 +515,17 @@
         });
 
         if (studentsList.length === 0) {
-            alert("يرجى التأكد من إرفاق ملف أسماء الطلاب أو إدخالهم يدوياً!");
+            alert("لم يتم العثور على أسماء. يجدر التأكد من ملف الـ PDF أو إدخال الأسماء يدوياً في خانة النص!");
             return;
         }
         if (questionsList.length === 0) {
-            alert("يرجى التأكد من إرفاق ملف المحاضرة أو إدخاله يدوياً!");
+            alert("يرجى إرفاق ملف المحاضرة أو إدخاله يدوياً!");
             return;
         }
 
         document.getElementById('setup-view').classList.add('hidden');
         document.getElementById('exam-view').classList.remove('hidden');
-        document.getElementById('exam-room-title').innerText = `غرفة امتحان: ${currentRoomName}`;
+        document.getElementById('exam-room-title').innerText = `غرفة امتحان: ${currentRoomName} (عدد الطلاب: ${studentsList.length})`;
 
         studentPointer = 0;
         questionPointer = 0;
