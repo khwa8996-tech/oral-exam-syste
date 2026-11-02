@@ -462,22 +462,19 @@
         });
     }
 
-    // دالة مرنة ومطورة جداً لاستخراج الأسماء بدون أي قيود معقدة
     function cleanNames(text) {
         let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 4);
         let valid = [];
         for (let l of lines) {
-            // استبعاد ترويسات الوزارة والمدرسة فقط لتنظيف القائمة
             if (!l.includes("ثانوية") && !l.includes("المتفوقين") && !l.includes("سجل") && 
                 !l.includes("العام الدراسي") && !l.includes("المادة") && !l.includes("الصف")) {
-                // إزالة الأرقام المسلسلة البسيطة من البداية
                 let cleaned = l.replace(/^[\d\-\–\.\s١٢٣٤٥٦٧٨٩٠]+/, '').trim();
                 if (cleaned.length > 3) {
                     valid.push(cleaned);
                 }
             }
         }
-        return valid.length > 0 ? valid : lines; // إذا لم يجد تطابقاً يأخذ الأسطر مباشرة
+        return valid.length > 0 ? valid : lines;
     }
 
     async function startExamSession() {
@@ -498,7 +495,17 @@
         studentsList = [...new Set(rawNames.map(s => s.trim()).filter(s => s.length > 2))];
 
         let sentences = rawLectures.split('.').map(s => s.trim()).filter(s => s.length > 10);
-        if (sentences.length < 3) sentences = rawLectures.split('\n').map(s => s.trim()).filter(s => s.length > 10);
+        if (sentences.length < 3) {
+            sentences = rawLectures.split('\n').map(s => s.trim()).filter(s => s.length > 5);
+        }
+        if (sentences.length === 0) {
+            // أسئلة افتراضية في حال لم يتم رفع ملف محاضرة لضمان عمل النظام بسلاسة
+            sentences = [
+                "ما هو المفهوم الأساسي لصيانة الحاسوب والبرمجيات",
+                "ما هي إجراءات الصيانة الوقائية لنظام التشغيل",
+                "ما الفرق بين ترقية وتحديث البرمجيات"
+            ];
+        }
 
         questionsList = sentences.map(s => {
             let correctOption = s.length > 35 ? s.substring(0, 35) + "..." : s;
@@ -515,11 +522,7 @@
         });
 
         if (studentsList.length === 0) {
-            alert("لم يتم العثور على أسماء. يجدر التأكد من ملف الـ PDF أو إدخال الأسماء يدوياً في خانة النص!");
-            return;
-        }
-        if (questionsList.length === 0) {
-            alert("يرجى إرفاق ملف المحاضرة أو إدخاله يدوياً!");
+            alert("يرجى التأكد من إرفاق ملف أسماء الطلاب أو إدخالهم يدوياً!");
             return;
         }
 
