@@ -274,7 +274,6 @@
     let timer;
     let timeLeft = 45;
 
-    // تحديث حالة الملفات عند اختيارها
     document.getElementById('students-file-input').addEventListener('change', function(e) {
         document.getElementById('students-file-status').innerText = `تم اختيار ${e.target.files.length} ملف لأسماء الطلاب بنجاح.`;
     });
@@ -317,7 +316,6 @@
         document.getElementById("setup-section").classList.remove("hidden");
     }
 
-    // دالة استخراج النص من ملف PDF فردي
     async function extractTextFromPDF(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -338,7 +336,6 @@
         });
     }
 
-    // دالة قراءة ملف النص الفردي
     async function extractTextFromTXT(file) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -347,7 +344,6 @@
         });
     }
 
-    // تنظيف وفلترة أسماء الطلاب بدقة تامة من ترويسات الكشوفات
     function cleanStudentNames(rawText) {
         let lines = rawText.split('\n').map(l => l.trim());
         let validNames = [];
@@ -385,7 +381,6 @@
         let allStudentsText = manualStudents ? manualStudents.split('\n') : [];
         let allLectureText = manualLectures ? manualLectures : "";
 
-        // معالجة ملفات الطلاب المرفوعة مباشرة
         if (studentFiles && studentFiles.length > 0) {
             for (let i = 0; i < studentFiles.length; i++) {
                 let file = studentFiles[i];
@@ -400,7 +395,6 @@
             }
         }
 
-        // معالجة ملفات المحاضرات المرفوعة مباشرة
         if (lectureFiles && lectureFiles.length > 0) {
             for (let i = 0; i < lectureFiles.length; i++) {
                 let file = lectureFiles[i];
@@ -412,12 +406,9 @@
             }
         }
 
-        // تنقية القائمة النهائية للطلاب
         studentsList = allStudentsText.map(s => s.trim()).filter(s => s.length > 3);
-        // إزالة الأسماء المكررة إن وجدت
         studentsList = [...new Set(studentsList)];
 
-        // صياغة الأسئلة من المحاضرات
         let rawSentences = allLectureText.split('.').map(s => s.trim()).filter(s => s.length > 15);
         if (rawSentences.length < 3) {
             rawSentences = allLectureText.split('\n').map(s => s.trim()).filter(s => s.length > 15);
