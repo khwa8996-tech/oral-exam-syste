@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الامتحان الشفهي الذكي</title>
+    <title>نظام الامتحان الشفهي التفاعلي والمحاضرات</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,8 +13,8 @@
             padding: 20px;
         }
         .container {
-            max-width: 700px;
-            margin: 40px auto;
+            max-width: 750px;
+            margin: 30px auto;
             background: #ffffff;
             padding: 30px;
             border-radius: 12px;
@@ -23,56 +23,66 @@
         h2 {
             text-align: center;
             color: #1a73e8;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        .student-box {
+        .section-box {
             background: #e8f0fe;
             padding: 20px;
             border-radius: 8px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
             margin-bottom: 20px;
+        }
+        textarea, select, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .student-box {
+            background: #f8f9fa;
+            border: 2px dashed #1a73e8;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
             color: #174ea6;
+        }
+        .question-box {
+            background: #fff8e1;
+            border: 1px solid #ffe0b2;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #e65100;
         }
         .timer {
             text-align: center;
             font-size: 18px;
             color: #d93025;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: bold;
         }
-        .quick-buttons {
+        .action-buttons {
             display: flex;
             gap: 15px;
-            justify-content: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        .rate-btn {
-            flex: 1;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            color: white;
-            transition: 0.2s;
-        }
-        .rate-btn.full { background-color: #34a853; }
-        .rate-btn.full:hover { background-color: #2e8b57; }
+        .btn-correct { background-color: #34a853; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-wrong { background-color: #ea4335; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-next { background-color: #1a73e8; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-reset { background-color: #6c757d; color: white; border: none; cursor: pointer; font-weight: bold; }
         
-        .rate-btn.partial { background-color: #fbbc05; color: #333; }
-        .rate-btn.partial:hover { background-color: #f9ab00; }
-        
-        .rate-btn.zero { background-color: #ea4335; }
-        .rate-btn.zero:hover { background-color: #d33828; }
-
-        .results-summary {
-            margin-top: 20px;
-            border-top: 2px solid #eee;
-            padding-top: 15px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -84,59 +94,109 @@
             text-align: center;
         }
         th { background-color: #f8f9fa; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>نظام الامتحان الشفهي الذكي</h2>
+    <h2>نظام الامتحان الشفهي التفاعلي والمحاضرات</h2>
     
-    <!-- عرض اسم الطالب الحالي -->
-    <div class="student-box" id="current-student">اضغط على ابدأ الامتحان للبحث عن الطالب الأول</div>
-    
-    <!-- المؤقت الزمني -->
-    <div class="timer" id="timer-display">الوقت المتبقي: --</div>
+    <!-- واجهة الإعداد ورفع المحاضرة والأسماء -->
+    <div class="section-box" id="setup-section">
+        <h3>1. اختر الشعبة:</h3>
+        <select id="class-select">
+            <option value="4A">الرابع أ</option>
+            <option value="4B">الرابع ب</option>
+            <option value="5A">الخامس أ</option>
+            <option value="5B">الخامس ب</option>
+        </select>
 
-    <!-- أزرار الضغط السريع -->
-    <div class="quick-buttons">
-        <button class="rate-btn full" onclick="recordGrade(3, 'إجابة تامة (+3)')">✅ إجابة تامة (+3)</button>
-        <button class="rate-btn partial" onclick="recordGrade(1.5, 'إجابة جزئية (+1.5)')">⚠️ إجابة جزئية (+1.5)</button>
-        <button class="rate-btn zero" onclick="recordGrade(0, 'بدون إجابة (0)')">❌ بدون إجابة (0)</button>
+        <h3>2. أدخل محتوى المحاضرة أو الأسئلة الشفهية:</h3>
+        <textarea id="lecture-input" placeholder="اكتب أو الصق نص المحاضرة والأسئلة هنا، مثلاً:
+س: ما هو نظام التشغيل؟ ج: مجموعة برمجيات...
+س: ما وظيفة لوحة المفاتيح؟ ج: إدخال البيانات..."></textarea>
+
+        <button class="btn-next" onclick="startExamSystem()">بدء الامتحان الشفهي 🚀</button>
     </div>
 
-    <button onclick="nextStudent()" style="width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">بدء / الانتقال للطالب التالي 🔄</button>
+    <!-- واجهة الامتحان الفعلية -->
+    <div id="exam-section" class="hidden">
+        <div id="class-title" style="text-align: center; font-weight: bold; color: #555; margin-bottom: 10px;"></div>
+        
+        <div class="student-box" id="current-student">الطالب: --</div>
+        <div class="question-box" id="current-question">السؤال: بانتظار تحميل المحاضرة...</div>
+        <div class="timer" id="timer-display">الوقت المتبقي: 45 ثانية</div>
 
-    <!-- جدول النتائج المسجلة -->
-    <div class="results-summary">
-        <h3>سجل درجات الطلاب:</h3>
+        <!-- أزرار تقييم الإجابة (صح / خطأ / بدون إجابة) -->
+        <div class="action-buttons">
+            <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('إجابة صحيحة (+3)')">✔️ صح (+3)</button>
+            <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('إجابة خاطئة (0)')">❌ خطأ (0)</button>
+        </div>
+
+        <button class="btn-next" style="margin-bottom: 15px;" onclick="nextStep()">السؤال أو الطالب التالي 🔄</button>
+
+        <h3>سجل النتائج:</h3>
         <table>
             <thead>
                 <tr>
                     <th>اسم الطالب</th>
-                    <th>التقييم والدرجة</th>
+                    <th>التقييم المسجل</th>
                 </tr>
             </thead>
-            <tbody id="results-table-body">
-                <!-- يتم تعبئتها برمجياً -->
-            </tbody>
+            <tbody id="results-table-body"></tbody>
         </table>
+
+        <!-- زر التصفير والبدء من جديد -->
+        <button class="btn-reset" style="margin-top: 20px;" onclick="resetEverything()">🔄 تصفير الكل والبدء من جديد</button>
     </div>
 </div>
 
 <script>
-    // قائمة أسماء الطلاب (يمكنك تعديلها بالأسماء التي ترغب بها)
-    const students = [
-        "أحمد محمد علي",
-        "حسين علي حسن",
-        "سارة أحمد جاسم",
-        "فاطمة كريم عبد الله",
-        "محمد باقر علي",
-        "زينب مصطفى جواد"
-    ];
+    const schoolData = {
+        "4A": ["أحمد محمد علي", "حسين علي حسن", "كرار حيدر كاظم", "مصطفى قاسم محمد"],
+        "4B": ["سارة أحمد جاسم", "فاطمة كريم عبد الله", "زهراء علي حسين", "مريم حسن عبد"],
+        "5A": ["محمد باقر علي", "زينب مصطفى جواد", "علي رضا مهدي", "رقية حيمد كاظم"],
+        "5B": ["يوسف إبراهيم خليل", "بنين أحمد عبد الرضا", "حسن مجيد حميد", "درغام فلاح حسن"]
+    };
 
-    let currentIndex = -1;
+    const classNames = {
+        "4A": "الشعبة: الرابع (أ)",
+        "4B": "الشعبة: الرابع (ب)",
+        "5A": "الشعبة: الخامس (أ)",
+        "5B": "الشعبة: الخامس (ب)"
+    };
+
+    let currentStudentsList = [];
+    let questionsList = [];
+    let studentIndex = -1;
+    let questionIndex = 0;
     let timer;
-    let timeLeft = 45; // 45 ثانية لكل طالب
+    let timeLeft = 45;
+
+    function startExamSystem() {
+        const selectedClass = document.getElementById("class-select").value;
+        const lectureText = document.getElementById("lecture-input").value.trim();
+
+        if(!lectureText) {
+            alert("يرجى إدخال محتوى المحاضرة أو الأسئلة أولاً!");
+            return;
+        }
+
+        currentStudentsList = schoolData[selectedClass];
+        
+        // استخراج الأسطر التي تبدأ بحرف س أو تحتوي على أسئلة
+        questionsList = lectureText.split('\n').filter(line => line.trim().length > 0);
+
+        document.getElementById("class-title").innerText = classNames[selectedClass];
+        document.getElementById("setup-section").classList.add("hidden");
+        document.getElementById("exam-section").classList.remove("hidden");
+
+        studentIndex = -1;
+        questionIndex = 0;
+        document.getElementById("results-table-body").innerHTML = "";
+        nextStep();
+    }
 
     function startTimer() {
         clearInterval(timer);
@@ -153,34 +213,46 @@
         }, 1000);
     }
 
-    function nextStudent() {
-        currentIndex++;
-        if (currentIndex < students.length) {
-            document.getElementById("current-student").innerText = students[currentIndex];
-            startTimer();
-        } else {
-            document.getElementById("current-student").innerText = "انتهت قائمة الطلاب بنجاح! 🎓";
+    function nextStep() {
+        studentIndex++;
+        if (studentIndex >= currentStudentsList.length) {
+            document.getElementById("current-student").innerText = "انتهت قائمة طلاب الشعبة! 🎓";
+            document.getElementById("current-question").innerText = "انتهت الأسئلة.";
             clearInterval(timer);
-            document.getElementById("timer-display").innerText = "";
-        }
-    }
-
-    function recordGrade(score, statusText) {
-        if (currentIndex < 0 || currentIndex >= students.length) {
-            alert("يرجى بدء الامتحان أو اختيار طالب أولاً!");
             return;
         }
-        
-        const studentName = students[currentIndex];
-        
-        // إضافة النتيجة إلى الجدول
+
+        // اختيار سؤال بالتناوب من المحاضرة المرفوعة
+        const currentStudent = currentStudentsList[studentIndex];
+        const currentQ = questionsList[questionIndex % questionsList.length];
+        questionIndex++;
+
+        document.getElementById("current-student").innerText = `الطالب: ${currentStudent}`;
+        document.getElementById("current-question").innerText = `السؤال: ${currentQ}`;
+        startTimer();
+    }
+
+    function evaluateAnswer(statusText) {
+        if (studentIndex < 0 || studentIndex >= currentStudentsList.length) {
+            alert("الرجاء بدء الامتحان أولاً!");
+            return;
+        }
+
+        const studentName = currentStudentsList[studentIndex];
         const tableBody = document.getElementById("results-table-body");
         const newRow = document.createElement("tr");
         newRow.innerHTML = `<td>${studentName}</td><td>${statusText}</td>`;
         tableBody.appendChild(newRow);
 
-        // الانتقال التلقائي للطالب التالي فور الضغط
-        nextStudent();
+        nextStep();
+    }
+
+    function resetEverything() {
+        clearInterval(timer);
+        document.getElementById("exam-section").classList.add("hidden");
+        document.getElementById("setup-section").classList.remove("hidden");
+        document.getElementById("lecture-input").value = "";
+        document.getElementById("results-table-body").innerHTML = "";
     }
 </script>
 
