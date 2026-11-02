@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة غرف الامتحان الشفهي الذكية</title>
+    <title>منصة غرف الامتحان الشفهي الذكية والمحاضرات</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -53,7 +53,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
-        textarea, button {
+        textarea, input[type="file"], button {
             width: 100%;
             padding: 12px;
             font-size: 16px;
@@ -61,10 +61,11 @@
             border: 1px solid #ccc;
             margin-top: 10px;
             box-sizing: border-box;
+            background: white;
         }
         textarea {
             resize: vertical;
-            height: 120px;
+            height: 100px;
         }
         .student-box {
             background: #f8f9fa;
@@ -105,6 +106,19 @@
         .btn-start { background-color: #1a73e8; color: white; border: none; cursor: pointer; font-weight: bold; }
         .btn-back { background-color: #6c757d; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; }
         
+        /* شريط الإشعار الفوري الملون */
+        #alert-banner {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -122,11 +136,11 @@
 <body>
 
 <div class="container">
-    <h2>منصة غرف الامتحان الشفهي الذكية</h2>
+    <h2>منصة غرف الامتحان الشفهي الذكية والمحاضرات</h2>
     
     <!-- واجهة اختيار غرف الشعب -->
     <div id="rooms-section">
-        <h3 style="text-align: center; color: #555; margin-bottom: 20px;">اختر غرفة الشعبة لبيان الطلاب وبدء الامتحان:</h3>
+        <h3 style="text-align: center; color: #555; margin-bottom: 20px;">اختر غرفة الشعبة لرفع المحاضرة وبدء الامتحان:</h3>
         <div class="rooms-grid">
             <div class="room-card" onclick="openRoom('4A', 'الرابع (أ)')">غرفة الرابع أ 🏫</div>
             <div class="room-card" onclick="openRoom('4B', 'الرابع (ب)')">غرفة الرابع ب 🏫</div>
@@ -135,13 +149,17 @@
         </div>
     </div>
 
-    <!-- واجهة إدخال الأسئلة للشعبة المختارة -->
+    <!-- واجهة رفع المحاضرة والأسئلة للشعبة المختارة -->
     <div class="section-box hidden" id="setup-section">
         <h3 id="room-title-setup" style="color: #1a73e8; text-align: center;"></h3>
-        <p style="text-align: center; color: #666;">قم بلصق محتوى المحاضرة أو أسئلة الامتحان أدناه:</p>
-        <textarea id="lecture-input" placeholder="اكتب أو الصق الأسئلة هنا، كل سؤال في سطر:
-س: ما هو نظام التشغيل؟
+        
+        <p style="font-weight: bold; margin-top: 15px;">الخيار الأول: رفع ملف المحاضرة (ملف نصي .txt يحتوي الأسئلة)</p>
+        <input type="file" id="file-upload" accept=".txt" onchange="handleFileUpload(event)">
+
+        <p style="font-weight: bold; margin-top: 15px;">أو الخيار الثاني: اكتب أو الصق الأسئلة مباشرة أدناه</p>
+        <textarea id="lecture-input" placeholder="س: ما هو نظام التشغيل؟
 س: ما وظيفة لوحة المفاتيح؟"></textarea>
+
         <button class="btn-start" onclick="startExam()">دخول الغرفة وبدء الامتحان 🚀</button>
         <button class="btn-back" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
     </div>
@@ -150,36 +168,39 @@
     <div id="exam-section" class="hidden">
         <div id="room-title-exam" style="text-align: center; font-weight: bold; color: #1a73e8; font-size: 20px; margin-bottom: 10px;"></div>
         
+        <!-- إشعار النتيجة الفوري (صح / خطأ) -->
+        <div id="alert-banner"></div>
+
         <div class="student-box" id="current-student">الطالب: --</div>
         <div class="question-box" id="current-question">السؤال: --</div>
         <div class="timer" id="timer-display">الوقت المتبقي: 45 ثانية</div>
 
-        <!-- أزرار التقييم (صح / خطأ) -->
+        <!-- أزرار التقييم الفوري -->
         <div class="action-buttons">
-            <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('✔️ صح (+3)')">✔️ صح (+3)</button>
-            <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('❌ خطأ (0)')">❌ خطأ (0)</button>
+            <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer(true)">✔️ إجابة صحيحة (+3)</button>
+            <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer(false)">❌ إجابة خاطئة (0)</button>
         </div>
 
-        <button class="btn-start" style="margin-bottom: 15px;" onclick="nextStep()">السؤال أو الطالب التالي 🔄</button>
+        <button class="btn-start" style="margin-bottom: 15px;" onclick="nextStep()">تخطي / الانتقال للسؤال التالي 🔄</button>
 
         <h3>سجل درجات الغرفة:</h3>
         <table>
             <thead>
                 <tr>
                     <th>اسم الطالب</th>
-                    <th>التقييم المسجل</th>
+                    <th>السؤال المطروح</th>
+                    <th>التقييم</th>
                 </tr>
             </thead>
             <tbody id="results-table-body"></tbody>
         </table>
 
-        <!-- زر التصفير والعودة للغرف -->
         <button class="btn-back" onclick="resetAndBackToRooms()">🔄 تصفير النتائج والعودة للغرف</button>
     </div>
 </div>
 
 <script>
-    // قاعدة بيانات أسماء الطلاب لكل غرفة شعبة (يمكنك تعديلها في أي وقت)
+    // قاعدة بيانات أسماء الطلاب لكل شعبة (يمكنك تعديلها وإضافة أسماء طلابك بكل سهولة)
     const schoolData = {
         "4A": ["أحمد محمد علي", "حسين علي حسن", "كرار حيدر كاظم", "مصطفى قاسم محمد"],
         "4B": ["سارة أحمد جاسم", "فاطمة كريم عبد الله", "زهراء علي حسين", "مريم حسن عبد"],
@@ -193,6 +214,7 @@
     let questionsList = [];
     let studentIndex = -1;
     let questionIndex = 0;
+    let currentQuestionText = "";
     let timer;
     let timeLeft = 45;
 
@@ -200,15 +222,26 @@
         selectedClassKey = classKey;
         selectedClassName = className;
         
-        document.getElementById("room-title-setup").innerText = `إعداد أسئلة امتحان: ${className}`;
+        document.getElementById("room-title-setup").innerText = `إدارة غرفة: ${className}`;
         document.getElementById("rooms-section").classList.add("hidden");
         document.getElementById("setup-section").classList.remove("hidden");
+    }
+
+    // قراءة ملف المحاضرة المرفوع بصيغة txt
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById("lecture-input").value = e.target.result;
+        };
+        reader.readAsText(file, "UTF-8");
     }
 
     function startExam() {
         const lectureText = document.getElementById("lecture-input").value.trim();
         if(!lectureText) {
-            alert("يرجى إدخال محتوى المحاضرة أو الأسئلة أولاً!");
+            alert("يرجى رفع ملف المحاضرة أو كتابة الأسئلة أولاً!");
             return;
         }
 
@@ -218,6 +251,7 @@
         document.getElementById("room-title-exam").innerText = `غرفة امتحان: ${selectedClassName}`;
         document.getElementById("setup-section").classList.add("hidden");
         document.getElementById("exam-section").classList.remove("hidden");
+        document.getElementById("alert-banner").style.display = "none";
 
         studentIndex = -1;
         questionIndex = 0;
@@ -245,32 +279,52 @@
         if (studentIndex >= currentStudentsList.length) {
             document.getElementById("current-student").innerText = "انتهت قائمة طلاب هذه الغرفة! 🎓";
             document.getElementById("current-question").innerText = "انتهت الأسئلة.";
+            document.getElementById("alert-banner").style.display = "none";
             clearInterval(timer);
             return;
         }
 
         const currentStudent = currentStudentsList[studentIndex];
-        const currentQ = questionsList[questionIndex % questionsList.length];
+        currentQuestionText = questionsList[questionIndex % questionsList.length];
         questionIndex++;
 
         document.getElementById("current-student").innerText = `الطالب: ${currentStudent}`;
-        document.getElementById("current-question").innerText = `السؤال: ${currentQ}`;
+        document.getElementById("current-question").innerText = `السؤال: ${currentQuestionText}`;
+        document.getElementById("alert-banner").style.display = "none";
         startTimer();
     }
 
-    function evaluateAnswer(statusText) {
+    function evaluateAnswer(isCorrect) {
         if (studentIndex < 0 || studentIndex >= currentStudentsList.length) {
             alert("الرجاء بدء الامتحان أولاً!");
             return;
         }
 
         const studentName = currentStudentsList[studentIndex];
+        const banner = document.getElementById("alert-banner");
+        let statusText = "";
+
+        if (isCorrect) {
+            banner.className = "alert-success";
+            banner.innerText = "✔️ إجابة صحيحة! تمت إضافة (+3) درجات بنجاح.";
+            statusText = "✔️ صح (+3)";
+        } else {
+            banner.className = "alert-danger";
+            banner.innerText = "❌ إجابة خاطئة! تم تسجيل (0) درجات.";
+            statusText = "❌ خطأ (0)";
+        }
+        banner.style.display = "block";
+
+        // تسجيل النتيجة في الجدول
         const tableBody = document.getElementById("results-table-body");
         const newRow = document.createElement("tr");
-        newRow.innerHTML = `<td>${studentName}</td><td>${statusText}</td>`;
+        newRow.innerHTML = `<td>${studentName}</td><td style="font-size:14px;">${currentQuestionText}</td><td>${statusText}</td>`;
         tableBody.appendChild(newRow);
 
-        nextStep();
+        // الانتظار 1.5 ثانية لرؤية الإشعار ثم الانتقال التلقائي للطالب التالي
+        setTimeout(() => {
+            nextStep();
+        }, 1500);
     }
 
     function backToRooms() {
@@ -278,6 +332,7 @@
         document.getElementById("setup-section").classList.add("hidden");
         document.getElementById("rooms-section").classList.remove("hidden");
         document.getElementById("lecture-input").value = "";
+        document.getElementById("file-upload").value = "";
     }
 
     function resetAndBackToRooms() {
@@ -285,7 +340,9 @@
         document.getElementById("exam-section").classList.add("hidden");
         document.getElementById("rooms-section").classList.remove("hidden");
         document.getElementById("lecture-input").value = "";
+        document.getElementById("file-upload").value = "";
         document.getElementById("results-table-body").innerHTML = "";
+        document.getElementById("alert-banner").style.display = "none";
     }
 </script>
 
