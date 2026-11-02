@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة غرف الامتحان الشفهي الذكية والمحاضرات</title>
+    <title>منصة غرف الامتحان الشفهي الذكية (ملفات PDF)</title>
+    <!-- مكتبة قراءة ملفات الـ PDF برمجياً في المتصفح -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -65,7 +67,7 @@
         }
         textarea {
             resize: vertical;
-            height: 100px;
+            height: 80px;
         }
         .student-box {
             background: #f8f9fa;
@@ -106,7 +108,6 @@
         .btn-start { background-color: #1a73e8; color: white; border: none; cursor: pointer; font-weight: bold; }
         .btn-back { background-color: #6c757d; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; }
         
-        /* شريط الإشعار الفوري الملون */
         #alert-banner {
             text-align: center;
             padding: 12px;
@@ -136,52 +137,51 @@
 <body>
 
 <div class="container">
-    <h2>منصة غرف الامتحان الشفهي الذكية والمحاضرات</h2>
+    <h2>منصة غرف الامتحان الشفهي الذكية (ملفات PDF)</h2>
     
-    <!-- واجهة اختيار غرف الشعب -->
+    <!-- واجهة اختيار الغرف -->
     <div id="rooms-section">
-        <h3 style="text-align: center; color: #555; margin-bottom: 20px;">اختر غرفة الشعبة لرفع المحاضرة وبدء الامتحان:</h3>
+        <h3 style="text-align: center; color: #555; margin-bottom: 20px;">اختر غرفة الشعبة لرفع ملفات الـ PDF وبدء الامتحان:</h3>
         <div class="rooms-grid">
-            <div class="room-card" onclick="openRoom('4A', 'الرابع (أ)')">غرفة الرابع أ 🏫</div>
-            <div class="room-card" onclick="openRoom('4B', 'الرابع (ب)')">غرفة الرابع ب 🏫</div>
-            <div class="room-card" onclick="openRoom('5A', 'الخامس (أ)')">غرفة الخامس أ 🏫</div>
-            <div class="room-card" onclick="openRoom('5B', 'الخامس (ب)')">غرفة الخامس ب 🏫</div>
+            <div class="room-card" onclick="openRoom('الرابع (أ)')">غرفة الرابع أ 🏫</div>
+            <div class="room-card" onclick="openRoom('الرابع (ب)')">غرفة الرابع ب 🏫</div>
+            <div class="room-card" onclick="openRoom('الخامس (أ)')">غرفة الخامس أ 🏫</div>
+            <div class="room-card" onclick="openRoom('الخامس (ب)')">غرفة الخامس ب 🏫</div>
         </div>
     </div>
 
-    <!-- واجهة رفع المحاضرة والأسئلة للشعبة المختارة -->
+    <!-- واجهة رفع ملفات الـ PDF للأسماء والمحاضرات -->
     <div class="section-box hidden" id="setup-section">
         <h3 id="room-title-setup" style="color: #1a73e8; text-align: center;"></h3>
         
-        <p style="font-weight: bold; margin-top: 15px;">الخيار الأول: رفع ملف المحاضرة (ملف نصي .txt يحتوي الأسئلة)</p>
-        <input type="file" id="file-upload" accept=".txt" onchange="handleFileUpload(event)">
+        <p style="font-weight: bold; margin-top: 10px;">1. رفع ملف أسماء الطلاب بصيغة PDF</p>
+        <input type="file" id="students-pdf" accept=".pdf" onchange="readPDF(event, 'students-input')">
+        <textarea id="students-input" placeholder="أو اكتب الأسماء يدوياً هنا، كل اسم في سطر..."></textarea>
 
-        <p style="font-weight: bold; margin-top: 15px;">أو الخيار الثاني: اكتب أو الصق الأسئلة مباشرة أدناه</p>
-        <textarea id="lecture-input" placeholder="س: ما هو نظام التشغيل؟
-س: ما وظيفة لوحة المفاتيح؟"></textarea>
+        <p style="font-weight: bold; margin-top: 15px;">2. رفع ملف المحاضرة والأسئلة بصيغة PDF</p>
+        <input type="file" id="lecture-pdf" accept=".pdf" onchange="readPDF(event, 'lecture-input')">
+        <textarea id="lecture-input" placeholder="أو اكتب أو الصق الأسئلة يدوياً هنا..."></textarea>
 
         <button class="btn-start" onclick="startExam()">دخول الغرفة وبدء الامتحان 🚀</button>
         <button class="btn-back" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
     </div>
 
-    <!-- واجهة الامتحان الفعلية داخل الغرفة -->
+    <!-- واجهة الامتحان داخل الغرفة -->
     <div id="exam-section" class="hidden">
         <div id="room-title-exam" style="text-align: center; font-weight: bold; color: #1a73e8; font-size: 20px; margin-bottom: 10px;"></div>
         
-        <!-- إشعار النتيجة الفوري (صح / خطأ) -->
         <div id="alert-banner"></div>
 
         <div class="student-box" id="current-student">الطالب: --</div>
         <div class="question-box" id="current-question">السؤال: --</div>
         <div class="timer" id="timer-display">الوقت المتبقي: 45 ثانية</div>
 
-        <!-- أزرار التقييم الفوري -->
         <div class="action-buttons">
-            <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer(true)">✔️ إجابة صحيحة (+3)</button>
-            <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer(false)">❌ إجابة خاطئة (0)</button>
+            <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer(true)">✔️ صح (+3)</button>
+            <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer(false)">❌ خطأ (0)</button>
         </div>
 
-        <button class="btn-start" style="margin-bottom: 15px;" onclick="nextStep()">تخطي / الانتقال للسؤال التالي 🔄</button>
+        <button class="btn-start" style="margin-bottom: 15px;" onclick="nextStep()">تخطي / السؤال التالي 🔄</button>
 
         <h3>سجل درجات الغرفة:</h3>
         <table>
@@ -200,17 +200,8 @@
 </div>
 
 <script>
-    // قاعدة بيانات أسماء الطلاب لكل شعبة (يمكنك تعديلها وإضافة أسماء طلابك بكل سهولة)
-    const schoolData = {
-        "4A": ["أحمد محمد علي", "حسين علي حسن", "كرار حيدر كاظم", "مصطفى قاسم محمد"],
-        "4B": ["سارة أحمد جاسم", "فاطمة كريم عبد الله", "زهراء علي حسين", "مريم حسن عبد"],
-        "5A": ["محمد باقر علي", "زينب مصطفى جواد", "علي رضا مهدي", "رقية حيمد كاظم"],
-        "5B": ["يوسف إبراهيم خليل", "بنين أحمد عبد الرضا", "حسن مجيد حميد", "درغام فلاح حسن"]
-    };
-
-    let selectedClassKey = "";
     let selectedClassName = "";
-    let currentStudentsList = [];
+    let studentsList = [];
     let questionsList = [];
     let studentIndex = -1;
     let questionIndex = 0;
@@ -218,35 +209,61 @@
     let timer;
     let timeLeft = 45;
 
-    function openRoom(classKey, className) {
-        selectedClassKey = classKey;
+    function openRoom(className) {
         selectedClassName = className;
-        
-        document.getElementById("room-title-setup").innerText = `إدارة غرفة: ${className}`;
+        document.getElementById("room-title-setup").innerText = `إعداد غرفة: ${className}`;
         document.getElementById("rooms-section").classList.add("hidden");
         document.getElementById("setup-section").classList.remove("hidden");
     }
 
-    // قراءة ملف المحاضرة المرفوع بصيغة txt
-    function handleFileUpload(event) {
+    // دالة استخراج النص تلقائياً من ملف الـ PDF المرفوع
+    function readPDF(event, targetId) {
         const file = event.target.files[0];
         if (!file) return;
+
         const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById("lecture-input").value = e.target.result;
+        reader.onload = function() {
+            const typedarray = new Uint8Array(this.result);
+            
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc) {
+                let textPromises = [];
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    textPromises.push(
+                        pdfDoc.getPage(i).then(function(page) {
+                            return page.getTextContent().then(function(textContent) {
+                                return textContent.items.map(item => item.str).join(' ');
+                            });
+                        })
+                    );
+                }
+                Promise.all(textPromises).then(function(pagesText) {
+                    // وضع النص المستخرج داخل خانة النص ليتمكن المعلم من مراجعته أو تعديله
+                    document.getElementById(targetId).value = pagesText.join('\n');
+                });
+            }).catch(error => {
+                alert("حدث خطأ أثناء قراءة ملف الـ PDF. تأكد من أن الملف سليم وقابل للقراءة.");
+                console.error(error);
+            });
         };
-        reader.readAsText(file, "UTF-8");
+        reader.readAsArrayBuffer(file);
     }
 
     function startExam() {
+        const studentsText = document.getElementById("students-input").value.trim();
         const lectureText = document.getElementById("lecture-input").value.trim();
+
+        if(!studentsText) {
+            alert("يرجى رفع ملف PDF لأسماء الطلاب أو كتابتها أولاً!");
+            return;
+        }
         if(!lectureText) {
-            alert("يرجى رفع ملف المحاضرة أو كتابة الأسئلة أولاً!");
+            alert("يرجى رفع ملف PDF للمحاضرة والأسئلة أو كتابتها أولاً!");
             return;
         }
 
-        currentStudentsList = schoolData[selectedClassKey];
-        questionsList = lectureText.split('\n').filter(line => line.trim().length > 0);
+        // تقسيم النصوص إلى أسطر واستبعاد الأسطر الفارغة
+        studentsList = studentsText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+        questionsList = lectureText.split('\n').map(q => q.trim()).filter(q => q.length > 0);
 
         document.getElementById("room-title-exam").innerText = `غرفة امتحان: ${selectedClassName}`;
         document.getElementById("setup-section").classList.add("hidden");
@@ -276,7 +293,7 @@
 
     function nextStep() {
         studentIndex++;
-        if (studentIndex >= currentStudentsList.length) {
+        if (studentIndex >= studentsList.length) {
             document.getElementById("current-student").innerText = "انتهت قائمة طلاب هذه الغرفة! 🎓";
             document.getElementById("current-question").innerText = "انتهت الأسئلة.";
             document.getElementById("alert-banner").style.display = "none";
@@ -284,7 +301,7 @@
             return;
         }
 
-        const currentStudent = currentStudentsList[studentIndex];
+        const currentStudent = studentsList[studentIndex];
         currentQuestionText = questionsList[questionIndex % questionsList.length];
         questionIndex++;
 
@@ -295,12 +312,12 @@
     }
 
     function evaluateAnswer(isCorrect) {
-        if (studentIndex < 0 || studentIndex >= currentStudentsList.length) {
+        if (studentIndex < 0 || studentIndex >= studentsList.length) {
             alert("الرجاء بدء الامتحان أولاً!");
             return;
         }
 
-        const studentName = currentStudentsList[studentIndex];
+        const studentName = studentsList[studentIndex];
         const banner = document.getElementById("alert-banner");
         let statusText = "";
 
@@ -315,13 +332,11 @@
         }
         banner.style.display = "block";
 
-        // تسجيل النتيجة في الجدول
         const tableBody = document.getElementById("results-table-body");
         const newRow = document.createElement("tr");
         newRow.innerHTML = `<td>${studentName}</td><td style="font-size:14px;">${currentQuestionText}</td><td>${statusText}</td>`;
         tableBody.appendChild(newRow);
 
-        // الانتظار 1.5 ثانية لرؤية الإشعار ثم الانتقال التلقائي للطالب التالي
         setTimeout(() => {
             nextStep();
         }, 1500);
@@ -331,16 +346,20 @@
         clearInterval(timer);
         document.getElementById("setup-section").classList.add("hidden");
         document.getElementById("rooms-section").classList.remove("hidden");
+        document.getElementById("students-input").value = "";
         document.getElementById("lecture-input").value = "";
-        document.getElementById("file-upload").value = "";
+        document.getElementById("students-pdf").value = "";
+        document.getElementById("lecture-pdf").value = "";
     }
 
     function resetAndBackToRooms() {
         clearInterval(timer);
         document.getElementById("exam-section").classList.add("hidden");
         document.getElementById("rooms-section").classList.remove("hidden");
+        document.getElementById("students-input").value = "";
         document.getElementById("lecture-input").value = "";
-        document.getElementById("file-upload").value = "";
+        document.getElementById("students-pdf").value = "";
+        document.getElementById("lecture-pdf").value = "";
         document.getElementById("results-table-body").innerHTML = "";
         document.getElementById("alert-banner").style.display = "none";
     }
