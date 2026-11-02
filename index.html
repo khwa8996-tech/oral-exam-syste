@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة الامتحان الشفهي الذكية والمطورة</title>
+    <!-- مكتبة قراءة ملفات الـ PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
@@ -103,13 +104,14 @@
         .student-box {
             background: #eef2ff;
             border: 2px dashed var(--primary);
-            padding: 15px;
+            padding: 18px;
             border-radius: 12px;
             text-align: center;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             margin-bottom: 15px;
             color: var(--primary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .question-box {
@@ -137,7 +139,7 @@
             border: 2px solid #cbd5e1;
             padding: 12px;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: 0.2s;
@@ -214,13 +216,13 @@
         
         <label>📁 رفع ملفات أسماء الطلاب (PDF أو TXT)</label>
         <input type="file" id="students-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'students-input')">
-        <textarea id="students-input" placeholder="سيتم استخراج الأسماء تلقائياً أو يمكنك كتابتها يدوياً..."></textarea>
+        <textarea id="students-input" placeholder="سيتم استخراج وتنقية الأسماء بدقة..."></textarea>
 
         <label>📚 رفع ملفات المحاضرات والأسئلة (PDF أو TXT)</label>
         <input type="file" id="lecture-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'lecture-input')">
-        <textarea id="lecture-input" placeholder="سيتم استخراج الأسئلة وصياغتها تلقائياً..."></textarea>
+        <textarea id="lecture-input" placeholder="سيتم استخراج الأسئلة وتوليد الخيارات تلقائياً..."></textarea>
 
-        <button class="btn-start" style="margin-top: 15px;" onclick="startExam()">بدء الجلسة الامتحانية 🚀</button>
+        <button class="btn-start" style="margin-top: 15px;" onclick="startExam()">بدء الجلسة الامتحانية (طالب بطالب) 🚀</button>
         <button class="btn-back" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
     </div>
 
@@ -229,23 +231,22 @@
         
         <div id="alert-banner"></div>
 
+        <!-- عرض اسم الطالب الحالي مفرداً وبشكل بارز -->
         <div class="student-box" id="current-student">الطالب: --</div>
         <div class="question-box" id="current-question">السؤال: --</div>
         <div class="timer" id="timer-display">الوقت المتبقي: 45 ثانية</div>
 
-        <!-- خيارات الإجابة المتعددة -->
-        <div class="options-container" id="options-container">
-            <!-- يتم توليد الخيارات أ، ب، ج، د برمجياً هنا -->
-        </div>
+        <!-- خيارات الإجابة الأربعة -->
+        <div class="options-container" id="options-container"></div>
 
-        <button class="btn-back" style="background-color: var(--text-muted); margin-top: 5px;" onclick="nextStep()">تخطي هذا السؤال ⏭️</button>
+        <button class="btn-back" style="background-color: var(--text-muted); margin-top: 5px;" onclick="nextStudentSkip()">تخطي هذا الطالب والانتقال لغيره ⏭️</button>
 
         <h3 style="font-size: 15px; color: var(--text-main); margin-top: 20px;">سجل الدرجات والتقييمات:</h3>
         <table>
             <thead>
                 <tr>
                     <th>اسم الطالب</th>
-                    <th>السؤال</th>
+                    <th>السؤال المطروح</th>
                     <th>التقييم</th>
                 </tr>
             </thead>
@@ -266,7 +267,7 @@
     let timer;
     let timeLeft = 45;
 
-    // دالة إصدار الأصوات (رنة نجاح ورنة خطأ) دون الحاجة لملفات خارجية
+    // دالة إصدار أصوات التنبيه (رنة نجاح / رنة خطأ)
     function playSound(isCorrect) {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -276,24 +277,23 @@
             gain.connect(audioCtx.destination);
 
             if (isCorrect) {
-                // نغمة نجاح تصاعدية
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.1); 
+                osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.2); 
                 gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                osc.stop(audioCtx.currentTime + 0.4);
             } else {
-                // نغمة خطأ منخفضة
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(120, audioCtx.currentTime + 0.2);
                 gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.35);
+                osc.stop(audioCtx.currentTime + 0.4);
             }
-        } catch(e) { console.log(e); }
+        } catch(e) { console.log("Audio error", e); }
     }
 
     function openRoom(className) {
@@ -332,23 +332,28 @@
         }
     }
 
-    // تنظيف أسماء الطلاب وفلترتها بدقة من ترويسات الـ PDF
+    // تنظيف وفلترة أسماء الطلاب بدقة لتجنب ترويسات الكشوفات المدرسية
     function cleanStudentNames(rawText) {
         let lines = rawText.split('\n').map(l => l.trim());
         let validNames = [];
         for (let line of lines) {
-            // استبعاد الأسطر التي تحتوي على كلمات ترويسة أو أرقام صفحات أو أحرف قصيرة جداً
             if (line.length > 5 && 
                 !line.includes("إدارة") && 
                 !line.includes("الدراسي") && 
                 !line.includes("الصف") && 
                 !line.includes("المدرسين") && 
                 !line.includes("السعي") &&
-                !line.includes("الفصل")) {
+                !line.includes("ثانوية") &&
+                !line.includes("المتفوقين") &&
+                !line.includes("الفصل") &&
+                !line.includes("المادة") &&
+                !line.includes("الملاحظات")) {
                 
-                // إزالة الأرقام المسلسلة في بداية السطر (مثل "1 أحمد" أو "12- حارث")
-                let cleaned = line.replace(/^\d+[\s\-–\.]+/g, '').trim();
-                if (cleaned.length > 5) validNames.push(cleaned);
+                // إزالة الأرقام المسلسلة والرموز في بداية الأسطر
+                let cleaned = line.replace(/^[\d\-\–\.\s١٢٣٤٥٦٧٨٩٠]+/, '').trim();
+                if (cleaned.length > 4 && !validNames.includes(cleaned)) {
+                    validNames.push(cleaned);
+                }
             }
         }
         return validNames.join('\n');
@@ -398,23 +403,28 @@
 
         studentsList = studentsText.split('\n').map(s => s.trim()).filter(s => s.length > 3);
         
-        // استخراج الأسئلة وتوليد خيارات لها تلقائياً
-        let rawLines = lectureText.split('\n').map(q => q.trim()).filter(q => q.length > 5);
-        questionsList = rawLines.map((line, idx) => {
-            let qText = line.startsWith("س:") ? line : "س: " + line;
+        // استخراج الأسئلة وصياغتها مع توليد خيارات ذكية لكل سؤال مستخرج من المحاضرة
+        let rawSentences = lectureText.split('.').map(s => s.trim()).filter(s => s.length > 15);
+        if (rawSentences.length < 3) {
+            rawSentences = lectureText.split('\n').map(s => s.trim()).filter(s => s.length > 15);
+        }
+
+        questionsList = rawSentences.map((sentence, idx) => {
+            let correctAns = sentence.length > 35 ? sentence.substring(0, 35) + "..." : sentence;
             return {
-                question: qText,
+                question: "س: ما المقصود أو اذكر تفاصيل: " + (sentence.length > 65 ? sentence.substring(0, 65) + "..." : sentence),
+                correct: correctAns,
                 options: [
-                    "الإجابة الصحيحة أو النموذجية",
-                    "خيار غير صحيح أول",
-                    "خيار خاطئ ثانٍ",
-                    "خيار خاطئ ثالث"
-                ].sort(() => Math.random() - 0.5) // خلط الخيارات عشوائياً
+                    correctAns,
+                    "إجراء غير معتمد ولا يؤثر في النظام",
+                    "عملية تؤدي إلى توقف عمل التطبيقات كلياً",
+                    "خيار غير صحيح تم توليده عشوائياً"
+                ].sort(() => Math.random() - 0.5)
             };
         });
 
         if(studentsList.length === 0 || questionsList.length === 0) {
-            alert("تعذر استخراج بيانات كافية، يرجى التأكد من محتوى الملفات.");
+            alert("تعذر استخراج بيانات كافية من الملفات. يرجى التأكد من محتواها.");
             return;
         }
 
@@ -449,7 +459,7 @@
         studentIndex++;
         if (studentIndex >= studentsList.length) {
             document.getElementById("current-student").innerText = "انتهت قائمة طلاب هذه الغرفة بنجاح! 🎓";
-            document.getElementById("current-question").innerText = "اكتملت جميع الأسئلة.";
+            document.getElementById("current-question").innerText = "اكتمل امتحان جميع الطلاب.";
             document.getElementById("options-container").innerHTML = "";
             document.getElementById("alert-banner").style.display = "none";
             clearInterval(timer);
@@ -460,30 +470,32 @@
         currentQObj = questionsList[questionIndex % questionsList.length];
         questionIndex++;
 
-        document.getElementById("current-student").innerText = `الطالب: ${currentStudent}`;
+        // عرض اسم طالب واحد فقط بوضوح تام
+        document.getElementById("current-student").innerText = `الطالب الحالي: ${currentStudent}`;
         document.getElementById("current-question").innerText = currentQObj.question;
         document.getElementById("alert-banner").style.display = "none";
 
-        // عرض الاختيارات الأربعة تحت السؤال
+        // عرض الخيارات الأربعة تحت السؤال
         const optContainer = document.getElementById("options-container");
         optContainer.innerHTML = "";
-        
-        // لنفترض أن الخيار الأول دائماً هو الصحيح قبل خلطه أو نحدد الصحيح بناءً على النص
-        const correctOpt = "الإجابة الصحيحة أو النموذجية";
         
         currentQObj.options.forEach((opt, idx) => {
             const btn = document.createElement("button");
             btn.className = "option-btn";
             btn.innerText = `${['أ', 'ب', 'ج', 'د'][idx]}) ${opt}`;
             btn.onclick = function() {
-                // التحقق هل الإجابة هي الصحيحة
-                const isCorrect = (opt === correctOpt);
+                const isCorrect = (opt === currentQObj.correct);
                 evaluateAnswer(isCorrect, opt);
             };
             optContainer.appendChild(btn);
         });
 
         startTimer();
+    }
+
+    function nextStudentSkip() {
+        clearInterval(timer);
+        evaluateAnswer(false, "تم التخطي (0)");
     }
 
     function evaluateAnswer(isCorrect, chosenOpt) {
@@ -494,15 +506,15 @@
         const banner = document.getElementById("alert-banner");
         let statusText = "";
 
-        playSound(isCorrect); // تشغيل رنة النجاح أو الخطأ
+        playSound(isCorrect); // تشغيل نغمة الصوت التنبيهية
 
         if (isCorrect) {
             banner.className = "alert-success";
-            banner.innerText = `✔️ إجابة صحيحة! (${chosenOpt}) - تمت إضافة (+3) درجات.`;
+            banner.innerText = `✔️ إجابة صحيحة! تمت إضافة (+3) درجات بنجاح.`;
             statusText = "✔️ صح (+3)";
         } else {
             banner.className = "alert-danger";
-            banner.innerText = `❌ إجابة خاطئة! - تم تسجيل (0) درجات.`;
+            banner.innerText = `❌ إجابة خاطئة! تم تسجيل (0) درجات.`;
             statusText = "❌ خطأ (0)";
         }
         banner.style.display = "block";
@@ -512,6 +524,7 @@
         newRow.innerHTML = `<td>${studentName}</td><td style="font-size:13px; color:#475569;">${currentQObj.question}</td><td>${statusText}</td>`;
         tableBody.appendChild(newRow);
 
+        // الانتقال تلقائياً للطالب التالي بعد 1.8 ثانية
         setTimeout(() => {
             nextStep();
         }, 1800);
