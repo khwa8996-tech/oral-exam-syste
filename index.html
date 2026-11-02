@@ -44,7 +44,6 @@
             margin-bottom: 30px;
             font-size: 28px;
             font-weight: 800;
-            letter-spacing: -0.5px;
         }
 
         .rooms-container {
@@ -63,27 +62,15 @@
             cursor: pointer;
             box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .room-tile:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.3);
-            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
         }
 
-        .room-tile h3 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .room-tile span {
-            font-size: 13px;
-            opacity: 0.85;
-            margin-top: 5px;
-            display: block;
-        }
+        .room-tile h3 { margin: 0; font-size: 20px; font-weight: 700; }
+        .room-tile span { font-size: 13px; opacity: 0.85; margin-top: 5px; display: block; }
 
         .setup-panel {
             background: #f8fafc;
@@ -92,9 +79,7 @@
             border-radius: 20px;
         }
 
-        .file-upload-group {
-            margin-bottom: 20px;
-        }
+        .file-upload-group { margin-bottom: 20px; }
 
         label {
             font-weight: 700;
@@ -112,18 +97,29 @@
             border: 1px solid var(--border-color);
             background: white;
             box-sizing: border-box;
-            transition: border-color 0.2s;
         }
 
-        input[type="file"]:hover {
-            border-color: var(--primary);
-            cursor: pointer;
-        }
+        textarea { resize: vertical; height: 80px; margin-top: 8px; }
 
-        textarea {
-            resize: vertical;
-            height: 90px;
+        /* تصميم عداد التقدم الشريطي */
+        .progress-container {
+            width: 100%;
+            background-color: #e2e8f0;
+            border-radius: 10px;
             margin-top: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 14px;
+            background-color: var(--success);
+            text-align: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            transition: width 0.3s ease;
         }
 
         .status-badge {
@@ -145,11 +141,7 @@
             border: 1px solid #c7d2fe;
         }
 
-        .exam-header h4 {
-            margin: 0;
-            color: var(--primary);
-            font-size: 18px;
-        }
+        .exam-header h4 { margin: 0; color: var(--primary); font-size: 18px; }
 
         .timer-badge {
             background: var(--danger);
@@ -167,21 +159,10 @@
             border-radius: 16px;
             text-align: center;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .student-display-card h3 {
-            margin: 0;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .student-display-card h1 {
-            margin: 8px 0 0 0;
-            font-size: 28px;
-            color: var(--primary);
-            font-weight: 800;
-        }
+        .student-display-card h3 { margin: 0; font-size: 14px; color: var(--text-muted); }
+        .student-display-card h1 { margin: 8px 0 0 0; font-size: 28px; color: var(--primary); font-weight: 800; }
 
         .question-display-card {
             background: #fffbeb;
@@ -214,14 +195,9 @@
             transition: all 0.2s ease;
             color: var(--text-main);
             text-align: right;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .option-card:hover {
-            border-color: var(--primary);
-            background: #f8fafc;
-            transform: translateY(-2px);
-        }
+        .option-card:hover { border-color: var(--primary); background: #f8fafc; }
 
         .action-btn {
             width: 100%;
@@ -231,18 +207,12 @@
             border-radius: 12px;
             border: none;
             cursor: pointer;
-            transition: background 0.2s;
             box-sizing: border-box;
         }
 
         .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-dark); }
-
         .btn-success { background-color: var(--success); color: white; margin-top: 15px; }
-        .btn-success:hover { background-color: #047857; }
-
         .btn-secondary { background-color: var(--text-muted); color: white; margin-top: 15px; }
-        .btn-secondary:hover { background-color: #475569; }
 
         #alert-notification {
             text-align: center;
@@ -283,7 +253,7 @@
     
     <!-- واجهة اختيار الغرف -->
     <div id="rooms-view">
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 16px;">يرجى اختيار غرفة الشعبة المدرجة لبدء جلسة الاختبار الشفهي:</p>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 16px;">يرجى اختيار غرفة الشعبة لبدء جلسة الاختبار الشفهي:</p>
         <div class="rooms-container">
             <div class="room-tile" onclick="openRoom('الرابع (أ)')">
                 <h3>غرفة الرابع أ</h3>
@@ -304,13 +274,16 @@
         </div>
     </div>
 
-    <!-- واجهة الإعدادات ورفع الملفات -->
+    <!-- واجهة الإعدادات ورفع الملفات مع عداد التقدم -->
     <div id="setup-view" class="setup-view hidden">
         <h3 id="room-title-setup" style="color: var(--primary); text-align: center; margin-bottom: 25px;"></h3>
         
         <div class="file-upload-group">
             <label>📁 ملف كشف أسماء الطلاب (PDF أو TXT)</label>
             <input type="file" id="students-file" accept=".pdf, .txt" multiple>
+            <div id="students-progress-box" class="progress-container">
+                <div id="students-progress-bar" class="progress-bar">0%</div>
+            </div>
             <span id="students-status" class="status-badge"></span>
             <textarea id="students-manual" placeholder="أو أدخل أسماء الطلاب يدوياً (كل اسم في سطر)..."></textarea>
         </div>
@@ -318,11 +291,14 @@
         <div class="file-upload-group">
             <label>📚 ملف المحاضرة أو الملخص المنهجي (PDF أو TXT)</label>
             <input type="file" id="lecture-file" accept=".pdf, .txt" multiple>
+            <div id="lecture-progress-box" class="progress-container">
+                <div id="lecture-progress-bar" class="progress-bar">0%</div>
+            </div>
             <span id="lecture-status" class="status-badge"></span>
             <textarea id="lecture-manual" placeholder="أو الصق محتوى المحاضرة والأسئلة يدوياً هنا..."></textarea>
         </div>
 
-        <button class="action-btn btn-primary" onclick="startExamSession()">بدء جلسة الامتحان الشفهي 🚀</button>
+        <button id="start-exam-btn" class="action-btn btn-primary" onclick="startExamSession()">بدء جلسة الامتحان الشفهي 🚀</button>
         <button class="action-btn btn-secondary" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
     </div>
 
@@ -344,10 +320,9 @@
             جاري تحميل السؤال...
         </div>
 
-        <!-- أزرار الخيارات الأربعة (أ، ب، ج، د) -->
         <div class="options-grid" id="options-grid"></div>
 
-        <button class="action-btn btn-secondary" onclick="skipCurrentStudent()">تخطي هذا الطالب والانتقال للتيلي ⏭️</button>
+        <button class="action-btn btn-secondary" onclick="skipCurrentStudent()">تخطي هذا الطالب والانتقال لغيره ⏭️</button>
 
         <h3 style="font-size: 16px; color: var(--text-main); margin-top: 30px;">سجل الدرجات المعتمد:</h3>
         <table class="grades-table">
@@ -379,32 +354,51 @@
     let cachedStudentsText = "";
     let cachedLectureText = "";
 
-    // قراءة الملفات فور اختيارها وتخزينها مؤقتاً لتجنب التأخير
+    // معالجة ملفات الطلاب مع عداد التقتم (Progress Bar)
     document.getElementById('students-file').addEventListener('change', async (e) => {
         const files = e.target.files;
         if (files.length > 0) {
-            document.getElementById('students-status').innerText = `⏳ جاري معالجة ملف الأسماء...`;
+            const progBox = document.getElementById('students-progress-box');
+            const progBar = document.getElementById('students-progress-bar');
+            progBox.style.display = "block";
+            progBar.style.width = "10%";
+            progBar.innerText = "10%";
+
             let combined = "";
-            for (let f of files) {
+            for (let i = 0; i < files.length; i++) {
+                let f = files[i];
                 let txt = f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f);
                 combined += txt + "\n";
+                let percent = Math.round(((i + 1) / files.length) * 100);
+                progBar.style.width = percent + "%";
+                progBar.innerText = percent + "%";
             }
             cachedStudentsText = combined;
-            document.getElementById('students-status').innerText = `✓ تم تجهيز ملف أسماء الطلاب بنجاح.`;
+            document.getElementById('students-status').innerText = `✓ تم تجهيز وفلترة ملف أسماء الطلاب بنجاح.`;
         }
     });
 
+    // معالجة ملفات المحاضرات مع عداد التقدم (Progress Bar)
     document.getElementById('lecture-file').addEventListener('change', async (e) => {
         const files = e.target.files;
         if (files.length > 0) {
-            document.getElementById('lecture-status').innerText = `⏳ جاري معالجة ملفات المحاضرات...`;
+            const progBox = document.getElementById('lecture-progress-box');
+            const progBar = document.getElementById('lecture-progress-bar');
+            progBox.style.display = "block";
+            progBar.style.width = "10%";
+            progBar.innerText = "10%";
+
             let combined = "";
-            for (let f of files) {
+            for (let i = 0; i < files.length; i++) {
+                let f = files[i];
                 let txt = f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f);
                 combined += txt + "\n";
+                let percent = Math.round(((i + 1) / files.length) * 100);
+                progBar.style.width = percent + "%";
+                progBar.innerText = percent + "%";
             }
             cachedLectureText = combined;
-            document.getElementById('lecture-status').innerText = `✓ تم تجهيز ملفات المحاضرات بنجاح.`;
+            document.getElementById('lecture-status').innerText = `✓ تم قراءة ملفات المحاضرات واستخراج محتواها بنجاح.`;
         }
     });
 
@@ -515,11 +509,11 @@
         });
 
         if (studentsList.length === 0) {
-            alert("يرجى الانتظار حتى اكتمال تحميل ملف أسماء الطلاب أو إدخالهم يدوياً!");
+            alert("يرجى التأكد من إرفاق ملف أسماء الطلاب أو إدخالهم يدوياً!");
             return;
         }
         if (questionsList.length === 0) {
-            alert("يرجى الانتظار حتى اكتمال تحميل ملف المحاضرة أو إدخاله يدوياً!");
+            alert("يرجى التأكد من إرفاق ملف المحاضرة أو إدخاله يدوياً!");
             return;
         }
 
@@ -643,6 +637,8 @@
         document.getElementById('lecture-file').value = "";
         document.getElementById('students-status').innerText = "";
         document.getElementById('lecture-status').innerText = "";
+        document.getElementById('students-progress-box').style.display = "none";
+        document.getElementById('lecture-progress-box').style.display = "none";
         cachedStudentsText = "";
         cachedLectureText = "";
     }
