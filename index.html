@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة غرف الامتحان الشفهي الذكية (ملفات PDF)</title>
-    <!-- مكتبة قراءة ملفات الـ PDF برمجياً في المتصفح -->
+    <title>منصة غرف الامتحان الشفهي الذكية والمتطورة</title>
+    <!-- مكتبة قراءة ملفات الـ PDF برمجياً -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         body {
@@ -137,11 +137,11 @@
 <body>
 
 <div class="container">
-    <h2>منصة غرف الامتحان الشفهي الذكية (ملفات PDF)</h2>
+    <h2>منصة غرف الامتحان الشفهي الذكية والمطورة</h2>
     
     <!-- واجهة اختيار الغرف -->
     <div id="rooms-section">
-        <h3 style="text-align: center; color: #555; margin-bottom: 20px;">اختر غرفة الشعبة لرفع ملفات الـ PDF وبدء الامتحان:</h3>
+        <h3 style="text-align: center; color: #555; margin-bottom: 20px;">اختر غرفة الشعبة لرفع الملفات المتعددة وبدء الامتحان:</h3>
         <div class="rooms-grid">
             <div class="room-card" onclick="openRoom('الرابع (أ)')">غرفة الرابع أ 🏫</div>
             <div class="room-card" onclick="openRoom('الرابع (ب)')">غرفة الرابع ب 🏫</div>
@@ -150,19 +150,19 @@
         </div>
     </div>
 
-    <!-- واجهة رفع ملفات الـ PDF للأسماء والمحاضرات -->
+    <!-- واجهة رفع الملفات المتعددة -->
     <div class="section-box hidden" id="setup-section">
         <h3 id="room-title-setup" style="color: #1a73e8; text-align: center;"></h3>
         
-        <p style="font-weight: bold; margin-top: 10px;">1. رفع ملف أسماء الطلاب بصيغة PDF</p>
-        <input type="file" id="students-pdf" accept=".pdf" onchange="readPDF(event, 'students-input')">
+        <p style="font-weight: bold; margin-top: 10px;">1. رفع ملفات أسماء الطلاب (يمكنك اختيار أكثر من ملف PDF أو TXT)</p>
+        <input type="file" id="students-files" accept=".pdf, .txt" multiple onchange="handleMultipleFiles(event, 'students-input')">
         <textarea id="students-input" placeholder="أو اكتب الأسماء يدوياً هنا، كل اسم في سطر..."></textarea>
 
-        <p style="font-weight: bold; margin-top: 15px;">2. رفع ملف المحاضرة والأسئلة بصيغة PDF</p>
-        <input type="file" id="lecture-pdf" accept=".pdf" onchange="readPDF(event, 'lecture-input')">
+        <p style="font-weight: bold; margin-top: 15px;">2. رفع ملفات المحاضرات والأسئلة (يمكنك اختيار أكثر من ملف PDF أو TXT)</p>
+        <input type="file" id="lecture-files" accept=".pdf, .txt" multiple onchange="handleMultipleFiles(event, 'lecture-input')">
         <textarea id="lecture-input" placeholder="أو اكتب أو الصق الأسئلة يدوياً هنا..."></textarea>
 
-        <button class="btn-start" onclick="startExam()">دخول الغرفة وبدء الامتحان 🚀</button>
+        <button class="btn-start" onclick="startExam()">صياغة الأسئلة ودخول الغرفة 🚀</button>
         <button class="btn-back" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
     </div>
 
@@ -188,7 +188,7 @@
             <thead>
                 <tr>
                     <th>اسم الطالب</th>
-                    <th>السؤال المطروح</th>
+                    <th>السؤال المصاغ</th>
                     <th>التقييم</th>
                 </tr>
             </thead>
@@ -211,25 +211,50 @@
 
     function openRoom(className) {
         selectedClassName = className;
-        document.getElementById("room-title-setup").innerText = `إعداد غرفة: ${className}`;
+        document.getElementById("room-title-setup").innerText = `إدارة غرفة: ${className}`;
         document.getElementById("rooms-section").classList.add("hidden");
         document.getElementById("setup-section").classList.remove("hidden");
     }
 
-    // دالة استخراج النص تلقائياً من ملف الـ PDF المرفوع
-    function readPDF(event, targetId) {
-        const file = event.target.files[0];
-        if (!file) return;
+    // دالة معالجة رفع الملفات المتعددة (سواء PDF أو TXT) ودمجها تلقائياً
+    async function handleMultipleFiles(event, targetId) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
 
+        let combinedText = document.getElementById(targetId).value;
+        if (combinedText && !combinedText.endsWith('\n')) combinedText += '\n';
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type === "application/pdf") {
+                await readPDFFile(file, function(pdfText) {
+                    document.getElementById(targetId).value += pdfText + '\n';
+                });
+            } else {
+                await readTextFile(file, function(txtText) {
+                    document.getElementById(targetId).value += txtText + '\n';
+                });
+            }
+        }
+    }
+
+    function readTextFile(file, callback) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            callback(e.target.result);
+        };
+        reader.readAsText(file, "UTF-8");
+    }
+
+    function readPDFFile(file, callback) {
         const reader = new FileReader();
         reader.onload = function() {
             const typedarray = new Uint8Array(this.result);
-            
             pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc) {
                 let textPromises = [];
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                for (let j = 1; j <= pdfDoc.numPages; j++) {
                     textPromises.push(
-                        pdfDoc.getPage(i).then(function(page) {
+                        pdfDoc.getPage(j).then(function(page) {
                             return page.getTextContent().then(function(textContent) {
                                 return textContent.items.map(item => item.str).join(' ');
                             });
@@ -237,15 +262,29 @@
                     );
                 }
                 Promise.all(textPromises).then(function(pagesText) {
-                    // وضع النص المستخرج داخل خانة النص ليتمكن المعلم من مراجعته أو تعديله
-                    document.getElementById(targetId).value = pagesText.join('\n');
+                    callback(pagesText.join('\n'));
                 });
             }).catch(error => {
-                alert("حدث خطأ أثناء قراءة ملف الـ PDF. تأكد من أن الملف سليم وقابل للقراءة.");
-                console.error(error);
+                console.error("خطأ في قراءة الـ PDF", error);
             });
         };
         reader.readAsArrayBuffer(file);
+    }
+
+    // دالة ذكية لصياغة الأسئلة واستخراجها بصيغة امتحانية صحيحة
+    function formatQuestions(rawText) {
+        let lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 5);
+        let formatted = [];
+        
+        for (let line of lines) {
+            // إذا لم يبدأ السؤال بكلمة "س:" أو علامة استفهام، يقوم النظام بصياغته كإشكال سؤالي احترافي
+            if (!line.startsWith("س:") && !line.startsWith("سؤال")) {
+                formatted.id = "س: " + line;
+            } else {
+                formatted.push(line);
+            }
+        }
+        return formatted.length > 0 ? formatted : lines;
     }
 
     function startExam() {
@@ -253,17 +292,19 @@
         const lectureText = document.getElementById("lecture-input").value.trim();
 
         if(!studentsText) {
-            alert("يرجى رفع ملف PDF لأسماء الطلاب أو كتابتها أولاً!");
+            alert("يرجى رفع ملفات أسماء الطلاب أو كتابتها أولاً!");
             return;
         }
         if(!lectureText) {
-            alert("يرجى رفع ملف PDF للمحاضرة والأسئلة أو كتابتها أولاً!");
+            alert("يرجى رفع ملفات المحاضرات والأسئلة أو كتابتها أولاً!");
             return;
         }
 
-        // تقسيم النصوص إلى أسطر واستبعاد الأسطر الفارغة
         studentsList = studentsText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-        questionsList = lectureText.split('\n').map(q => q.trim()).filter(q => q.length > 0);
+        
+        // معالجة وصياغة الأسئلة تلقائياً من المحاضرات المرفوعة
+        let rawQuestions = lectureText.split('\n').map(q => q.trim()).filter(q => q.length > 3);
+        questionsList = rawQuestions.map(q => q.startsWith("س:") ? q : "س: " + q);
 
         document.getElementById("room-title-exam").innerText = `غرفة امتحان: ${selectedClassName}`;
         document.getElementById("setup-section").classList.add("hidden");
@@ -306,7 +347,7 @@
         questionIndex++;
 
         document.getElementById("current-student").innerText = `الطالب: ${currentStudent}`;
-        document.getElementById("current-question").innerText = `السؤال: ${currentQuestionText}`;
+        document.getElementById("current-question").innerText = `السؤال المصاغ: ${currentQuestionText}`;
         document.getElementById("alert-banner").style.display = "none";
         startTimer();
     }
@@ -348,8 +389,8 @@
         document.getElementById("rooms-section").classList.remove("hidden");
         document.getElementById("students-input").value = "";
         document.getElementById("lecture-input").value = "";
-        document.getElementById("students-pdf").value = "";
-        document.getElementById("lecture-pdf").value = "";
+        document.getElementById("students-files").value = "";
+        document.getElementById("lecture-files").value = "";
     }
 
     function resetAndBackToRooms() {
@@ -358,8 +399,8 @@
         document.getElementById("rooms-section").classList.remove("hidden");
         document.getElementById("students-input").value = "";
         document.getElementById("lecture-input").value = "";
-        document.getElementById("students-pdf").value = "";
-        document.getElementById("lecture-pdf").value = "";
+        document.getElementById("students-files").value = "";
+        document.getElementById("lecture-files").value = "";
         document.getElementById("results-table-body").innerHTML = "";
         document.getElementById("alert-banner").style.display = "none";
     }
