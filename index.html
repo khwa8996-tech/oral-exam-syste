@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الامتحان الشفهي الذكي</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 25px;
+        }
+        .student-box {
+            background: #e8f0fe;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #174ea6;
+        }
+        .timer {
+            text-align: center;
+            font-size: 18px;
+            color: #d93025;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .quick-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .rate-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+        .rate-btn.full { background-color: #34a853; }
+        .rate-btn.full:hover { background-color: #2e8b57; }
+        
+        .rate-btn.partial { background-color: #fbbc05; color: #333; }
+        .rate-btn.partial:hover { background-color: #f9ab00; }
+        
+        .rate-btn.zero { background-color: #ea4335; }
+        .rate-btn.zero:hover { background-color: #d33828; }
 
+        .results-summary {
+            margin-top: 20px;
+            border-top: 2px solid #eee;
+            padding-top: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>نظام الامتحان الشفهي الذكي</h2>
+    
+    <!-- عرض اسم الطالب الحالي -->
+    <div class="student-box" id="current-student">اضغط على ابدأ الامتحان للبحث عن الطالب الأول</div>
+    
+    <!-- المؤقت الزمني -->
+    <div class="timer" id="timer-display">الوقت المتبقي: --</div>
+
+    <!-- أزرار الضغط السريع -->
+    <div class="quick-buttons">
+        <button class="rate-btn full" onclick="recordGrade(3, 'إجابة تامة (+3)')">✅ إجابة تامة (+3)</button>
+        <button class="rate-btn partial" onclick="recordGrade(1.5, 'إجابة جزئية (+1.5)')">⚠️ إجابة جزئية (+1.5)</button>
+        <button class="rate-btn zero" onclick="recordGrade(0, 'بدون إجابة (0)')">❌ بدون إجابة (0)</button>
+    </div>
+
+    <button onclick="nextStudent()" style="width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">بدء / الانتقال للطالب التالي 🔄</button>
+
+    <!-- جدول النتائج المسجلة -->
+    <div class="results-summary">
+        <h3>سجل درجات الطلاب:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم الطالب</th>
+                    <th>التقييم والدرجة</th>
+                </tr>
+            </thead>
+            <tbody id="results-table-body">
+                <!-- يتم تعبئتها برمجياً -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // قائمة أسماء الطلاب (يمكنك تعديلها بالأسماء التي ترغب بها)
+    const students = [
+        "أحمد محمد علي",
+        "حسين علي حسن",
+        "سارة أحمد جاسم",
+        "فاطمة كريم عبد الله",
+        "محمد باقر علي",
+        "زينب مصطفى جواد"
+    ];
+
+    let currentIndex = -1;
+    let timer;
+    let timeLeft = 45; // 45 ثانية لكل طالب
+
+    function startTimer() {
+        clearInterval(timer);
+        timeLeft = 45;
+        document.getElementById("timer-display").innerText = `الوقت المتبقي: ${timeLeft} ثانية`;
+        
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById("timer-display").innerText = `الوقت المتبقي: ${timeLeft} ثانية`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                document.getElementById("timer-display").innerText = "انتهى الوقت المخصص للإجابة!";
+            }
+        }, 1000);
+    }
+
+    function nextStudent() {
+        currentIndex++;
+        if (currentIndex < students.length) {
+            document.getElementById("current-student").innerText = students[currentIndex];
+            startTimer();
+        } else {
+            document.getElementById("current-student").innerText = "انتهت قائمة الطلاب بنجاح! 🎓";
+            clearInterval(timer);
+            document.getElementById("timer-display").innerText = "";
+        }
+    }
+
+    function recordGrade(score, statusText) {
+        if (currentIndex < 0 || currentIndex >= students.length) {
+            alert("يرجى بدء الامتحان أو اختيار طالب أولاً!");
+            return;
+        }
+        
+        const studentName = students[currentIndex];
+        
+        // إضافة النتيجة إلى الجدول
+        const tableBody = document.getElementById("results-table-body");
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `<td>${studentName}</td><td>${statusText}</td>`;
+        tableBody.appendChild(newRow);
+
+        // الانتقال التلقائي للطالب التالي فور الضغط
+        nextStudent();
+    }
+</script>
+
+</body>
+</html>
