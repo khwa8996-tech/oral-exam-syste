@@ -101,12 +101,11 @@
             height: 80px;
         }
 
-        .loading-text {
-            font-size: 13px;
-            color: #d97706;
+        .status-msg {
+            font-size: 14px;
+            color: var(--primary);
             font-weight: 700;
             margin-top: 5px;
-            display: none;
         }
 
         .student-box {
@@ -223,14 +222,14 @@
         <h3 id="room-title-setup" style="color: var(--primary); text-align: center; margin-bottom: 15px;"></h3>
         
         <label>📁 رفع ملفات أسماء الطلاب (PDF أو TXT)</label>
-        <input type="file" id="students-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'students-input', 'students-loading')">
-        <div id="students-loading" class="loading-text">⏳ جاري قراءة واستخراج أسماء الطلاب من الملف... يرجى الانتظار</div>
-        <textarea id="students-input" placeholder="ستظهر الأسماء المستخرجة هنا تلقائياً..."></textarea>
+        <input type="file" id="students-file-input" accept=".pdf, .txt" multiple>
+        <div id="students-file-status" class="status-msg">لم يتم اختيار ملف بعد (أو يمكنك الكتابة أدناه)</div>
+        <textarea id="students-input" placeholder="أو أدخل أسماء الطلاب يدوياً، كل اسم في سطر..."></textarea>
 
         <label>📚 رفع ملفات المحاضرات والأسئلة (PDF أو TXT)</label>
-        <input type="file" id="lecture-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'lecture-input', 'lecture-loading')">
-        <div id="lecture-loading" class="loading-text">⏳ جاري قراءة المحاضرة واستخراج الأسئلة... يرجى الانتظار</div>
-        <textarea id="lecture-input" placeholder="ستظهر الأسئلة المستخرجة هنا تلقائياً..."></textarea>
+        <input type="file" id="lecture-file-input" accept=".pdf, .txt" multiple>
+        <div id="lecture-file-status" class="status-msg">لم يتم اختيار ملف بعد (أو يمكنك الكتابة أدناه)</div>
+        <textarea id="lecture-input" placeholder="أو اكتب أو الصق نصوص المحاضرات هنا..."></textarea>
 
         <button class="btn-start" style="margin-top: 15px;" onclick="startExam()">بدء الجلسة الامتحانية (طالب بطالب) 🚀</button>
         <button class="btn-back" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
@@ -275,6 +274,14 @@
     let timer;
     let timeLeft = 45;
 
+    // تحديث حالة الملفات عند اختيارها
+    document.getElementById('students-file-input').addEventListener('change', function(e) {
+        document.getElementById('students-file-status').innerText = `تم اختيار ${e.target.files.length} ملف لأسماء الطلاب بنجاح.`;
+    });
+    document.getElementById('lecture-file-input').addEventListener('change', function(e) {
+        document.getElementById('lecture-file-status').innerText = `تم اختيار ${e.target.files.length} ملف للمحاضرات بنجاح.`;
+    });
+
     function playSound(isCorrect) {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -310,40 +317,37 @@
         document.getElementById("setup-section").classList.remove("hidden");
     }
 
-    async function handleFiles(event, targetId, loadingId) {
-        const files = event.target.files;
-        if (!files || files.length === 0) return;
-
-        const loadingEl = document.getElementById(loadingId);
-        loadingEl.style.display = "block";
-
-        let combinedText = document.getElementById(targetId).value;
-        if (combinedText && !combinedText.endsWith('\n')) combinedText += '\n';
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            if (file.type === "application/pdf") {
-                await readPDFFile(file, function(pdfText) {
-                    if(targetId === 'students-input') {
-                        document.getElementById(targetId).value += cleanStudentNames(pdfText) + '\n';
-                    } else {
-                        document.getElementById(targetId).value += pdfText + '\n';
+    // دالة استخراج النص من ملف PDF فردي
+    async function extractTextFromPDF(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const typedarray = new Uint8Array(this.result);
+                pdfjsLib.getDocument(typedarray).promise.then(async function(pdfDoc) {
+                    let fullText = "";
+                    for (let j = 1; j <= pdfDoc.numPages; j++) {
+                        const page = await pdfDoc.getPage(j);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n';
                     }
-                });
-            } else {
-                await readTextFile(file, function(txtText) {
-                    if(targetId === 'students-input') {
-                        document.getElementById(targetId).value += cleanStudentNames(txtText) + '\n';
-                    } else {
-                        document.getElementById(targetId).value += txtText + '\n';
-                    }
-                });
-            }
-        }
-        loadingEl.style.display = "none";
+                    resolve(fullText);
+                }).catch(err => reject(err));
+            };
+            reader.readAsArrayBuffer(file);
+        });
     }
 
-    // تنظيف أسماء الطلاب بذكاء واستبعاد أي ترويسات أو نصوص غريبة
+    // دالة قراءة ملف النص الفردي
+    async function extractTextFromTXT(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) { resolve(e.target.result); };
+            reader.readAsText(file, "UTF-8");
+        });
+    }
+
+    // تنظيف وفلترة أسماء الطلاب بدقة تامة من ترويسات الكشوفات
     function cleanStudentNames(rawText) {
         let lines = rawText.split('\n').map(l => l.trim());
         let validNames = [];
@@ -362,67 +366,64 @@
                 !line.includes("الدرجة") &&
                 !line.includes("النهائية")) {
                 
-                // إزالة الأرقام والرموز التسلسلية من بداية السطر
                 let cleaned = line.replace(/^[\d\-\–\.\s١٢٣٤٥٦٧٨٩٠]+/, '').trim();
-                // التأكد من أن السطر يحتوي على مسافة واحدة على الأقل (أي اسم ثنائي أو ثلاثي)
                 if (cleaned.length > 4 && !validNames.includes(cleaned)) {
                     validNames.push(cleaned);
                 }
             }
         }
-        return validNames.join('\n');
+        return validNames;
     }
 
-    function readTextFile(file, callback) {
-        const reader = new FileReader();
-        reader.onload = function(e) { callback(e.target.result); };
-        reader.readAsText(file, "UTF-8");
-    }
-
-    function readPDFFile(file, callback) {
-        const reader = new FileReader();
-        reader.onload = function() {
-            const typedarray = new Uint8Array(this.result);
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc) {
-                let textPromises = [];
-                for (let j = 1; j <= pdfDoc.numPages; j++) {
-                    textPromises.push(
-                        pdfDoc.getPage(j).then(function(page) {
-                            return page.getTextContent().then(function(textContent) {
-                                return textContent.items.map(item => item.str).join(' ');
-                            });
-                        })
-                    );
-                }
-                Promise.all(textPromises).then(function(pagesText) {
-                    callback(pagesText.join('\n'));
-                });
-            }).catch(error => console.error(error));
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function startExam() {
-        const studentsText = document.getElementById("students-input").value.trim();
-        const lectureText = document.getElementById("lecture-input").value.trim();
-
-        if(!studentsText) {
-            alert("يرجى الانتظار حتى يتم تحميل ملف أسماء الطلاب، أو كتابتها يدوياً في الخانة!");
-            return;
-        }
-        if(!lectureText) {
-            alert("يرجى الانتظار حتى يتم تحميل ملف المحاضرة، أو كتابتها يدوياً في الخانة!");
-            return;
-        }
-
-        studentsList = studentsText.split('\n').map(s => s.trim()).filter(s => s.length > 3);
+    async function startExam() {
+        const studentFiles = document.getElementById("students-file-input").files;
+        const lectureFiles = document.getElementById("lecture-file-input").files;
         
-        let rawSentences = lectureText.split('.').map(s => s.trim()).filter(s => s.length > 15);
-        if (rawSentences.length < 3) {
-            rawSentences = lectureText.split('\n').map(s => s.trim()).filter(s => s.length > 15);
+        let manualStudents = document.getElementById("students-input").value.trim();
+        let manualLectures = document.getElementById("lecture-input").value.trim();
+
+        let allStudentsText = manualStudents ? manualStudents.split('\n') : [];
+        let allLectureText = manualLectures ? manualLectures : "";
+
+        // معالجة ملفات الطلاب المرفوعة مباشرة
+        if (studentFiles && studentFiles.length > 0) {
+            for (let i = 0; i < studentFiles.length; i++) {
+                let file = studentFiles[i];
+                let text = "";
+                if (file.type === "application/pdf") {
+                    text = await extractTextFromPDF(file);
+                } else {
+                    text = await extractTextFromTXT(file);
+                }
+                let cleaned = cleanStudentNames(text);
+                allStudentsText = allStudentsText.concat(cleaned);
+            }
         }
 
-        questionsList = rawSentences.map((sentence, idx) => {
+        // معالجة ملفات المحاضرات المرفوعة مباشرة
+        if (lectureFiles && lectureFiles.length > 0) {
+            for (let i = 0; i < lectureFiles.length; i++) {
+                let file = lectureFiles[i];
+                if (file.type === "application/pdf") {
+                    allLectureText += await extractTextFromPDF(file) + '\n';
+                } else {
+                    allLectureText += await extractTextFromTXT(file) + '\n';
+                }
+            }
+        }
+
+        // تنقية القائمة النهائية للطلاب
+        studentsList = allStudentsText.map(s => s.trim()).filter(s => s.length > 3);
+        // إزالة الأسماء المكررة إن وجدت
+        studentsList = [...new Set(studentsList)];
+
+        // صياغة الأسئلة من المحاضرات
+        let rawSentences = allLectureText.split('.').map(s => s.trim()).filter(s => s.length > 15);
+        if (rawSentences.length < 3) {
+            rawSentences = allLectureText.split('\n').map(s => s.trim()).filter(s => s.length > 15);
+        }
+
+        questionsList = rawSentences.map((sentence) => {
             let correctAns = sentence.length > 35 ? sentence.substring(0, 35) + "..." : sentence;
             return {
                 question: "س: ما المقصود أو اذكر تفاصيل: " + (sentence.length > 65 ? sentence.substring(0, 65) + "..." : sentence),
@@ -436,8 +437,12 @@
             };
         });
 
-        if(studentsList.length === 0 || questionsList.length === 0) {
-            alert("تعذر استخراج بيانات كافية. يرجى التأكد من محتوى الملفات.");
+        if (studentsList.length === 0) {
+            alert("يرجى اختيار ملف أسماء الطلاب بصيغة PDF أو كتابتهم يدوياً في الخانة!");
+            return;
+        }
+        if (questionsList.length === 0) {
+            alert("يرجى اختيار ملف المحاضرة بصيغة PDF أو كتابتها يدوياً في الخانة!");
             return;
         }
 
@@ -546,18 +551,14 @@
         document.getElementById("rooms-section").classList.remove("hidden");
         document.getElementById("students-input").value = "";
         document.getElementById("lecture-input").value = "";
-        document.getElementById("students-files").value = "";
-        document.getElementById("lecture-files").value = "";
+        document.getElementById("students-file-input").value = "";
+        document.getElementById("lecture-file-input").value = "";
+        document.getElementById('students-file-status').innerText = "لم يتم اختيار ملف بعد";
+        document.getElementById('lecture-file-status').innerText = "لم يتم اختيار ملف بعد";
     }
 
     function resetAndBackToRooms() {
-        clearInterval(timer);
-        document.getElementById("exam-section").classList.add("hidden");
-        document.getElementById("rooms-section").classList.remove("hidden");
-        document.getElementById("students-input").value = "";
-        document.getElementById("lecture-input").value = "";
-        document.getElementById("students-files").value = "";
-        document.getElementById("lecture-files").value = "";
+        backToRooms();
         document.getElementById("results-table-body").innerHTML = "";
         document.getElementById("alert-banner").style.display = "none";
     }
