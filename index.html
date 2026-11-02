@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الامتحان الشفهي التفاعلي والمحاضرات</title>
+    <title>منصة غرف الامتحان الشفهي الذكية</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +23,29 @@
         h2 {
             text-align: center;
             color: #1a73e8;
+            margin-bottom: 25px;
+        }
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             margin-bottom: 20px;
+        }
+        .room-card {
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(26,115,232,0.3);
+            transition: 0.2s;
+        }
+        .room-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(26,115,232,0.4);
         }
         .section-box {
             background: #e8f0fe;
@@ -31,7 +53,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
-        textarea, select, button {
+        textarea, button {
             width: 100%;
             padding: 12px;
             font-size: 16px;
@@ -42,7 +64,7 @@
         }
         textarea {
             resize: vertical;
-            height: 100px;
+            height: 120px;
         }
         .student-box {
             background: #f8f9fa;
@@ -80,8 +102,8 @@
         }
         .btn-correct { background-color: #34a853; color: white; border: none; cursor: pointer; font-weight: bold; }
         .btn-wrong { background-color: #ea4335; color: white; border: none; cursor: pointer; font-weight: bold; }
-        .btn-next { background-color: #1a73e8; color: white; border: none; cursor: pointer; font-weight: bold; }
-        .btn-reset { background-color: #6c757d; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-start { background-color: #1a73e8; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-back { background-color: #6c757d; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; }
         
         table {
             width: 100%;
@@ -100,44 +122,47 @@
 <body>
 
 <div class="container">
-    <h2>نظام الامتحان الشفهي التفاعلي والمحاضرات</h2>
+    <h2>منصة غرف الامتحان الشفهي الذكية</h2>
     
-    <!-- واجهة الإعداد ورفع المحاضرة والأسماء -->
-    <div class="section-box" id="setup-section">
-        <h3>1. اختر الشعبة:</h3>
-        <select id="class-select">
-            <option value="4A">الرابع أ</option>
-            <option value="4B">الرابع ب</option>
-            <option value="5A">الخامس أ</option>
-            <option value="5B">الخامس ب</option>
-        </select>
-
-        <h3>2. أدخل محتوى المحاضرة أو الأسئلة الشفهية:</h3>
-        <textarea id="lecture-input" placeholder="اكتب أو الصق نص المحاضرة والأسئلة هنا، مثلاً:
-س: ما هو نظام التشغيل؟
-س: ما وظيفة لوحة المفاتيح؟
-س: ما هي مكونات الحاسوب الأساسية؟"></textarea>
-
-        <button class="btn-next" onclick="startExamSystem()">بدء الامتحان الشفهي 🚀</button>
+    <!-- واجهة اختيار غرف الشعب -->
+    <div id="rooms-section">
+        <h3 style="text-align: center; color: #555; margin-bottom: 20px;">اختر غرفة الشعبة لبيان الطلاب وبدء الامتحان:</h3>
+        <div class="rooms-grid">
+            <div class="room-card" onclick="openRoom('4A', 'الرابع (أ)')">غرفة الرابع أ 🏫</div>
+            <div class="room-card" onclick="openRoom('4B', 'الرابع (ب)')">غرفة الرابع ب 🏫</div>
+            <div class="room-card" onclick="openRoom('5A', 'الخامس (أ)')">غرفة الخامس أ 🏫</div>
+            <div class="room-card" onclick="openRoom('5B', 'الخامس (ب)')">غرفة الخامس ب 🏫</div>
+        </div>
     </div>
 
-    <!-- واجهة الامتحان الفعلية -->
+    <!-- واجهة إدخال الأسئلة للشعبة المختارة -->
+    <div class="section-box hidden" id="setup-section">
+        <h3 id="room-title-setup" style="color: #1a73e8; text-align: center;"></h3>
+        <p style="text-align: center; color: #666;">قم بلصق محتوى المحاضرة أو أسئلة الامتحان أدناه:</p>
+        <textarea id="lecture-input" placeholder="اكتب أو الصق الأسئلة هنا، كل سؤال في سطر:
+س: ما هو نظام التشغيل؟
+س: ما وظيفة لوحة المفاتيح؟"></textarea>
+        <button class="btn-start" onclick="startExam()">دخول الغرفة وبدء الامتحان 🚀</button>
+        <button class="btn-back" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
+    </div>
+
+    <!-- واجهة الامتحان الفعلية داخل الغرفة -->
     <div id="exam-section" class="hidden">
-        <div id="class-title" style="text-align: center; font-weight: bold; color: #555; margin-bottom: 10px;"></div>
+        <div id="room-title-exam" style="text-align: center; font-weight: bold; color: #1a73e8; font-size: 20px; margin-bottom: 10px;"></div>
         
         <div class="student-box" id="current-student">الطالب: --</div>
-        <div class="question-box" id="current-question">السؤال: بانتظار تحميل المحاضرة...</div>
+        <div class="question-box" id="current-question">السؤال: --</div>
         <div class="timer" id="timer-display">الوقت المتبقي: 45 ثانية</div>
 
-        <!-- أزرار تقييم الإجابة (صح / خطأ) -->
+        <!-- أزرار التقييم (صح / خطأ) -->
         <div class="action-buttons">
             <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('✔️ صح (+3)')">✔️ صح (+3)</button>
             <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('❌ خطأ (0)')">❌ خطأ (0)</button>
         </div>
 
-        <button class="btn-next" style="margin-bottom: 15px;" onclick="nextStep()">السؤال أو الطالب التالي 🔄</button>
+        <button class="btn-start" style="margin-bottom: 15px;" onclick="nextStep()">السؤال أو الطالب التالي 🔄</button>
 
-        <h3>سجل النتائج:</h3>
+        <h3>سجل درجات الغرفة:</h3>
         <table>
             <thead>
                 <tr>
@@ -148,13 +173,13 @@
             <tbody id="results-table-body"></tbody>
         </table>
 
-        <!-- زر التصفير والبدء من جديد -->
-        <button class="btn-reset" style="margin-top: 20px;" onclick="resetEverything()">🔄 تصفير الكل والبدء من جديد</button>
+        <!-- زر التصفير والعودة للغرف -->
+        <button class="btn-back" onclick="resetAndBackToRooms()">🔄 تصفير النتائج والعودة للغرف</button>
     </div>
 </div>
 
 <script>
-    // قائمة أسماء الطلاب لكل شعبة (يمكنك تعديلها وإضافة أسماء طلابك الحقيقيين هنا)
+    // قاعدة بيانات أسماء الطلاب لكل غرفة شعبة (يمكنك تعديلها في أي وقت)
     const schoolData = {
         "4A": ["أحمد محمد علي", "حسين علي حسن", "كرار حيدر كاظم", "مصطفى قاسم محمد"],
         "4B": ["سارة أحمد جاسم", "فاطمة كريم عبد الله", "زهراء علي حسين", "مريم حسن عبد"],
@@ -162,13 +187,8 @@
         "5B": ["يوسف إبراهيم خليل", "بنين أحمد عبد الرضا", "حسن مجيد حميد", "درغام فلاح حسن"]
     };
 
-    const classNames = {
-        "4A": "الشعبة: الرابع (أ)",
-        "4B": "الشعبة: الرابع (ب)",
-        "5A": "الشعبة: الخامس (أ)",
-        "5B": "الشعبة: الخامس (ب)"
-    };
-
+    let selectedClassKey = "";
+    let selectedClassName = "";
     let currentStudentsList = [];
     let questionsList = [];
     let studentIndex = -1;
@@ -176,19 +196,26 @@
     let timer;
     let timeLeft = 45;
 
-    function startExamSystem() {
-        const selectedClass = document.getElementById("class-select").value;
-        const lectureText = document.getElementById("lecture-input").value.trim();
+    function openRoom(classKey, className) {
+        selectedClassKey = classKey;
+        selectedClassName = className;
+        
+        document.getElementById("room-title-setup").innerText = `إعداد أسئلة امتحان: ${className}`;
+        document.getElementById("rooms-section").classList.add("hidden");
+        document.getElementById("setup-section").classList.remove("hidden");
+    }
 
+    function startExam() {
+        const lectureText = document.getElementById("lecture-input").value.trim();
         if(!lectureText) {
             alert("يرجى إدخال محتوى المحاضرة أو الأسئلة أولاً!");
             return;
         }
 
-        currentStudentsList = schoolData[selectedClass];
+        currentStudentsList = schoolData[selectedClassKey];
         questionsList = lectureText.split('\n').filter(line => line.trim().length > 0);
 
-        document.getElementById("class-title").innerText = classNames[selectedClass];
+        document.getElementById("room-title-exam").innerText = `غرفة امتحان: ${selectedClassName}`;
         document.getElementById("setup-section").classList.add("hidden");
         document.getElementById("exam-section").classList.remove("hidden");
 
@@ -216,7 +243,7 @@
     function nextStep() {
         studentIndex++;
         if (studentIndex >= currentStudentsList.length) {
-            document.getElementById("current-student").innerText = "انتهت قائمة طلاب الشعبة! 🎓";
+            document.getElementById("current-student").innerText = "انتهت قائمة طلاب هذه الغرفة! 🎓";
             document.getElementById("current-question").innerText = "انتهت الأسئلة.";
             clearInterval(timer);
             return;
@@ -246,10 +273,17 @@
         nextStep();
     }
 
-    function resetEverything() {
+    function backToRooms() {
+        clearInterval(timer);
+        document.getElementById("setup-section").classList.add("hidden");
+        document.getElementById("rooms-section").classList.remove("hidden");
+        document.getElementById("lecture-input").value = "";
+    }
+
+    function resetAndBackToRooms() {
         clearInterval(timer);
         document.getElementById("exam-section").classList.add("hidden");
-        document.getElementById("setup-section").classList.remove("hidden");
+        document.getElementById("rooms-section").classList.remove("hidden");
         document.getElementById("lecture-input").value = "";
         document.getElementById("results-table-body").innerHTML = "";
     }
