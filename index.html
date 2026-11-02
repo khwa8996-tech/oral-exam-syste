@@ -101,6 +101,14 @@
             height: 80px;
         }
 
+        .loading-text {
+            font-size: 13px;
+            color: #d97706;
+            font-weight: 700;
+            margin-top: 5px;
+            display: none;
+        }
+
         .student-box {
             background: #eef2ff;
             border: 2px dashed var(--primary);
@@ -215,12 +223,14 @@
         <h3 id="room-title-setup" style="color: var(--primary); text-align: center; margin-bottom: 15px;"></h3>
         
         <label>📁 رفع ملفات أسماء الطلاب (PDF أو TXT)</label>
-        <input type="file" id="students-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'students-input')">
-        <textarea id="students-input" placeholder="سيتم استخراج وتنقية الأسماء بدقة..."></textarea>
+        <input type="file" id="students-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'students-input', 'students-loading')">
+        <div id="students-loading" class="loading-text">⏳ جاري قراءة واستخراج أسماء الطلاب من الملف... يرجى الانتظار</div>
+        <textarea id="students-input" placeholder="ستظهر الأسماء المستخرجة هنا تلقائياً..."></textarea>
 
         <label>📚 رفع ملفات المحاضرات والأسئلة (PDF أو TXT)</label>
-        <input type="file" id="lecture-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'lecture-input')">
-        <textarea id="lecture-input" placeholder="سيتم استخراج الأسئلة وتوليد الخيارات تلقائياً..."></textarea>
+        <input type="file" id="lecture-files" accept=".pdf, .txt" multiple onchange="handleFiles(event, 'lecture-input', 'lecture-loading')">
+        <div id="lecture-loading" class="loading-text">⏳ جاري قراءة المحاضرة واستخراج الأسئلة... يرجى الانتظار</div>
+        <textarea id="lecture-input" placeholder="ستظهر الأسئلة المستخرجة هنا تلقائياً..."></textarea>
 
         <button class="btn-start" style="margin-top: 15px;" onclick="startExam()">بدء الجلسة الامتحانية (طالب بطالب) 🚀</button>
         <button class="btn-back" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
@@ -231,12 +241,10 @@
         
         <div id="alert-banner"></div>
 
-        <!-- عرض اسم الطالب الحالي مفرداً وبشكل بارز -->
         <div class="student-box" id="current-student">الطالب: --</div>
         <div class="question-box" id="current-question">السؤال: --</div>
         <div class="timer" id="timer-display">الوقت المتبقي: 45 ثانية</div>
 
-        <!-- خيارات الإجابة الأربعة -->
         <div class="options-container" id="options-container"></div>
 
         <button class="btn-back" style="background-color: var(--text-muted); margin-top: 5px;" onclick="nextStudentSkip()">تخطي هذا الطالب والانتقال لغيره ⏭️</button>
@@ -267,7 +275,6 @@
     let timer;
     let timeLeft = 45;
 
-    // دالة إصدار أصوات التنبيه (رنة نجاح / رنة خطأ)
     function playSound(isCorrect) {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -303,9 +310,12 @@
         document.getElementById("setup-section").classList.remove("hidden");
     }
 
-    async function handleFiles(event, targetId) {
+    async function handleFiles(event, targetId, loadingId) {
         const files = event.target.files;
         if (!files || files.length === 0) return;
+
+        const loadingEl = document.getElementById(loadingId);
+        loadingEl.style.display = "block";
 
         let combinedText = document.getElementById(targetId).value;
         if (combinedText && !combinedText.endsWith('\n')) combinedText += '\n';
@@ -330,9 +340,10 @@
                 });
             }
         }
+        loadingEl.style.display = "none";
     }
 
-    // تنظيف وفلترة أسماء الطلاب بدقة لتجنب ترويسات الكشوفات المدرسية
+    // تنظيف أسماء الطلاب بذكاء واستبعاد أي ترويسات أو نصوص غريبة
     function cleanStudentNames(rawText) {
         let lines = rawText.split('\n').map(l => l.trim());
         let validNames = [];
@@ -347,10 +358,13 @@
                 !line.includes("المتفوقين") &&
                 !line.includes("الفصل") &&
                 !line.includes("المادة") &&
-                !line.includes("الملاحظات")) {
+                !line.includes("الملاحظات") &&
+                !line.includes("الدرجة") &&
+                !line.includes("النهائية")) {
                 
-                // إزالة الأرقام المسلسلة والرموز في بداية الأسطر
+                // إزالة الأرقام والرموز التسلسلية من بداية السطر
                 let cleaned = line.replace(/^[\d\-\–\.\s١٢٣٤٥٦٧٨٩٠]+/, '').trim();
+                // التأكد من أن السطر يحتوي على مسافة واحدة على الأقل (أي اسم ثنائي أو ثلاثي)
                 if (cleaned.length > 4 && !validNames.includes(cleaned)) {
                     validNames.push(cleaned);
                 }
@@ -393,17 +407,16 @@
         const lectureText = document.getElementById("lecture-input").value.trim();
 
         if(!studentsText) {
-            alert("يرجى إرفاق ملف أسماء الطلاب أولاً!");
+            alert("يرجى الانتظار حتى يتم تحميل ملف أسماء الطلاب، أو كتابتها يدوياً في الخانة!");
             return;
         }
         if(!lectureText) {
-            alert("يرجى إرفاق ملف المحاضرة والأسئلة أولاً!");
+            alert("يرجى الانتظار حتى يتم تحميل ملف المحاضرة، أو كتابتها يدوياً في الخانة!");
             return;
         }
 
         studentsList = studentsText.split('\n').map(s => s.trim()).filter(s => s.length > 3);
         
-        // استخراج الأسئلة وصياغتها مع توليد خيارات ذكية لكل سؤال مستخرج من المحاضرة
         let rawSentences = lectureText.split('.').map(s => s.trim()).filter(s => s.length > 15);
         if (rawSentences.length < 3) {
             rawSentences = lectureText.split('\n').map(s => s.trim()).filter(s => s.length > 15);
@@ -424,7 +437,7 @@
         });
 
         if(studentsList.length === 0 || questionsList.length === 0) {
-            alert("تعذر استخراج بيانات كافية من الملفات. يرجى التأكد من محتواها.");
+            alert("تعذر استخراج بيانات كافية. يرجى التأكد من محتوى الملفات.");
             return;
         }
 
@@ -470,12 +483,10 @@
         currentQObj = questionsList[questionIndex % questionsList.length];
         questionIndex++;
 
-        // عرض اسم طالب واحد فقط بوضوح تام
         document.getElementById("current-student").innerText = `الطالب الحالي: ${currentStudent}`;
         document.getElementById("current-question").innerText = currentQObj.question;
         document.getElementById("alert-banner").style.display = "none";
 
-        // عرض الخيارات الأربعة تحت السؤال
         const optContainer = document.getElementById("options-container");
         optContainer.innerHTML = "";
         
@@ -506,7 +517,7 @@
         const banner = document.getElementById("alert-banner");
         let statusText = "";
 
-        playSound(isCorrect); // تشغيل نغمة الصوت التنبيهية
+        playSound(isCorrect);
 
         if (isCorrect) {
             banner.className = "alert-success";
@@ -524,7 +535,6 @@
         newRow.innerHTML = `<td>${studentName}</td><td style="font-size:13px; color:#475569;">${currentQObj.question}</td><td>${statusText}</td>`;
         tableBody.appendChild(newRow);
 
-        // الانتقال تلقائياً للطالب التالي بعد 1.8 ثانية
         setTimeout(() => {
             nextStep();
         }, 1800);
