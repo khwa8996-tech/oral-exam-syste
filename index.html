@@ -114,8 +114,9 @@
 
         <h3>2. أدخل محتوى المحاضرة أو الأسئلة الشفهية:</h3>
         <textarea id="lecture-input" placeholder="اكتب أو الصق نص المحاضرة والأسئلة هنا، مثلاً:
-س: ما هو نظام التشغيل؟ ج: مجموعة برمجيات...
-س: ما وظيفة لوحة المفاتيح؟ ج: إدخال البيانات..."></textarea>
+س: ما هو نظام التشغيل؟
+س: ما وظيفة لوحة المفاتيح؟
+س: ما هي مكونات الحاسوب الأساسية؟"></textarea>
 
         <button class="btn-next" onclick="startExamSystem()">بدء الامتحان الشفهي 🚀</button>
     </div>
@@ -128,10 +129,10 @@
         <div class="question-box" id="current-question">السؤال: بانتظار تحميل المحاضرة...</div>
         <div class="timer" id="timer-display">الوقت المتبقي: 45 ثانية</div>
 
-        <!-- أزرار تقييم الإجابة (صح / خطأ / بدون إجابة) -->
+        <!-- أزرار تقييم الإجابة (صح / خطأ) -->
         <div class="action-buttons">
-            <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('إجابة صحيحة (+3)')">✔️ صح (+3)</button>
-            <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('إجابة خاطئة (0)')">❌ خطأ (0)</button>
+            <button class="action-btn btn-correct" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('✔️ صح (+3)')">✔️ صح (+3)</button>
+            <button class="action-btn btn-wrong" style="padding: 15px; border-radius: 8px; flex:1;" onclick="evaluateAnswer('❌ خطأ (0)')">❌ خطأ (0)</button>
         </div>
 
         <button class="btn-next" style="margin-bottom: 15px;" onclick="nextStep()">السؤال أو الطالب التالي 🔄</button>
@@ -153,6 +154,7 @@
 </div>
 
 <script>
+    // قائمة أسماء الطلاب لكل شعبة (يمكنك تعديلها وإضافة أسماء طلابك الحقيقيين هنا)
     const schoolData = {
         "4A": ["أحمد محمد علي", "حسين علي حسن", "كرار حيدر كاظم", "مصطفى قاسم محمد"],
         "4B": ["سارة أحمد جاسم", "فاطمة كريم عبد الله", "زهراء علي حسين", "مريم حسن عبد"],
@@ -184,8 +186,6 @@
         }
 
         currentStudentsList = schoolData[selectedClass];
-        
-        // استخراج الأسطر التي تبدأ بحرف س أو تحتوي على أسئلة
         questionsList = lectureText.split('\n').filter(line => line.trim().length > 0);
 
         document.getElementById("class-title").innerText = classNames[selectedClass];
@@ -222,7 +222,6 @@
             return;
         }
 
-        // اختيار سؤال بالتناوب من المحاضرة المرفوعة
         const currentStudent = currentStudentsList[studentIndex];
         const currentQ = questionsList[questionIndex % questionsList.length];
         questionIndex++;
