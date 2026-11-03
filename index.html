@@ -31,11 +31,9 @@
         h1 { color: #1e1b4b; margin: 0 0 8px 0; font-size: 26px; }
         h2 { color: var(--text-muted); margin: 0; font-size: 16px; font-weight: 500; }
         
-        /* شريط النسخ الاحتياطي والتزامن الاحترافي */
         .backup-section { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .backup-section span { font-size: 14px; font-weight: 600; color: #1e40af; }
 
-        /* أقسام بنوك الأسئلة */
         .grid-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
         @media(max-width: 768px) { .grid-sections { grid-template-columns: 1fr; } }
 
@@ -46,7 +44,6 @@
         .start-exam-btn { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; padding: 15px 25px; font-size: 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); transition: 0.2s; }
         .start-exam-btn:hover { opacity: 0.95; transform: translateY(-1px); }
 
-        /* التبويبات والشعب */
         .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab-btn { padding: 10px 22px; cursor: pointer; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 600; font-size: 15px; color: var(--text-muted); transition: 0.2s; }
         .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
@@ -55,7 +52,7 @@
         .section-content.active { display: block; }
         
         .controls { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
-        input[type="text"] { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 65%; outline: none; transition: 0.2s; }
+        input[type="text"] { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 50%; outline: none; transition: 0.2s; }
         input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         
         textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; box-sizing: border-box; margin-top: 10px; text-align: right; line-height: 1.5; outline: none; }
@@ -72,6 +69,9 @@
         .clear-box-btn { background: #94a3b8; color: white; }
         .skip-btn { background: var(--warning); color: white; }
         .backup-btn { background: #0284c7; color: white; }
+
+        .students-upload-box { background: #f0fdf4; border: 1px dashed #86efac; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .students-upload-box span { font-size: 13px; font-weight: 600; color: #166534; }
 
         ul { list-style-type: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
         li { background: #fff; margin-bottom: 8px; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
@@ -96,7 +96,7 @@
         .timer-display.warning { background: #fee2e2; color: #dc2626; border-color: #fecaca; animation: pulse 0.5s infinite alternate; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.03); } }
 
-        /* جدول غرفة النتائج الاحترافي */
+        /* جدول غرفة النتائج */
         .results-header { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; flex-wrap: wrap; gap: 10px; }
         .results-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: right; font-size: 14px; border-radius: 8px; overflow: hidden; }
         .results-table th, .results-table td { border: 1px solid #e2e8f0; padding: 10px 14px; }
@@ -109,7 +109,7 @@
 <div class="container" id="mainHomeContainer">
     <header>
         <h1>ثانوية المتفوقين الثانية للبنين</h1>
-        <h2>نظام إدارة الاختبارات الشفهية والطلبة (بدون إنترنت - حفظ دائم)</h2>
+        <h2>نظام إدارة الاختبارات الشفهية والطلبة (رفع الأسماء والطلبة دفعة واحدة - حفظ دائم)</h2>
     </header>
 
     <!-- شريط النسخ الاحتياطي والتزامن -->
@@ -127,7 +127,7 @@
         <!-- الصف الرابع -->
         <div class="exam-file-section" style="border-color: #3b82f6;">
             <h3 style="color: #1d4ed8;">📚 بنك أسئلة الرابع (أ، ب)</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 10px 0;">ضع عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح.</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 10px 0;">ضع عبارة (الإجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
             <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
                 <input type="file" id="file4" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '4')">
                 <button class="action-btn upload-btn" onclick="document.getElementById('file4').click()">📁 رفع ملف</button>
@@ -141,7 +141,7 @@
         <!-- الصف الخامس -->
         <div class="exam-file-section" style="border-color: #10b981;">
             <h3 style="color: #047857;">📚 بنك أسئلة الخامس (أ، ب)</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 10px 0;">ضع عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح.</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 10px 0;">ضع عبارة (الإجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
             <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
                 <input type="file" id="file5" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '5')">
                 <button class="action-btn upload-btn" style="background: #10b981;" onclick="document.getElementById('file5').click()">📁 رفع ملف</button>
@@ -155,7 +155,7 @@
 
     <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي واختيار الشعبة</button>
 
-    <!-- التبويبات والشعب -->
+    <!-- التبويبات للشعب -->
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('sec-4a', event)">الرابع (أ)</button>
         <button class="tab-btn" onclick="switchTab('sec-4b', event)">الرابع (ب)</button>
@@ -166,6 +166,16 @@
     <!-- الرابع أ -->
     <div id="sec-4a" class="section-content active">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الرابع (أ)</h3>
+        
+        <!-- خانة رفع الأسماء دفعة واحدة -->
+        <div class="students-upload-box">
+            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
+            <div>
+                <input type="file" id="studentsFile-4a" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '4a')">
+                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-4a').click()">📁 اختيار ملف الأسماء</button>
+            </div>
+        </div>
+
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-4a" placeholder="أدخل اسم طالب جديد...">
@@ -179,6 +189,15 @@
     <!-- الرابع ب -->
     <div id="sec-4b" class="section-content">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الرابع (ب)</h3>
+        
+        <div class="students-upload-box">
+            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
+            <div>
+                <input type="file" id="studentsFile-4b" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '4b')">
+                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-4b').click()">📁 اختيار ملف الأسماء</button>
+            </div>
+        </div>
+
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-4b" placeholder="أدخل اسم طالب جديد...">
@@ -192,6 +211,15 @@
     <!-- الخامس أ -->
     <div id="sec-5a" class="section-content">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الخامس (أ)</h3>
+        
+        <div class="students-upload-box">
+            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
+            <div>
+                <input type="file" id="studentsFile-5a" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '5a')">
+                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-5a').click()">📁 اختيار ملف الأسماء</button>
+            </div>
+        </div>
+
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-5a" placeholder="أدخل اسم طالب جديد...">
@@ -205,6 +233,15 @@
     <!-- الخامس ب -->
     <div id="sec-5b" class="section-content">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الخامس (ب)</h3>
+        
+        <div class="students-upload-box">
+            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
+            <div>
+                <input type="file" id="studentsFile-5b" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '5b')">
+                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-5b').click()">📁 اختيار ملف الأسماء</button>
+            </div>
+        </div>
+
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-5b" placeholder="أدخل اسم طالب جديد...">
@@ -334,26 +371,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v27') || "";
-    let fileName5 = localStorage.getItem('fileName5_v27') || "";
+    let fileName4 = localStorage.getItem('fileName4_v29') || "";
+    let fileName5 = localStorage.getItem('fileName5_v29') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v27');
+        const saved = localStorage.getItem('schoolAppData_v29');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v27')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v29')) || [];
 
-    if(localStorage.getItem('q4_text_v27')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v27');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v27') || "[]");
+    if(localStorage.getItem('q4_text_v29')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v29');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v29') || "[]");
     }
-    if(localStorage.getItem('q5_text_v27')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v27');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v27') || "[]");
+    if(localStorage.getItem('q5_text_v29')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v29');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v29') || "[]");
     }
 
     let currentStudent = "";
@@ -389,15 +426,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v27', JSON.stringify(appData));
-            localStorage.setItem('examResults_v27', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v27', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v27', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v27', fileName4);
+            localStorage.setItem('schoolAppData_v29', JSON.stringify(appData));
+            localStorage.setItem('examResults_v29', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v29', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v29', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v29', fileName4);
 
-            localStorage.setItem('q5_text_v27', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v27', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v27', fileName5);
+            localStorage.setItem('q5_text_v29', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v29', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v29', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -486,8 +523,35 @@
         }
     }
 
+    // رفع أسماء الطلبة دفعة واحدة لشعبة محددة من ملف نصي .txt (كل اسم في سطر)
+    function handleStudentsUpload(event, sec) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            const lines = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            
+            if (lines.length > 0) {
+                if (confirm(`تم العثور على ${lines.length} طالباً في الملف. هل تريد دمجهم مع القائمة الحالية أم استبدالها؟\n[موافق] = استبدال القائمة بالكامل\n[إلغاء] = إضافة للأسماء الموجودة`)) {
+                    appData[sec] = lines; // استبدال كامل
+                } else {
+                    appData[sec] = appData[sec].concat(lines); // دمج
+                }
+                saveData();
+                renderLists();
+                alert(`✅ تم تحديث قائمة طلاب شعبة ${sec} بنجاح!`);
+            } else {
+                alert('⚠️ الملف فارغ أو لم يتم العثور على أسماء صالحة.');
+            }
+            event.target.value = ''; // إعادة تعيين حقل الملف
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+
     function deleteStudent(sec, index) {
-        if (confirm('هل أنت متأكد من حذف هذا الطالب؟')) {
+        if (confirm('هل أنت متأكد من حذف هذا الطالب من القائمة؟')) {
             appData[sec].splice(index, 1);
             saveData();
             renderLists();
@@ -495,7 +559,7 @@
     }
 
     function resetData(sec) {
-        if (confirm('هل أنت متأكد من إعادة ضبط هذه الشعبة؟')) {
+        if (confirm(`هل أنت متأكد من إعادة ضبط وتصفير قائمة أسئلة/طلاب الشعبة (${sec}) وإعادتها للوضع الافتراضي؟`)) {
             appData[sec] = [...defaultData[sec]];
             saveData();
             renderLists();
@@ -505,8 +569,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v27'); localStorage.removeItem('q4_text_v27'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v27'); localStorage.removeItem('q5_text_v27'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v29'); localStorage.removeItem('q4_text_v29'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v29'); localStorage.removeItem('q5_text_v29'); }
             saveData();
             updateInfoDisplays();
         }
