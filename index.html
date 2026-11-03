@@ -358,28 +358,28 @@
         <!-- الصف الرابع -->
         <div class="exam-file-section" style="border-color: #93c5fd;">
             <h3 style="color: #1d4ed8;">📚 بنك أسئلة الرابع (أ، ب)</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 12px 0;">ضع عبارة (الإجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 12px 0;">ضع عبارة (الاجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
             <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;">
                 <input type="file" id="file4" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '4')">
                 <button class="action-btn upload-btn" type="button" onclick="document.getElementById('file4').click()">📁 رفع ملف</button>
                 <button class="action-btn clear-box-btn" type="button" onclick="clearBox('4')">🗑️ مسح</button>
             </div>
             <div id="info4" class="file-info">⚠️ لم يتم حفظ أسئلة للرابع بعد.</div>
-            <textarea id="text4" placeholder="مثال:&#10;ما هي أهمية نظام التشغيل؟&#10;إدارة الموارد (الإجابة الصحيحة)&#10;زيادة الحرارة&#10;حذف الملفات"></textarea>
+            <textarea id="text4" placeholder="مثال:&#10;ما هي أهمية نظام التشغيل؟&#10;إدارة الموارد (الاجابة الصحيحة)&#10;زيادة الحرارة&#10;حذف الملفات"></textarea>
             <button class="action-btn add-btn" type="button" onclick="saveQuestions('4')" style="margin-top: 12px; width: 100%; justify-content: center;">💾 حفظ بنك الرابع</button>
         </div>
 
         <!-- الصف الخامس -->
         <div class="exam-file-section" style="border-color: #6ee7b7;">
             <h3 style="color: #047857;">📚 بنك أسئلة الخامس (أ، ب)</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 12px 0;">ضع عبارة (الإجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 12px 0;">ضع عبارة (الاجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
             <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;">
                 <input type="file" id="file5" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '5')">
                 <button class="action-btn upload-btn" type="button" style="background: #10b981;" onclick="document.getElementById('file5').click()">📁 رفع ملف</button>
                 <button class="action-btn clear-box-btn" type="button" onclick="clearBox('5')">🗑️ مسح</button>
             </div>
             <div id="info5" class="file-info">⚠️ لم يتم حفظ أسئلة للخامس بعد.</div>
-            <textarea id="text5" placeholder="مثال:&#10;ما هو الغرض من Defragment؟&#10;إعادة تنظيم البيانات (الإجابة الصحيحة)&#10;حذف النظام&#10;تشفير القرص"></textarea>
+            <textarea id="text5" placeholder="مثال:&#10;ما هو الغرض من Defragment؟&#10;إعادة تنظيم البيانات (الاجابة الصحيحة)&#10;حذف النظام&#10;تشفير القرص"></textarea>
             <button class="action-btn add-btn" type="button" style="background: var(--success-gradient); margin-top: 12px; width: 100%; justify-content: center;" onclick="saveQuestions('5')">💾 حفظ بنك الخامس</button>
         </div>
     </div>
@@ -595,26 +595,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v39') || "";
-    let fileName5 = localStorage.getItem('fileName5_v39') || "";
+    let fileName4 = localStorage.getItem('fileName4_v40') || "";
+    let fileName5 = localStorage.getItem('fileName5_v40') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v39');
+        const saved = localStorage.getItem('schoolAppData_v40');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v39')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v40')) || [];
 
-    if(localStorage.getItem('q4_text_v39')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v39');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v39') || "[]");
+    if(localStorage.getItem('q4_text_v40')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v40');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v40') || "[]");
     }
-    if(localStorage.getItem('q5_text_v39')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v39');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v39') || "[]");
+    if(localStorage.getItem('q5_text_v40')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v40');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v40') || "[]");
     }
 
     let currentStudent = "";
@@ -626,7 +626,7 @@
     let studentCorrectAnswers = 0;
 
     let timerInterval = null;
-    let timeLeft = 25;
+    let timeLeft = 25; // مضبوط تماماً على 25 ثانية
 
     function playAlarmSound() {
         try {
@@ -650,15 +650,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v39', JSON.stringify(appData));
-            localStorage.setItem('examResults_v39', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v39', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v39', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v39', fileName4);
+            localStorage.setItem('schoolAppData_v40', JSON.stringify(appData));
+            localStorage.setItem('examResults_v40', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v40', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v40', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v40', fileName4);
 
-            localStorage.setItem('q5_text_v39', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v39', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v39', fileName5);
+            localStorage.setItem('q5_text_v40', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v40', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v40', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -791,8 +791,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v39'); localStorage.removeItem('q4_text_v39'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v39'); localStorage.removeItem('q5_text_v39'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v40'); localStorage.removeItem('q4_text_v40'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v40'); localStorage.removeItem('q5_text_v40'); }
             saveData();
             updateInfoDisplays();
         }
@@ -883,13 +883,15 @@
                 correctIdx = 0;
             } else {
                 if(currentQ !== "") {
-                    // الكشف عن الإجابة الصحيحة للرابع والخامس معاً في الخلفية
-                    if(line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
+                    // الفحص الشامل والدقيق لاكتشاف عبارة الإجابة الصحيحة أو النجمات بكل صيغها
+                    if(line.includes('الاجابة الصحيحة') || line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
                         correctIdx = currentOpts.length;
                     }
                     
-                    // تنظيف الخيارات بالكامل لتختفي عبارة الإجابة الصحيحة والنجمات عن الطالب
-                    let cleanLine = line.replace(/\(الإجابة الصحيحة\)/g, '')
+                    // تنظيف النص تماماً وإزالة كافة أشكال عبارات الإجابة الصحيحة لكي لا يراها الطالب نهائياً
+                    let cleanLine = line.replace(/\(الاجابة الصحيحة\)/g, '')
+                                        .replace(/الاجابة الصحيحة/g, '')
+                                        .replace(/\(الإجابة الصحيحة\)/g, '')
                                         .replace(/الإجابة الصحيحة/g, '')
                                         .replace(/\(\*\)/g, '')
                                         .replace(/\*/g, '')
@@ -931,6 +933,10 @@
     }
 
     function openExamModal() {
+        // عند فتح النافذة، نقوم بعمل إعادة تحليل سريعة وتطهير لضمان عدم بقاء أي نص قديم في الذاكرة
+        if(document.getElementById('text4').value.trim()) parseQuestions(document.getElementById('text4').value, '4');
+        if(document.getElementById('text5').value.trim()) parseQuestions(document.getElementById('text5').value, '5');
+
         document.getElementById('examModal').style.display = 'flex';
         document.getElementById('setupExamDiv').style.display = 'block';
         document.getElementById('activeExamArea').style.display = 'none';
@@ -1036,7 +1042,7 @@
 
     function startTimer() {
         clearInterval(timerInterval);
-        timeLeft = 25; // ضبط العداد ليبدأ من 25 ثانية
+        timeLeft = 25; // المؤقت مضبوط تماماً على 25 ثانية
         updateTimerDisplay();
 
         timerInterval = setInterval(() => {
@@ -1150,6 +1156,10 @@
     }
 
     window.onload = function() {
+        // عند فتح الصفحة، نقوم بإجراء إعادة تحليل فورية لضمان إزالة أي عبارات إجابة صحيحة مخزنة سابقاً
+        if(document.getElementById('text4').value.trim()) parseQuestions(document.getElementById('text4').value, '4');
+        if(document.getElementById('text5').value.trim()) parseQuestions(document.getElementById('text5').value, '5');
+        saveData();
         renderLists();
         updateInfoDisplays();
     };
