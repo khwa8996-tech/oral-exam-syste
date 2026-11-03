@@ -595,26 +595,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v33') || "";
-    let fileName5 = localStorage.getItem('fileName5_v33') || "";
+    let fileName4 = localStorage.getItem('fileName4_v35') || "";
+    let fileName5 = localStorage.getItem('fileName5_v35') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v33');
+        const saved = localStorage.getItem('schoolAppData_v35');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v33')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v35')) || [];
 
-    if(localStorage.getItem('q4_text_v33')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v33');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v33') || "[]");
+    if(localStorage.getItem('q4_text_v35')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v35');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v35') || "[]");
     }
-    if(localStorage.getItem('q5_text_v33')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v33');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v33') || "[]");
+    if(localStorage.getItem('q5_text_v35')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v35');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v35') || "[]");
     }
 
     let currentStudent = "";
@@ -650,15 +650,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v33', JSON.stringify(appData));
-            localStorage.setItem('examResults_v33', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v33', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v33', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v33', fileName4);
+            localStorage.setItem('schoolAppData_v35', JSON.stringify(appData));
+            localStorage.setItem('examResults_v35', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v35', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v35', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v35', fileName4);
 
-            localStorage.setItem('q5_text_v33', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v33', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v33', fileName5);
+            localStorage.setItem('q5_text_v35', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v35', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v35', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -791,8 +791,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v33'); localStorage.removeItem('q4_text_v33'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v33'); localStorage.removeItem('q5_text_v33'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v35'); localStorage.removeItem('q4_text_v35'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v35'); localStorage.removeItem('q5_text_v35'); }
             saveData();
             updateInfoDisplays();
         }
@@ -883,10 +883,12 @@
                 correctIdx = 0;
             } else {
                 if(currentQ !== "") {
+                    // فحص ما إذا كان الخيار يحتوي على إشارة الإجابة الصحيحة
                     if(line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
                         correctIdx = currentOpts.length;
                     }
                     
+                    // تنظيف النص تماماً من عبارة "الإجابة الصحيحة" أو النجمات لكي لا تظهر أمام الطالب
                     let cleanLine = line.replace(/\(الإجابة الصحيحة\)/g, '')
                                         .replace(/الإجابة الصحيحة/g, '')
                                         .replace(/\(\*\)/g, '')
