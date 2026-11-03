@@ -85,9 +85,9 @@
         .editable-input { font-size: 26px; font-weight: 800; color: var(--primary); text-align: center; border: 2px solid transparent; background: transparent; width: 100%; }
         .editable-input:focus { border-color: var(--primary); background: white; outline: none; }
 
-        .question-box { background: #fffbeb; border: 2px solid #fde68a; padding: 20px; border-radius: 16px; font-size: 20px; margin-bottom: 20px; text-align: center; font-weight: 800; color: #b45309; }
+        .question-box { background: #fffbeb; border: 2px solid #fde68a; padding: 22px; border-radius: 16px; font-size: 21px; margin-bottom: 20px; text-align: center; font-weight: 800; color: #b45309; line-height: 1.6; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .opt-btn { background: white; border: 2px solid #cbd5e1; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; transition: 0.2s; }
+        .opt-btn { background: white; border: 2px solid #cbd5e1; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; text-align: center; transition: 0.2s; color: var(--text-main); }
         .opt-btn:hover { border-color: var(--primary); background: #eef2ff; }
 
         .btn-main { background-color: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
@@ -137,7 +137,6 @@
         <label>📋 أسماء الطلاب (نسخ ولصق دفعة واحدة، كل اسم في سطر):</label>
         <textarea id="students-input" placeholder="اكتب أو الصق أسماء الطلاب هنا..."></textarea>
 
-        <!-- زر رفع ملف الأسئلة والأجوبة -->
         <label>📚 رفع ملف الأسئلة والأجوبة (PDF أو TXT):</label>
         <div class="file-upload-box">
             <input type="file" id="pdf-file" accept=".pdf, .txt" onchange="loadFile(event)" style="background:transparent; border:none; padding:5px;">
@@ -193,8 +192,8 @@
     let roomDB = {};
 
     const defaultQ = [
-        { q: "ما المقصود بالصيانة الوقائية؟", correct: "إجراءات لتجنب المشاكل المحتملة.", options: ["إجراءات لتجنب المشاكل المحتملة.", "استبدال القطع التالفة.", "حذف نظام التشغيل.", "زيادة حرارة المعالج."] },
-        { q: "ما هي غاية تحديث نظام التشغيل؟", correct: "إضافة خصائص جديدة وتحسينات أمنية.", options: ["إضافة خصائص جديدة وتحسينات أمنية.", "زيادة مساحة القرص.", "مسح متصفح الإنترنت.", "إيقاف المروحة."] }
+        { q: "ما المقصود بالصيانة الوقائية للبرمجيات؟", correct: "إجراءات وقائية تعتمد لتجنب مشكلة محتملة.", options: ["إجراءات وقائية تعتمد لتجنب مشكلة محتملة.", "إجراءات تركز على استبدال القطع التالفة.", "حذف نظام التشغيل بالكامل.", "زيادة سرعة المعالج."] },
+        { q: "ما هي الغاية الأساسية من تحديث نظام التشغيل؟", correct: "إضافة خصائص جديدة وتحسينات أمنية.", options: ["إضافة خصائص جديدة وتحسينات أمنية.", "زيادة مساحة القرص الصلب.", "مسح متصفح الإنترنت.", "إيقاف مروحة المعالج."] }
     ];
 
     function selectRoom(el, name, grade, sec) {
@@ -276,12 +275,13 @@
         let qArr = defaultQ;
         if (qText.length > 5) {
             let parts = qText.split('س:').filter(p => p.trim().length > 5);
+            if(parts.length === 0) parts = qText.split('\n').filter(p => p.trim().length > 5);
             if(parts.length > 0) {
                 qArr = parts.map(p => {
                     let lines = p.split('\n').map(l => l.trim()).filter(l => l.length > 2);
                     let qTitle = lines[0] || p;
                     let opts = lines.slice(1, 5);
-                    if(opts.length < 4) opts = [qTitle.substring(0,25)+" (صحيح)", "خيار مضلل 1", "خيار مضلل 2", "خيار مضلل 3"];
+                    if(opts.length < 4) opts = [qTitle.substring(0,25)+" (صحيح)", "خيار مضلل أول", "خيار مضلل ثانٍ", "خيار مضلل ثالث"];
                     return { q: "س: " + qTitle, correct: opts[0], options: opts };
                 });
             }
