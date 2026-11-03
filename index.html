@@ -64,33 +64,33 @@
 
 <div class="container" id="mainHomeContainer">
     <h1>ثانوية المتفوقين الثانية للبنين</h1>
-    <h2>سجل أسماء الطلبة وإدارة الأسئلة المنفصلة (مع تحديد الإجابة الصحيحة خلف الكواليس)</h2>
+    <h2>سجل أسماء الطلبة وإدارة الأسئلة المنفصلة</h2>
 
     <!-- بنك أسئلة الصف الرابع (للشعبتين أ و ب) -->
     <div class="exam-file-section" style="border-color: #3b82f6;">
         <h3 style="color: #1d4ed8; margin-top: 0;">📚 بنك أسئلة الصف الرابع (للشعبتين: أ، ب)</h3>
-        <p style="font-size: 12px; color: #475569; margin: 4px 0;">ملاحظة: يمكنك وضع علامة (*) بجانب الخيار الصحيح في الملف أو النص ليتعرف عليه النظام حصراً.</p>
+        <p style="font-size: 12px; color: #475569; margin: 4px 0;">اكتب بجانب الخيار الصحيح عبارتها ليتعرف عليها النظام ويقوم بإخفائها عن الطالب أثناء الامتحان.</p>
         <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
             <input type="file" id="file4" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '4')">
             <button class="action-btn upload-btn" onclick="document.getElementById('file4').click()">📁 رفع ملف أسئلة الرابع</button>
             <button class="action-btn clear-box-btn" onclick="clearBox('4')">🗑️ مسح</button>
         </div>
         <div id="info4" class="file-info">⚠️ لم يتم رفع ملف للرابع بعد.</div>
-        <textarea id="text4" placeholder="مثال:&#10;ما هي وحدة المعالجة المركزية؟&#10;CPU *&#10;RAM&#10;Hard Disk"></textarea>
+        <textarea id="text4" placeholder="مثال:&#10;ما هي أهمية تحديث نظام التشغيل؟&#10;إضافة خصائص جديدة (الإجابة الصحيحة)&#10;زيادة حرارة المعالج&#10;حذف كافة التطبيقات"></textarea>
         <button class="action-btn add-btn" onclick="saveQuestions('4')" style="margin-top: 6px; width: 100%;">حفظ بنك أسئلة الرابع دائمياً</button>
     </div>
 
     <!-- بنك أسئلة الصف الخامس (للشعبتين أ و ب) -->
     <div class="exam-file-section" style="border-color: #10b981;">
         <h3 style="color: #047857; margin-top: 0;">📚 بنك أسئلة الصف الخامس (للشعبتين: أ، ب)</h3>
-        <p style="font-size: 12px; color: #475569; margin: 4px 0;">ملاحظة: ضع علامة (*) بجانب الخيار الصحيح لكي يعرف النظام الإجابة الصحيحة حصراً.</p>
+        <p style="font-size: 12px; color: #475569; margin: 4px 0;">اكتب عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح ليتعرف عليه النظام ويخفيه عن الطالب.</p>
         <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
             <input type="file" id="file5" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '5')">
             <button class="action-btn upload-btn" style="background: #10b981;" onclick="document.getElementById('file5').click()">📁 رفع ملف أسئلة الخامس</button>
             <button class="action-btn clear-box-btn" onclick="clearBox('5')">🗑️ مسح</button>
         </div>
         <div id="info5" class="file-info">⚠️ لم يتم رفع ملف للخامس بعد.</div>
-        <textarea id="text5" placeholder="مثال:&#10;ما هي لغة البرمجة الافتراضية؟&#10;Python&#10;JavaScript *&#10;HTML"></textarea>
+        <textarea id="text5" placeholder="مثال:&#10;ما هي لغة البرمجة؟&#10;Python (الإجابة الصحيحة)&#10;HTML&#10;CSS"></textarea>
         <button class="action-btn add-btn" style="background: #10b981;" onclick="saveQuestions('5')" style="margin-top: 6px; width: 100%;">حفظ بنك أسئلة الخامس دائمياً</button>
     </div>
 
@@ -272,18 +272,18 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v20') || "";
-    let fileName5 = localStorage.getItem('fileName5_v20') || "";
+    let fileName4 = localStorage.getItem('fileName4_v21') || "";
+    let fileName5 = localStorage.getItem('fileName5_v21') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v20');
+        const saved = localStorage.getItem('schoolAppData_v21');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v20')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v21')) || [];
 
     if(localStorage.getItem('q4_text')) {
         document.getElementById('text4').value = localStorage.getItem('q4_text');
@@ -304,15 +304,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v20', JSON.stringify(appData));
-            localStorage.setItem('examResults_v20', JSON.stringify(examResults));
+            localStorage.setItem('schoolAppData_v21', JSON.stringify(appData));
+            localStorage.setItem('examResults_v21', JSON.stringify(examResults));
             localStorage.setItem('q4_text', document.getElementById('text4').value);
             localStorage.setItem('q4_bank', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v20', fileName4);
+            localStorage.setItem('fileName4_v21', fileName4);
 
             localStorage.setItem('q5_text', document.getElementById('text5').value);
             localStorage.setItem('q5_bank', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v20', fileName5);
+            localStorage.setItem('fileName5_v21', fileName5);
         } catch (e) {
             alert('تعذر الحفظ.');
         }
@@ -449,7 +449,7 @@
         alert(`تم حفظ بنك أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'} دائمياً بنجاح!`);
     }
 
-    // تحليل الأسئلة ومعرفة الإجابة الصحيحة خلف الكواليس عند وضع علامة (*)
+    // تحليل الأسئلة ومعرفة الإجابة الصحيحة وحذف كلمة (الإجابة الصحيحة) لتظهر نظيفة للطالب
     function parseQuestions(text, grade) {
         let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         let parsed = [];
@@ -462,15 +462,21 @@
                 if(currentQ !== "" && currentOpts.length > 0) {
                     parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
                 }
-                currentQ = line.replace(/^(س:|السؤال)\s*/, '');
+                // تنظيف عنوان السؤال من أي ترقيم سابق أو مسافات
+                currentQ = line.replace(/^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?)\s*/, '').trim();
                 currentOpts = [];
                 correctIdx = 0;
             } else {
                 if(currentQ !== "") {
-                    // التحقق إذا كان الخيار يحتوي على علامة النجمة (*) لتحديد الإجابة الصحيحة خلف الكواليس
-                    if(line.endsWith('*') || line.includes('(*)')) {
-                        correctIdx = currentOpts.length; // تحديد موقع الخيار الصحيح
-                        line = line.replace('*', '').replace('(*)', '').trim();
+                    // التحقق إذا كان الخيار يحتوي على عبارة الإجابة الصحيحة أو علامة النجمة
+                    if(line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
+                        correctIdx = currentOpts.length; // تحديد مكان الإجابة الصحيحة
+                        // تنظيف النص تماماً وحذف عبارة الإجابة الصحيحة لكي لا تظهر أمام الطالب
+                        line = line.replace(/\(الإجابة الصحيحة\)/g, '')
+                                   .replace(/الإجابة الصحيحة/g, '')
+                                   .replace(/\(\*\)/g, '')
+                                   .replace(/\*/g, '')
+                                   .trim();
                     }
                     currentOpts.push(line);
                     
@@ -579,7 +585,7 @@
         const optionsContainer = document.getElementById('optionsContainer');
         optionsContainer.innerHTML = '';
 
-        // عرض الخيارات نظيفة تماماً دون إظهار أي إشارة للإجابة الصحيحة للطالب
+        // عرض الخيارات نظيفة تماماً دون أن تظهر عبارة الإجابة الصحيحة للطالب
         qObj.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
