@@ -52,7 +52,7 @@
         .section-content.active { display: block; }
         
         .controls { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
-        input[type="text"] { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 55%; outline: none; transition: 0.2s; }
+        input[type="text"] { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
         input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         
         textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; box-sizing: border-box; margin-top: 10px; text-align: right; line-height: 1.5; outline: none; }
@@ -72,6 +72,10 @@
 
         .bulk-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
         .bulk-box label { font-size: 13px; font-weight: bold; color: #166534; display: block; margin-bottom: 5px; }
+
+        .edit-student-box { background: #eef2ff; border: 1px solid #c7d2fe; padding: 12px 15px; border-radius: 10px; margin-bottom: 15px; text-align: right; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+        .edit-student-box label { font-weight: bold; color: var(--primary); font-size: 14px; }
+        .edit-student-box input { flex-grow: 1; padding: 8px 12px; font-size: 15px; font-weight: bold; color: #1e1b4b; border-radius: 6px; border: 1px solid #a5b4fc; }
 
         ul { list-style-type: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
         li { background: #fff; margin-bottom: 8px; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
@@ -109,7 +113,7 @@
 <div class="container" id="mainHomeContainer">
     <header>
         <h1>ثانوية المتفوقين الثانية للبنين</h1>
-        <h2>نظام إدارة الاختبارات الشفهية والطلبة (نسخة مطورة ومستقرة تماماً)</h2>
+        <h2>نظام إدارة الاختبارات الشفهية والطلبة (تعديل اسم الطالب أثناء الامتحان وحفظ دائم)</h2>
     </header>
 
     <!-- شريط النسخ الاحتياطي والتزامن -->
@@ -149,7 +153,7 @@
             </div>
             <div id="info5" class="file-info">⚠️ لم يتم حفظ أسئلة للخامس بعد.</div>
             <textarea id="text5" placeholder="مثال:&#10;ما هو الغرض من Defragment؟&#10;إعادة تنظيم البيانات (الإجابة الصحيحة)&#10;حذف النظام&#10;تشفير القرص"></textarea>
-            <button class="action-btn add-btn" type="button" onclick="saveQuestions('5')" style="margin-top: 10px; width: 100%; justify-content: center;" onclick="saveQuestions('5')">💾 حفظ بنك الخامس</button>
+            <button class="action-btn add-btn" type="button" style="background: #10b981; margin-top: 10px; width: 100%; justify-content: center;" onclick="saveQuestions('5')">💾 حفظ بنك الخامس</button>
         </div>
     </div>
 
@@ -175,7 +179,7 @@
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-4a" placeholder="أدخل اسم طالب مفرد...">
+                <input type="text" id="input-4a" style="width: 55%;" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" type="button" onclick="addStudent('4a')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" type="button" onclick="resetData('4a')">🔄 إعادة ضبط القائمة</button>
@@ -195,7 +199,7 @@
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-4b" placeholder="أدخل اسم طالب مفرد...">
+                <input type="text" id="input-4b" style="width: 55%;" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" type="button" onclick="addStudent('4b')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" type="button" onclick="resetData('4b')">🔄 إعادة ضبط القائمة</button>
@@ -215,7 +219,7 @@
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-5a" placeholder="أدخل اسم طالب مفرد...">
+                <input type="text" id="input-5a" style="width: 55%;" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" type="button" onclick="addStudent('5a')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" type="button" onclick="resetData('5a')">🔄 إعادة ضبط القائمة</button>
@@ -235,7 +239,7 @@
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-5b" placeholder="أدخل اسم طالب مفرد...">
+                <input type="text" id="input-5b" style="width: 55%;" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" type="button" onclick="addStudent('5b')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" type="button" onclick="resetData('5b')">🔄 إعادة ضبط القائمة</button>
@@ -263,10 +267,12 @@
         </div>
 
         <div id="activeExamArea" style="display: none;">
-            <div id="studentInfoBanner" style="font-size: 16px; font-weight: bold; color: var(--primary); background: #eef2ff; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #c7d2fe;">
-                🎓 الطالب: ... | الشعبة: ...
+            <!-- حقل التعديل المباشر على اسم الطالب أثناء الامتحان -->
+            <div class="edit-student-box">
+                <label for="currentStudentNameInput">🎓 اسم الطالب الحالي (يمكنك تعديله الآن قبل رصد النتيجة):</label>
+                <input type="text" id="currentStudentNameInput" placeholder="أدخل أو عدّل اسم الطالب...">
             </div>
-            
+
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <div style="font-weight: bold; color: #d97706;" id="questionCounter">السؤال 1 من 3</div>
                 <div id="timerBox" class="timer-display">⏳ الوقت: 10 ثوانٍ</div>
@@ -362,26 +368,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v31') || "";
-    let fileName5 = localStorage.getItem('fileName5_v31') || "";
+    let fileName4 = localStorage.getItem('fileName4_v32') || "";
+    let fileName5 = localStorage.getItem('fileName5_v32') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v31');
+        const saved = localStorage.getItem('schoolAppData_v32');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v31')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v32')) || [];
 
-    if(localStorage.getItem('q4_text_v31')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v31');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v31') || "[]");
+    if(localStorage.getItem('q4_text_v32')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v32');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v32') || "[]");
     }
-    if(localStorage.getItem('q5_text_v31')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v31');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v31') || "[]");
+    if(localStorage.getItem('q5_text_v32')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v32');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v32') || "[]");
     }
 
     let currentStudent = "";
@@ -417,15 +423,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v31', JSON.stringify(appData));
-            localStorage.setItem('examResults_v31', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v31', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v31', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v31', fileName4);
+            localStorage.setItem('schoolAppData_v32', JSON.stringify(appData));
+            localStorage.setItem('examResults_v32', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v32', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v32', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v32', fileName4);
 
-            localStorage.setItem('q5_text_v31', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v31', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v31', fileName5);
+            localStorage.setItem('q5_text_v32', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v32', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v32', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -538,7 +544,6 @@
         }
     }
 
-    // دالة حذف طالب مفرد محسنة ومضمونة الاستجابة
     function deleteStudent(sec, index) {
         if (confirm('هل أنت متأكد من حذف هذا الطالب من القائمة؟')) {
             appData[sec].splice(index, 1);
@@ -547,7 +552,6 @@
         }
     }
 
-    // دالة إعادة ضبط الشعبة وإعادتها للقائمة الافتراضية
     function resetData(sec) {
         if (confirm(`هل أنت متأكد من إعادة ضبط وتصفير قائمة أسماء الشعبة (${sec}) وإعادتها للوضع الافتراضي؟`)) {
             appData[sec] = [...defaultData[sec]];
@@ -560,8 +564,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v31'); localStorage.removeItem('q4_text_v31'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v31'); localStorage.removeItem('q5_text_v31'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v32'); localStorage.removeItem('q4_text_v32'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v32'); localStorage.removeItem('q5_text_v32'); }
             saveData();
             updateInfoDisplays();
         }
@@ -747,7 +751,9 @@
         currentQuestionIdx = 0;
         studentCorrectAnswers = 0;
 
-        document.getElementById('studentInfoBanner').innerText = `🎓 الطالب: ${currentStudent} | الشعبة: ${currentSectionName}`;
+        // وضع اسم الطالب المختار داخل حقل التعديل المباشر
+        document.getElementById('currentStudentNameInput').value = currentStudent;
+        
         document.getElementById('setupExamDiv').style.display = 'none';
         document.getElementById('activeExamArea').style.display = 'block';
 
@@ -862,15 +868,18 @@
         let maxQ = selectedQuestions.length;
         let finalGrade = maxQ > 0 ? Math.round((studentCorrectAnswers / maxQ) * 10) : 0;
 
+        // قراءة الاسم المعدل من الحقل مباشرة فور انتهاء الامتحان
+        const updatedName = document.getElementById('currentStudentNameInput').value.trim() || currentStudent;
+
         examResults.unshift({
-            name: currentStudent,
+            name: updatedName,
             section: currentSectionName,
             grade: finalGrade
         });
         saveData();
         renderResultsTable();
 
-        alert(`انتهى امتحان الطالب: ${currentStudent}\nالنتيجة: ${studentCorrectAnswers} إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nسيتم الآن الانتقال تلقائياً لطالب جديد.`);
+        alert(`انتهى امتحان الطالب: ${updatedName}\nالنتيجة: ${studentCorrectAnswers} إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nسيتم الآن الانتقال تلقائياً لطالب جديد.`);
 
         startStudentExam();
     }
