@@ -366,24 +366,21 @@
         { q: "ما هو جهاز التوجيه (Router) في شبكات الحاسوب؟", correct: "جهاز يربط الشبكات ببعضها ويوجه البيانات.", options: ["جهاز يربط الشبكات ببعضها ويوجه البيانات.", "شاشة عرض البيانات.", "وحدة المعالجة المركزية.", "أداة لتبريد المعالج."] }
     ];
 
-    // محرك برمجي فائق لتصحيح النصوص العربية المعكوسة من ملفات الـ PDF
-    function fixPdfArabicText(rawText) {
+    // محرك تصحيح متطور لإعادة تجميع الكلمات المقلوبة في ملفات PDF المدرسية وعكس اتجاهها برمجياً
+    function smartFixArabicPDF(rawText) {
         if (!rawText) return "";
         let lines = rawText.split('\n');
         let fixedLines = lines.map(line => {
             let trimmed = line.trim();
             if (trimmed.length > 0) {
-                // معالجة عكس الكلمات وترتيب الحروف لتظهر صحيحة من اليمين لليسار
+                // تقسيم السطر إلى كلمات، ثم تصحيح انعكاس الحروف داخل كل كلمة، ثم إعادة ترتيب الكلمات بالاتجاه الصحيح
                 let words = trimmed.split(/\s+/);
                 let correctedWords = words.map(word => {
-                    // إذا كانت الكلمة تحتوي على حروف عربية ومقلوبة (مكتوبة باتجاه خاطئ)
                     if (/[\u0600-\u06FF]/.test(word)) {
-                        // عكس ترتيب حروف الكلمة لتعود للقراءة الصحيحة
                         return word.split('').reverse().join('');
                     }
                     return word;
                 });
-                // عكس ترتيب الكلمات في السطر ليتناسب مع الاتجاه الصحيح للنص العربي في ملفات الـ PDF
                 return correctedWords.reverse().join(' ');
             }
             return line;
@@ -448,20 +445,21 @@
                             x: item.transform[4],
                             y: item.transform[5]
                         }));
+                        // تجميع وترتيب العناصر بناءً على الإحداثيات العمودية والأفقية لملف الـ PDF
                         items.sort((a, b) => {
                             if (Math.abs(b.y - a.y) > 5) return b.y - a.y;
-                            return a.x - b.x;
+                            return b.x - a.x; // ترتيب معاكس ذكي لملفات الـ PDF المعكوسة
                         });
                         txt += items.map(item => item.str).join(' ') + '\n';
                     }
-                    // تمرير النص المعكوس على محرك التصحيح التلقائي
-                    document.getElementById("questions-input").value = fixPdfArabicText(txt);
+                    // تمرير النص المستخرج على محرك التصحيح الذكي
+                    document.getElementById("questions-input").value = smartFixArabicPDF(txt);
                 });
             };
             reader.readAsArrayBuffer(file);
         } else {
             const reader = new FileReader();
-            reader.onload = (ev) => { document.getElementById("questions-input").value = fixPdfArabicText(ev.target.result); };
+            reader.onload = (ev) => { document.getElementById("questions-input").value = smartFixArabicPDF(ev.target.result); };
             reader.readAsText(file, "UTF-8");
         }
     }
