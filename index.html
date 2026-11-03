@@ -52,7 +52,7 @@
         .section-content.active { display: block; }
         
         .controls { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
-        input[type="text"] { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 50%; outline: none; transition: 0.2s; }
+        input[type="text"] { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 55%; outline: none; transition: 0.2s; }
         input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         
         textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; box-sizing: border-box; margin-top: 10px; text-align: right; line-height: 1.5; outline: none; }
@@ -70,8 +70,8 @@
         .skip-btn { background: var(--warning); color: white; }
         .backup-btn { background: #0284c7; color: white; }
 
-        .students-upload-box { background: #f0fdf4; border: 1px dashed #86efac; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .students-upload-box span { font-size: 13px; font-weight: 600; color: #166534; }
+        .bulk-box { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .bulk-box label { font-size: 13px; font-weight: bold; color: #166534; display: block; margin-bottom: 5px; }
 
         ul { list-style-type: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
         li { background: #fff; margin-bottom: 8px; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
@@ -109,7 +109,7 @@
 <div class="container" id="mainHomeContainer">
     <header>
         <h1>ثانوية المتفوقين الثانية للبنين</h1>
-        <h2>نظام إدارة الاختبارات الشفهية والطلبة (رفع الأسماء والطلبة دفعة واحدة - حفظ دائم)</h2>
+        <h2>نظام إدارة الاختبارات الشفهية والطلبة (مع إضافة نصية دفعة واحدة وحفظ دائم)</h2>
     </header>
 
     <!-- شريط النسخ الاحتياطي والتزامن -->
@@ -167,18 +167,16 @@
     <div id="sec-4a" class="section-content active">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الرابع (أ)</h3>
         
-        <!-- خانة رفع الأسماء دفعة واحدة -->
-        <div class="students-upload-box">
-            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
-            <div>
-                <input type="file" id="studentsFile-4a" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '4a')">
-                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-4a').click()">📁 اختيار ملف الأسماء</button>
-            </div>
+        <!-- خانة إضافة أسماء متعددة نصياً دفعة واحدة -->
+        <div class="bulk-box">
+            <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
+            <textarea id="bulkInput-4a" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
+            <button class="action-btn add-btn" onclick="addBulkStudents('4a')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-4a" placeholder="أدخل اسم طالب جديد...">
+                <input type="text" id="input-4a" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" onclick="addStudent('4a')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" onclick="resetData('4a')">🔄 إعادة ضبط القائمة</button>
@@ -190,17 +188,15 @@
     <div id="sec-4b" class="section-content">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الرابع (ب)</h3>
         
-        <div class="students-upload-box">
-            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
-            <div>
-                <input type="file" id="studentsFile-4b" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '4b')">
-                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-4b').click()">📁 اختيار ملف الأسماء</button>
-            </div>
+        <div class="bulk-box">
+            <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
+            <textarea id="bulkInput-4b" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
+            <button class="action-btn add-btn" onclick="addBulkStudents('4b')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-4b" placeholder="أدخل اسم طالب جديد...">
+                <input type="text" id="input-4b" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" onclick="addStudent('4b')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" onclick="resetData('4b')">🔄 إعادة ضبط القائمة</button>
@@ -212,17 +208,15 @@
     <div id="sec-5a" class="section-content">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الخامس (أ)</h3>
         
-        <div class="students-upload-box">
-            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
-            <div>
-                <input type="file" id="studentsFile-5a" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '5a')">
-                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-5a').click()">📁 اختيار ملف الأسماء</button>
-            </div>
+        <div class="bulk-box">
+            <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
+            <textarea id="bulkInput-5a" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
+            <button class="action-btn add-btn" onclick="addBulkStudents('5a')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-5a" placeholder="أدخل اسم طالب جديد...">
+                <input type="text" id="input-5a" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" onclick="addStudent('5a')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" onclick="resetData('5a')">🔄 إعادة ضبط القائمة</button>
@@ -234,17 +228,15 @@
     <div id="sec-5b" class="section-content">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الخامس (ب)</h3>
         
-        <div class="students-upload-box">
-            <span>📂 رفع قائمة الأسماء دفعة واحدة (ملف نصي .txt):</span>
-            <div>
-                <input type="file" id="studentsFile-5b" accept=".txt" style="display: none;" onchange="handleStudentsUpload(event, '5b')">
-                <button class="action-btn upload-btn" onclick="document.getElementById('studentsFile-5b').click()">📁 اختيار ملف الأسماء</button>
-            </div>
+        <div class="bulk-box">
+            <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
+            <textarea id="bulkInput-5b" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
+            <button class="action-btn add-btn" onclick="addBulkStudents('5b')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
-                <input type="text" id="input-5b" placeholder="أدخل اسم طالب جديد...">
+                <input type="text" id="input-5b" placeholder="أدخل اسم طالب مفرد...">
                 <button class="action-btn add-btn" onclick="addStudent('5b')">➕ إضافة</button>
             </div>
             <button class="action-btn reset-btn" onclick="resetData('5b')">🔄 إعادة ضبط القائمة</button>
@@ -371,26 +363,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v29') || "";
-    let fileName5 = localStorage.getItem('fileName5_v29') || "";
+    let fileName4 = localStorage.getItem('fileName4_v30') || "";
+    let fileName5 = localStorage.getItem('fileName5_v30') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v29');
+        const saved = localStorage.getItem('schoolAppData_v30');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v29')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v30')) || [];
 
-    if(localStorage.getItem('q4_text_v29')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v29');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v29') || "[]");
+    if(localStorage.getItem('q4_text_v30')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v30');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v30') || "[]");
     }
-    if(localStorage.getItem('q5_text_v29')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v29');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v29') || "[]");
+    if(localStorage.getItem('q5_text_v30')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v30');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v30') || "[]");
     }
 
     let currentStudent = "";
@@ -426,15 +418,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v29', JSON.stringify(appData));
-            localStorage.setItem('examResults_v29', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v29', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v29', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v29', fileName4);
+            localStorage.setItem('schoolAppData_v30', JSON.stringify(appData));
+            localStorage.setItem('examResults_v30', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v30', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v30', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v30', fileName4);
 
-            localStorage.setItem('q5_text_v29', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v29', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v29', fileName5);
+            localStorage.setItem('q5_text_v30', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v30', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v30', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -493,7 +485,7 @@
             ul.innerHTML = '';
             appData[sec].forEach((name, index) => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${index + 1}. ${name}</span> <button class="delete-btn" onclick="deleteStudent('${sec}', ${index})">حذف</button>`;
+                li.innerHTML = `<span>${index + 1}. ${name}</span> <button class="delete-btn" type="button" onclick="deleteStudent('${sec}', ${index})">حذف</button>`;
                 ul.appendChild(li);
             });
         }
@@ -523,31 +515,29 @@
         }
     }
 
-    // رفع أسماء الطلبة دفعة واحدة لشعبة محددة من ملف نصي .txt (كل اسم في سطر)
-    function handleStudentsUpload(event, sec) {
-        const file = event.target.files[0];
-        if (!file) return;
+    // إضافة أسماء متعددة نصياً دفعة واحدة من المربع النصي
+    function addBulkStudents(sec) {
+        const textarea = document.getElementById(`bulkInput-${sec}`);
+        const text = textarea.value.trim();
+        if (!text) {
+            alert('يرجى لصق أو كتابة الأسماء في المربع المخصص أولاً.');
+            return;
+        }
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const content = e.target.result;
-            const lines = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            
-            if (lines.length > 0) {
-                if (confirm(`تم العثور على ${lines.length} طالباً في الملف. هل تريد دمجهم مع القائمة الحالية أم استبدالها؟\n[موافق] = استبدال القائمة بالكامل\n[إلغاء] = إضافة للأسماء الموجودة`)) {
-                    appData[sec] = lines; // استبدال كامل
-                } else {
-                    appData[sec] = appData[sec].concat(lines); // دمج
-                }
-                saveData();
-                renderLists();
-                alert(`✅ تم تحديث قائمة طلاب شعبة ${sec} بنجاح!`);
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length > 0) {
+            if (confirm(`تمت قراءة ${lines.length} اسماً. هل تريد استبدال القائمة الحالية أم دمج الأسماء الجديدة معها؟\n[موافق] = استبدال كامل\n[إلغاء] = إضافة للأسماء الحالية`)) {
+                appData[sec] = lines;
             } else {
-                alert('⚠️ الملف فارغ أو لم يتم العثور على أسماء صالحة.');
+                appData[sec] = appData[sec].concat(lines);
             }
-            event.target.value = ''; // إعادة تعيين حقل الملف
-        };
-        reader.readAsText(file, 'UTF-8');
+            saveData();
+            renderLists();
+            textarea.value = '';
+            alert(`✅ تمت إضافة وتحديث أسماء شعبة ${sec} بنجاح!`);
+        } else {
+            alert('⚠️ لم يتم العثور على أسماء صالحة.');
+        }
     }
 
     function deleteStudent(sec, index) {
@@ -559,18 +549,19 @@
     }
 
     function resetData(sec) {
-        if (confirm(`هل أنت متأكد من إعادة ضبط وتصفير قائمة أسئلة/طلاب الشعبة (${sec}) وإعادتها للوضع الافتراضي؟`)) {
+        if (confirm(`هل أنت متأكد من إعادة ضبط وتصفير قائمة أسماء الشعبة (${sec}) وإعادتها للوضع الافتراضي؟`)) {
             appData[sec] = [...defaultData[sec]];
             saveData();
             renderLists();
+            alert('✅ تمت إعادة ضبط الشعبة بنجاح.');
         }
     }
 
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v29'); localStorage.removeItem('q4_text_v29'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v29'); localStorage.removeItem('q5_text_v29'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v30'); localStorage.removeItem('q4_text_v30'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v30'); localStorage.removeItem('q5_text_v30'); }
             saveData();
             updateInfoDisplays();
         }
@@ -914,7 +905,7 @@
                 <td><strong>${res.name}</strong></td>
                 <td>${res.section}</td>
                 <td><span style="background: var(--success); color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">${res.grade} / 10</span></td>
-                <td><button class="delete-btn" onclick="deleteResult(${index})">حذف</button></td>
+                <td><button class="delete-btn" type="button" onclick="deleteResult(${index})">حذف</button></td>
             `;
             tbody.appendChild(tr);
         });
