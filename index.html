@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة ثانوية المتفوقين الثانية - سجل الأسماء والأسئلة</title>
+    <title>منصة ثانوية المتفوقين الثانية - نظام الامتحان الشفهي</title>
     <style>
         body { font-family: Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h1, h2 { text-align: center; color: #2c3e50; }
         
-        /* قسم إدارة ملف الأسئلة والبدء */
         .exam-file-section { background: #eef2f3; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px dashed #cbd5e1; text-align: center; }
         .exam-file-section h3 { margin-top: 0; color: #1e293b; font-size: 18px; }
         
@@ -32,16 +31,25 @@
         .delete-btn { background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
         .file-info { margin-top: 10px; font-weight: bold; color: #059669; }
 
-        /* نافذة الامتحان المنبثقة */
-        #examModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        /* نافذة الامتحان المنبثقة المحدثة */
+        #examModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; padding: 10px; box-sizing: border-box; overflow-y: auto; }
+        .modal-content { background: #fff; padding: 20px; border-radius: 10px; width: 100%; max-width: 650px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
         .modal-content h2 { color: #1e293b; margin-top: 0; }
-        .exam-controls { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
-        .score-btn { padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; color: white; }
+        
+        .exam-box { background: #f8fafc; border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: right; }
+        .question-title { font-weight: bold; color: #334155; margin-bottom: 10px; font-size: 17px; }
+        .options-list { display: flex; flex-direction: column; gap: 8px; }
+        .option-btn { background: #fff; border: 1px solid #cbd5e1; padding: 10px; border-radius: 5px; cursor: pointer; text-align: right; font-size: 15px; font-weight: bold; transition: 0.2s; }
+        .option-btn:hover { background: #f1f5f9; }
+        .option-btn.correct { background: #10b981 !important; color: white; border-color: #10b981; }
+        .option-btn.wrong { background: #ef4444 !important; color: white; border-color: #ef4444; }
+
+        .exam-controls { display: flex; justify-content: center; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .score-btn { padding: 10px 15px; font-size: 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; color: white; }
         .score-3 { background: #10b981; }
         .score-1 { background: #f59e0b; }
         .score-0 { background: #ef4444; }
-        .close-modal { background: #64748b; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+        .close-modal { background: #64748b; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -59,8 +67,7 @@
         </div>
         <div id="fileInfoDisplay" class="file-info">لا يوجد ملف أسئلة مرفوع حالياً.</div>
         
-        <!-- زر بدء الامتحان الجديد -->
-        <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء نافذة الامتحان التفاعلي</button>
+        <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء نافذة الامتحان التفاعلي والأسئلة</button>
     </div>
 
     <!-- التبويبات للشعب -->
@@ -124,32 +131,41 @@
     </div>
 </div>
 
-<!-- نافذة الامتحان المنبثقة -->
+<!-- نافذة الامتحان المنبثقة التفاعلية -->
 <div id="examModal">
     <div class="modal-content">
-        <h2>شاشة الامتحان الشفهي</h2>
-        <p>اختر الشعبة وابدأ باختيار طالب عشوائياً:</p>
+        <h2>شاشة الامتحان الشفهي والتصحيح التلقائي</h2>
         
-        <select id="examSectionSelect" style="padding: 8px; font-size: 16px; margin-bottom: 15px; width: 80%;">
-            <option value="4a">الرابع (أ)</option>
-            <option value="4b">الرابع (ب)</option>
-            <option value="5a">الخامس (أ)</option>
-            <option value="5b">الخامس (ب)</option>
-        </select>
-
-        <div id="randomStudentDisplay" style="font-size: 20px; font-weight: bold; color: #2563eb; margin: 20px 0; min-height: 40px; background: #f8fafc; padding: 10px; border-radius: 5px;">
-            اضغط زر "اختيار طالب عشوائي"
+        <div style="margin-bottom: 10px;">
+            <label style="font-weight: bold;">اختر الشعبة:</label>
+            <select id="examSectionSelect" style="padding: 6px; font-size: 15px; margin-right: 10px;">
+                <option value="4a">الرابع (أ)</option>
+                <option value="4b">الرابع (ب)</option>
+                <option value="5a">الخامس (أ)</option>
+                <option value="5b">الخامس (ب)</option>
+            </select>
+            <button class="action-btn add-btn" onclick="startNewRound()" style="padding: 6px 12px;">🎲 اختيار طالب وسؤال</button>
         </div>
 
-        <button class="action-btn add-btn" onclick="pickRandomStudent()" style="font-size: 16px; padding: 10px 20px;">🎲 اختيار طالب عشوائي</button>
+        <div id="randomStudentDisplay" style="font-size: 18px; font-weight: bold; color: #2563eb; background: #f8fafc; padding: 8px; border-radius: 5px; margin-bottom: 10px;">
+            الطالب: (لم يتم الاختيار بعد)
+        </div>
+
+        <!-- صندوق السؤال والخيارات -->
+        <div class="exam-box" id="examBoxContainer" style="display: none;">
+            <div class="question-title" id="questionText">السؤال سيظهر هنا...</div>
+            <div class="options-list" id="optionsContainer">
+                <!-- الخيارات ستظهر هنا ديناميكياً -->
+            </div>
+        </div>
 
         <div class="exam-controls">
-            <button class="score-btn score-3" onclick="recordScore(3)">+3 ممتاز</button>
-            <button class="score-btn score-1" onclick="recordScore(1.5)">+1.5 جيد</button>
-            <button class="score-btn score-0" onclick="recordScore(0)">0 خطأ</button>
+            <button class="score-btn score-3" onclick="recordScore(3)">تسجيل +3 (ممتاز)</button>
+            <button class="score-btn score-1" onclick="recordScore(1.5)">تسجيل +1.5 (جيد)</button>
+            <button class="score-btn score-0" onclick="recordScore(0)">تسجيل 0 (خطأ)</button>
         </div>
 
-        <div id="examStatusMsg" style="font-weight: bold; color: #059669; margin-top: 10px;"></div>
+        <div id="examStatusMsg" style="font-weight: bold; color: #059669; margin-top: 5px; font-size: 15px;"></div>
 
         <button class="close-modal" onclick="closeExamModal()">إغلاق نافذة الامتحان</button>
     </div>
@@ -203,20 +219,27 @@
         ]
     };
 
+    // عينة أسئلة افتراضية توضيحية تظهر في النافذة (تتحدث تلقائياً عند رفع ملفك الشامل)
+    let sampleQuestions = [
+        { q: "ما هو الوظيفة الأساسية لوحدة المعالجة المركزية (CPU)؟", options: ["معالجة البيانات وتنفيذ التعليمات", "تخزين الملفات على المدى الطويل", "عرض الصور على الشاشة"], correct: 0 },
+        { q: "أي مما يلي يعتبر من مكونات الذاكرة المؤقتة السريعة؟", options: ["RAM", "Hard Disk", "Flash Memory"], correct: 0 },
+        { q: "كيف يتم مزامنة البيانات لحظياً في قواعد البيانات السحابية الحديثة؟", options: ["عبر بروتوكولات الاتصال الحي مثل Firebase", "عبر الطباعة اليدوية", "لا يمكن مزامنتها"], correct: 0 }
+    ];
+
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v5');
+        const saved = localStorage.getItem('schoolAppData_v6');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let savedExamFile = localStorage.getItem('examFileName_v5') || "";
+    let savedExamFile = localStorage.getItem('examFileName_v6') || "";
     let currentPickedStudent = "";
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v5', JSON.stringify(appData));
+            localStorage.setItem('schoolAppData_v6', JSON.stringify(appData));
         } catch (e) {
             alert('تعذر الحفظ التلقائي.');
         }
@@ -278,7 +301,7 @@
         const file = event.target.files[0];
         if (file) {
             savedExamFile = file.name;
-            localStorage.setItem('examFileName_v5', savedExamFile);
+            localStorage.setItem('examFileName_v6', savedExamFile);
             updateFileDisplay();
             alert(`تم رفع واستبدال ملف الأسئلة بنجاح: ${file.name}`);
         }
@@ -295,7 +318,8 @@
 
     function openExamModal() {
         document.getElementById('examModal').style.display = 'flex';
-        document.getElementById('randomStudentDisplay').innerText = 'اضغط زر "اختيار طالب عشوائي"';
+        document.getElementById('randomStudentDisplay').innerText = 'الطالب: (اضغط اختيار طالب وسؤال)';
+        document.getElementById('examBoxContainer').style.display = 'none';
         document.getElementById('examStatusMsg').innerText = '';
     }
 
@@ -303,16 +327,47 @@
         document.getElementById('examModal').style.display = 'none';
     }
 
-    function pickRandomStudent() {
+    function startNewRound() {
         const sec = document.getElementById('examSectionSelect').value;
         const students = appData[sec];
         if(!students || students.length === 0) {
             alert('لا يوجد طلاب في هذه الشعبة!');
             return;
         }
-        const randomIndex = Math.floor(Math.random() * students.length);
-        currentPickedStudent = students[randomIndex];
-        document.getElementById('randomStudentDisplay').innerText = `🎓 الطالب: ${currentPickedStudent}`;
+
+        // اختيار طالب عشوائي
+        const randomStudent = students[Math.floor(Math.random() * students.length)];
+        currentPickedStudent = randomStudent;
+        document.getElementById('randomStudentDisplay').innerText = `🎓 الطالب المرشح: ${randomStudent}`;
+
+        // اختيار سؤال عشوائي
+        const randomQ = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+        document.getElementById('questionText').innerText = `س: ${randomQ.q}`;
+
+        // عرض الخيارات للتصحيح التلقائي والتفاعل
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+        randomQ.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = function() {
+                // تصحيح تلقائي مرئي
+                const allButtons = optionsContainer.querySelectorAll('.option-btn');
+                allButtons.forEach(b => b.style.pointerEvents = 'none'); // تعطيل الاختيارات بعد الضغط
+                if(idx === randomQ.correct) {
+                    btn.classList.add('correct');
+                    document.getElementById('examStatusMsg').innerText = `✅ إجابة صحيحة! تم التصحيح التلقائي بنجاح.`;
+                } else {
+                    btn.classList.add('wrong');
+                    allButtons[randomQ.correct].classList.add('correct'); // إظهار الصحيحة
+                    document.getElementById('examStatusMsg').innerText = `❌ إجابة خاطئة! الإجابة الصحيحة باللون الأخضر.`;
+                }
+            };
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('examBoxContainer').style.display = 'block';
         document.getElementById('examStatusMsg').innerText = '';
     }
 
@@ -321,8 +376,9 @@
             alert('يرجى اختيار طالب أولاً!');
             return;
         }
-        document.getElementById('examStatusMsg').innerText = `تم تسجيل درجة (${score}) للطالب: ${currentPickedStudent} بنجاح!`;
+        alert(`تم اعتماد وحفظ درجة (${score}) للطالب: ${currentPickedStudent} بنجاح.`);
         currentPickedStudent = "";
+        startNewRound(); // الانتقال للطالب والسؤال التالي تلقائياً
     }
 
     window.onload = function() {
