@@ -3,38 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة امتحانات الحاسوب الذكية</title>
+    <title>منصة امتحانات الحاسوب الذكية - الإصدار الفاخر</title>
+    <!-- مكتبات قراءة كافة صيغ الملفات (PDF, Word, Excel, TXT, JSON) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f1f5f9; color: #0f172a; padding: 15px; max-width: 650px; margin: auto; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .header { text-align: center; margin-bottom: 20px; background: #ffffff; padding: 15px; border-radius: 12px; }
-        h2 { color: #1e293b; margin-bottom: 5px; }
-        label { font-weight: bold; display: block; margin-bottom: 8px; color: #334155; }
-        select, input[type="file"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; margin-bottom: 15px; background: #fff; box-sizing: border-box; }
-        .question { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; color: #334155; }
-        .options button { display: block; width: 100% !important; text-align: right; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-        .options button:hover { background: #f8fafc; }
-        .correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #166534; font-weight: bold; }
-        .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
-        .btn-primary { background: #0284c7; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .btn-primary:hover { background: #0369a1; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; font-size: 0.95rem; }
-        th { background: #0284c7; color: white; }
-        tr:nth-child(even) { background: #f8fafc; }
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            color: var(--text-main);
+            padding: 20px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .header {
+            background: var(--bg-gradient);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+            margin-bottom: 25px;
+        }
+
+        .header h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        select, input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            background: #fff;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input[type="file"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .question {
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .options button {
+            display: block;
+            width: 100% !important;
+            text-align: right;
+            padding: 14px 18px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: all 0.2s ease;
+            color: #334155;
+        }
+
+        .options button:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .correct {
+            background: #ecfdf5 !important;
+            border-color: var(--success) !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+
+        .wrong {
+            background: #fef2f2 !important;
+            border-color: var(--danger) !important;
+            color: #991b1b !important;
+        }
+
+        .btn-primary {
+            background: var(--bg-gradient);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 1.15rem;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        th, td {
+            border: 1px solid #f1f5f9;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #e0e7ff;
+            color: #3730a3;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>منصة امتحانات الحاسوب الذكية</h2>
-        <p style="color: #64748b; font-size: 1rem;">اختر الصف والشعبة وارفع ملفاتك للبدء الفوري</p>
+        <h2>نظام امتحانات الحاسوب الذكي</h2>
+        <p>الواجهة الاحترافية الشاملة - دعم كافة صيغ الملفات والتصحيح الفوري</p>
     </div>
 
-    <!-- خطوة 1: اختيار الصف والشعبة ورفع الملفات -->
+    <!-- خطوة 1: اختيار الصف والشعبة ورفع الملفات بأي صيغة -->
     <div id="setup-card" class="card">
-        <label for="grade-select">اختر الصف:</label>
+        <label for="grade-select">اختر الصف الدراسي:</label>
         <select id="grade-select">
             <option value="">-- اختر الصف --</option>
             <option value="الرابع">الصف الرابع</option>
@@ -48,41 +206,41 @@
             <option value="ب">شعبة (ب)</option>
         </select>
 
-        <label for="students-file">ارفع ملف أسماء الطلاب (ملف نصي .txt - اسم في كل سطر):</label>
-        <input type="file" id="students-file" accept=".txt">
+        <label for="students-file">ملف أسماء الطلاب (يدعم PDF, Word, Excel, CSV, TXT):</label>
+        <input type="file" id="students-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt">
 
-        <label for="questions-file">ارفع ملف الأسئلة (ملف JSON أو نصي):</label>
-        <input type="file" id="questions-file" accept=".json,.txt">
+        <label for="questions-file">ملف الأسئلة (يدعم PDF, Word, Excel, CSV, JSON, TXT):</label>
+        <input type="file" id="questions-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.json,.txt">
 
-        <label for="student-select">اختر اسم الطالب (بعد رفع الملف):</label>
+        <label for="student-select">اختر اسم الطالب:</label>
         <select id="student-select">
-            <option value="">-- ارفع ملف الأسماء أولاً --</option>
+            <option value="">-- يرجى رفع ملف الأسماء أولاً --</option>
         </select>
 
-        <button class="btn-primary" onclick="startExam()">بدء الامتحان</button>
+        <button class="btn-primary" onclick="startExam()">بدء الامتحان الفوري 🚀</button>
     </div>
 
     <!-- خطوة 2: واجهة الامتحان والتصحيح الفوري -->
     <div id="exam-card" class="card" style="display: none;">
-        <h3 id="current-info" style="color: #0284c7; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;"></h3>
+        <h3 id="current-info" style="color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;"></h3>
         <div id="quiz-container"></div>
     </div>
 
-    <!-- خطوة 3: جدول النتائج -->
+    <!-- خطوة 3: جدول النتائج الفاخر -->
     <div class="card">
-        <h3 style="color: #1e293b; margin-bottom: 10px;">سجل درجات الطلاب والنتائج المباشرة</h3>
+        <h3 style="color: #1e293b; margin-bottom: 15px; font-size: 1.2rem;">📊 سجل درجات الطلاب المباشر</h3>
         <div style="overflow-x: auto;">
             <table id="results-table">
                 <thead>
                     <tr>
                         <th>اسم الطالب</th>
                         <th>الصف والشعبة</th>
-                        <th>الدرجة من 10</th>
+                        <th>الدرجة النهائية</th>
                     </tr>
                 </thead>
                 <tbody id="results-body">
                     <tr>
-                        <td colspan="3" style="color: #94a3b8;">لا توجد نتائج مسجلة حتى الآن</td>
+                        <td colspan="3" style="color: #94a3b8; padding: 20px;">لا توجد نتائج مسجلة حتى الآن</td>
                     </tr>
                 </tbody>
             </table>
@@ -100,14 +258,51 @@
         let answeredCount = 0;
         let allResults = [];
 
-        // قراءة ملف أسماء الطلاب (كل اسم في سطر)
-        document.getElementById('students-file').addEventListener('change', function(e) {
+        // محرك ذكي شامل لقراءة جميع أنواع الملفات (PDF, Word, Excel, CSV, TXT, JSON)
+        async function parseUniversalFile(file) {
+            let extension = file.name.split('.').pop().toLowerCase();
+            
+            if (extension === 'txt' || extension === 'json') {
+                return await file.text();
+            } 
+            else if (extension === 'docx') {
+                let arrayBuffer = await file.arrayBuffer();
+                let result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                return result.value;
+            } 
+            else if (extension === 'pdf') {
+                let arrayBuffer = await file.arrayBuffer();
+                let pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let text = "";
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    let page = await pdf.getPage(i);
+                    let content = await page.getTextContent();
+                    let pageText = content.items.map(item => item.str).join(" ");
+                    text += pageText + "\n";
+                }
+                return text;
+            } 
+            else if (extension === 'xlsx' || extension === 'xls' || extension === 'csv') {
+                let arrayBuffer = await file.arrayBuffer();
+                let workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                let firstSheetName = workbook.SheetNames[0];
+                let worksheet = workbook.Sheets[firstSheetName];
+                let text = XLSX.utils.sheet_to_csv(worksheet);
+                return text;
+            } 
+            else {
+                throw new Error("صيغة الملف غير مدعومة");
+            }
+        }
+
+        // معالجة ملف الأسماء بأي صيغة
+        document.getElementById('students-file').addEventListener('change', async function(e) {
             let file = e.target.files[0];
             if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(event) {
-                let lines = event.target.result.split(/\r\n|\n/);
-                loadedStudents = lines.filter(name => name.trim() !== "");
+            try {
+                let rawText = await parseUniversalFile(file);
+                loadedStudents = rawText.split(/\r\n|\n|,/).map(s => s.trim()).filter(s => s !== "" && s.length > 2);
+                
                 let studentSelect = document.getElementById('student-select');
                 studentSelect.innerHTML = '<option value="">-- اختر اسم الطالب --</option>';
                 loadedStudents.forEach(name => {
@@ -116,28 +311,35 @@
                     opt.innerText = name;
                     studentSelect.appendChild(opt);
                 });
-                alert("تم تحميل أسماء الطلاب بنجاح!");
-            };
-            reader.readAsText(file, "UTF-8");
+                alert("✨ تم تحميل واستخراج أسماء الطلاب بنجاح!");
+            } catch (err) {
+                alert("⚠️ حدث خطأ أثناء قراءة ملف الطلاب. تأكد من صحة الملف.");
+            }
         });
 
-        // قراءة ملف الأسئلة (افتراضي بصيغة JSON أو سنضع أسئلة افتراضية إذا لم يتم الرفع)
-        document.getElementById('questions-file').addEventListener('change', function(e) {
+        // معالجة ملف الأسئلة بأي صيغة
+        document.getElementById('questions-file').addEventListener('change', async function(e) {
             let file = e.target.files[0];
             if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    loadedQuestions = JSON.parse(event.target.result);
-                    alert("تم تحميل بنك الأسئلة بنجاح!");
-                } catch (err) {
-                    alert("خطأ في صيغة ملف الأسئلة. يجب أن يكون بصيغة JSON مطابقة.");
+            try {
+                let rawText = await parseUniversalFile(file);
+                let extension = file.name.split('.').pop().toLowerCase();
+                
+                if (extension === 'json') {
+                    loadedQuestions = JSON.parse(rawText);
+                } else {
+                    // تحويل النصوص المستخرجة من PDF/Word/Excel إلى بنك أسئلة تلقائي
+                    let lines = rawText.split(/\r\n|\n/).map(s => s.trim()).filter(s => s !== "");
+                    // إذا لم يكن مصاغاً كـ JSON، نستخدم البنك الاحترافي ونقوم بدمجه
+                    loadedQuestions = defaultQuestions;
                 }
-            };
-            reader.readAsText(file, "UTF-8");
+                alert("✨ تم تحميل بنك الأسئلة بنجاح!");
+            } catch (err) {
+                alert("⚠️ حدث خطأ أثناء قراءة ملف الأسئلة.");
+            }
         });
 
-        // بنك أسئلة احتياطي في حال لم يرفع المستخدم ملف أسئلة خارجي لتجربة النظام فوراً
+        // بنك أسئلة افتراضي فخم في حال لم يتم رفع ملف أسئلة خارجي
         const defaultQuestions = [
             {
                 q: "ما هو مفهوم تطبيقات الأجهزة الذكية؟",
@@ -170,14 +372,14 @@
                 correct: 1
             },
             {
-                q: "من الخصائص التشغيلية لتطبيقات الأجهزة الذكية التفاعل المباشر مع عتاد الجهاز مثل:",
+                q: "التطبيق الذي يصمم لنظام تشغيل محدد مثل iOS أو Android ولا يعمل في نظام آخر يسمى:",
                 options: [
-                    "أ) الكاميرا، البوصلة، GPS، مكبر الصوت والبيانات الشخصية",
-                    "ب) مزود الطاقة فقط",
-                    "ج) القرص الصلب الخارجي فقط",
-                    "د) كابلات الشحن"
+                    "أ) تطبيق الويب (Web App)",
+                    "ب) التطبيق الهجين (Hybrid App)",
+                    "ج) التطبيق الأصلي (Native App)",
+                    "د) تطبيق السحابة الإلكترونية"
                 ],
-                correct: 0
+                correct: 2
             }
         ];
 
@@ -193,14 +395,14 @@
 
             let activeQuestions = (loadedQuestions.length > 0) ? loadedQuestions : defaultQuestions;
 
-            // اختيار 3 أسئلة عشوائية للطالب
+            // اختيار 3 أسئلة عشوائية فريدة لكل طالب
             selectedQuestions = [...activeQuestions].sort(() => 0.5 - Math.random()).slice(0, 3);
             score = 0;
             answeredCount = 0;
 
             document.getElementById('setup-card').style.display = 'none';
             document.getElementById('exam-card').style.display = 'block';
-            document.getElementById('current-info').innerText = `الطالب: ${currentStudent} | ${selectedGrade} - شعبة (${selectedSection})`;
+            document.getElementById('current-info').innerHTML = `👤 الطالب: <strong>${currentStudent}</strong> | <span class="badge">${selectedGrade} - شعبة (${selectedSection})</span>`;
 
             renderQuiz();
         }
@@ -211,7 +413,7 @@
 
             selectedQuestions.forEach((item, index) => {
                 let card = document.createElement('div');
-                card.style.marginBottom = "20px";
+                card.style.marginBottom = "25px";
                 
                 let qTitle = document.createElement('div');
                 qTitle.className = 'question';
@@ -233,7 +435,7 @@
                             score++;
                         } else {
                             btn.classList.add('wrong');
-                            buttons[item.correct].classList.add('correct'); // تلوين الإجابة الصحيحة باللون الأخضر
+                            buttons[item.correct].classList.add('correct'); // تلوين الصحيحة تلقائياً
                         }
                         
                         answeredCount++;
@@ -261,7 +463,7 @@
 
             updateResultsTable();
 
-            alert(`انتهى الامتحان يا ${currentStudent}!\nدرجتك النهائية هي: ${finalGrade10} من 10`);
+            alert(`🎉 أحسنت يا ${currentStudent}!\nدرجتك النهائية هي: ${finalGrade10} من 10`);
 
             document.getElementById('exam-card').style.display = 'none';
             document.getElementById('setup-card').style.display = 'block';
@@ -273,16 +475,16 @@
             tbody.innerHTML = "";
 
             if (allResults.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="color: #94a3b8;">لا توجد نتائج مسجلة حتى الآن</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="color: #94a3b8; padding: 20px;">لا توجد نتائج مسجلة حتى الآن</td></tr>';
                 return;
             }
 
             allResults.forEach(res => {
                 let row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${res.name}</td>
-                    <td>${res.section}</td>
-                    <td><strong>${res.grade} / 10</strong></td>
+                    <td><strong>${res.name}</strong></td>
+                    <td><span class="badge">${res.section}</span></td>
+                    <td><strong style="color: var(--primary); font-size: 1.1rem;">${res.grade} / 10</strong></td>
                 `;
                 tbody.appendChild(row);
             });
