@@ -31,7 +31,7 @@
 
         /* نافذة الامتحان وغرفة النتائج */
         #examModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 10px; box-sizing: border-box; overflow-y: auto; }
-        .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 100%; max-width: 700px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-height: 95vh; overflow-y: auto; }
+        .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 100%; max-width: 750px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-height: 95vh; overflow-y: auto; }
         
         .exam-box { background: #f8fafc; border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: right; }
         .question-title { font-weight: bold; color: #334155; margin-bottom: 12px; font-size: 17px; }
@@ -42,7 +42,8 @@
         .option-btn.wrong { background: #ef4444 !important; color: white; border-color: #ef4444; }
 
         /* جدول غرفة النتائج */
-        .results-table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: right; font-size: 14px; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 10px; }
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: right; font-size: 14px; }
         .results-table th, .results-table td { border: 1px solid #cbd5e1; padding: 8px 12px; }
         .results-table th { background: #3b82f6; color: white; }
         .results-table tr:nth-child(even) { background: #f8fafc; }
@@ -161,8 +162,13 @@
 
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #cbd5e1;">
 
-        <h3>📊 غرفة النتائج النهائية (تُحفظ تلقائياً)</h3>
-        <div style="max-height: 200px; overflow-y: auto;">
+        <!-- قسم غرفة النتائج مع أزرار الحذف والتصفير -->
+        <div class="results-header">
+            <h3 style="margin: 0;">📊 غرفة النتائج النهائية</h3>
+            <button class="action-btn reset-btn" onclick="clearAllResults()" style="padding: 6px 12px; font-size: 13px;">🗑️ تصفير وحذف كل النتائج</button>
+        </div>
+
+        <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
             <table class="results-table">
                 <thead>
                     <tr>
@@ -170,6 +176,7 @@
                         <th>اسم الطالب</th>
                         <th>الصف والشعبة</th>
                         <th>الدرجة (من 10)</th>
+                        <th>إجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="resultsTableBody">
@@ -230,7 +237,6 @@
         ]
     };
 
-    // بنك أسئلة افتراضي شامل (يتم سحب 3 منها لكل طالب تلقائياً)
     let questionBank = [
         { q: "ما هو المكون المسؤول عن معالجة البيانات وتنفيذ التعليمات في الحاسوب؟", options: ["وحدة المعالجة المركزية (CPU)", "الذاكرة العشوائية (RAM)", "قرص التخزين الصلب"], correct: 0 },
         { q: "أي من وحدات التخزين التالية تعتبر ذاكرة مؤقتة تفقد محتوياتها عند انقطاع التيار؟", options: ["RAM", "SSD", "HDD"], correct: 0 },
@@ -241,16 +247,15 @@
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v7');
+        const saved = localStorage.getItem('schoolAppData_v8');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v7')) || [];
-    let savedExamFile = localStorage.getItem('examFileName_v7') || "";
+    let examResults = JSON.parse(localStorage.getItem('examResults_v8')) || [];
+    let savedExamFile = localStorage.getItem('examFileName_v8') || "";
 
-    // متغيرات الامتحان الحالي
     let currentStudent = "";
     let currentSectionName = "";
     let selectedQuestions = [];
@@ -259,8 +264,8 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v7', JSON.stringify(appData));
-            localStorage.setItem('examResults_v7', JSON.stringify(examResults));
+            localStorage.setItem('schoolAppData_v8', JSON.stringify(appData));
+            localStorage.setItem('examResults_v8', JSON.stringify(examResults));
         } catch (e) {
             alert('تعذر الحفظ.');
         }
@@ -323,7 +328,7 @@
         const file = event.target.files[0];
         if (file) {
             savedExamFile = file.name;
-            localStorage.setItem('examFileName_v7', savedExamFile);
+            localStorage.setItem('examFileName_v8', savedExamFile);
             updateFileDisplay();
             alert(`تم رفع واستبدال ملف الأسئلة بنجاح: ${file.name}`);
         }
@@ -349,7 +354,6 @@
         document.getElementById('examModal').style.display = 'none';
     }
 
-    // بدء امتحان طالب عشوائي وسحب 3 أسئلة
     function startStudentExam() {
         const secKey = document.getElementById('examSectionSelect').value;
         const students = appData[secKey];
@@ -358,11 +362,9 @@
             return;
         }
 
-        // اختيار طالب عشوائي
         currentStudent = students[Math.floor(Math.random() * students.length)];
         currentSectionName = secKey === '4a' ? 'الرابع (أ)' : secKey === '4b' ? 'الرابع (ب)' : secKey === '5a' ? 'الخامس (أ)' : 'الخامس (ب)';
         
-        // سحب 3 أسئلة عشوائية من البنك
         let shuffled = [...questionBank].sort(() => 0.5 - Math.random());
         selectedQuestions = shuffled.slice(0, 3);
         currentQuestionIdx = 0;
@@ -377,7 +379,6 @@
 
     function loadQuestion() {
         if(currentQuestionIdx >= 3) {
-            // انتهى الامتحان للطالب وحساب الدرجة من 10
             finishStudentExam();
             return;
         }
@@ -397,7 +398,7 @@
             btn.innerText = opt;
             btn.onclick = function() {
                 const allBtns = optionsContainer.querySelectorAll('.option-btn');
-                allBtns.forEach(b => b.style.pointerEvents = 'none'); // تعطيل التكرار
+                allBtns.forEach(b => b.style.pointerEvents = 'none');
 
                 if(idx === qObj.correct) {
                     btn.classList.add('correct');
@@ -409,7 +410,6 @@
                     document.getElementById('feedbackMsg').innerHTML = `<span style="color: #ef4444;">❌ إجابة خاطئة!</span>`;
                 }
 
-                // إظهار زر الانتقال للسؤال التالي
                 document.getElementById('nextQuestionBtn').style.display = 'block';
             };
             optionsContainer.appendChild(btn);
@@ -422,10 +422,8 @@
     }
 
     function finishStudentExam() {
-        // حساب الدرجة من 10 (كل إجابة صحيحة من 3 أسئلة تمنح تقريباً 3.3 درجة، أو نجعلها تقريبية لـ 10: (صح / 3) * 10)
         let finalGrade = Math.round((studentCorrectAnswers / 3) * 10);
 
-        // رفع النتيجة إلى غرفة النتائج
         examResults.unshift({
             name: currentStudent,
             section: currentSectionName,
@@ -434,10 +432,27 @@
         saveData();
         renderResultsTable();
 
-        alert(`انتهى امتحان الطالب: ${currentStudent}\nالنتيجة: ${studentCorrectAnswers} من 3 إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nسيتم الآن الانتقال تلقائياً لطالب جديد.`);
+        alert(`انتهى امتحان الطالب: ${currentStudent}\nالنتيجة: ${studentCorrectAnswers} من 3 إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nسيتم الان الانتقال تلقائياً لطالب جديد.`);
 
-        // الانتقال التلقائي لطالب جديد فوراً
         startStudentExam();
+    }
+
+    // حذف نتيجة طالب محدد من جدول النتائج
+    function deleteResult(index) {
+        if(confirm('هل أنت متأكد من حذف نتيجة هذا الطالب؟')) {
+            examResults.splice(index, 1);
+            saveData();
+            renderResultsTable();
+        }
+    }
+
+    // تصفير وحذف كل النتائج دفعة واحدة
+    function clearAllResults() {
+        if(confirm('⚠️ هل أنت متأكد من حذف وتصفير جميع النتائج نهائياً والبدء من جديد؟')) {
+            examResults = [];
+            saveData();
+            renderResultsTable();
+        }
     }
 
     function renderResultsTable() {
@@ -445,7 +460,7 @@
         if(!tbody) return;
         tbody.innerHTML = '';
         if(examResults.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #64748b;">لا توجد نتائج مسجلة حتى الآن.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #64748b;">لا توجد نتائج مسجلة حتى الآن.</td></tr>`;
             return;
         }
         examResults.forEach((res, index) => {
@@ -455,6 +470,7 @@
                 <td><strong>${res.name}</strong></td>
                 <td>${res.section}</td>
                 <td><span style="background: #10b981; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">${res.grade} / 10</span></td>
+                <td><button class="delete-btn" onclick="deleteResult(${index})">حذف</button></td>
             `;
             tbody.appendChild(tr);
         });
