@@ -502,7 +502,7 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                 <div style="font-weight: 700; color: #d97706; font-size: 15px;" id="questionCounter">السؤال 1 من 3</div>
-                <div id="timerBox" class="timer-display">⏳ الوقت: 10 ثوانٍ</div>
+                <div id="timerBox" class="timer-display">⏳ الوقت: 25 ثانية</div>
             </div>
 
             <div class="exam-box">
@@ -595,26 +595,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v35') || "";
-    let fileName5 = localStorage.getItem('fileName5_v35') || "";
+    let fileName4 = localStorage.getItem('fileName4_v39') || "";
+    let fileName5 = localStorage.getItem('fileName5_v39') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v35');
+        const saved = localStorage.getItem('schoolAppData_v39');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v35')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v39')) || [];
 
-    if(localStorage.getItem('q4_text_v35')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v35');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v35') || "[]");
+    if(localStorage.getItem('q4_text_v39')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v39');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v39') || "[]");
     }
-    if(localStorage.getItem('q5_text_v35')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v35');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v35') || "[]");
+    if(localStorage.getItem('q5_text_v39')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v39');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v39') || "[]");
     }
 
     let currentStudent = "";
@@ -626,7 +626,7 @@
     let studentCorrectAnswers = 0;
 
     let timerInterval = null;
-    let timeLeft = 10;
+    let timeLeft = 25;
 
     function playAlarmSound() {
         try {
@@ -650,15 +650,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v35', JSON.stringify(appData));
-            localStorage.setItem('examResults_v35', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v35', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v35', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v35', fileName4);
+            localStorage.setItem('schoolAppData_v39', JSON.stringify(appData));
+            localStorage.setItem('examResults_v39', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v39', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v39', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v39', fileName4);
 
-            localStorage.setItem('q5_text_v35', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v35', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v35', fileName5);
+            localStorage.setItem('q5_text_v39', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v39', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v39', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -791,8 +791,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v35'); localStorage.removeItem('q4_text_v35'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v35'); localStorage.removeItem('q5_text_v35'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v39'); localStorage.removeItem('q4_text_v39'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v39'); localStorage.removeItem('q5_text_v39'); }
             saveData();
             updateInfoDisplays();
         }
@@ -883,12 +883,12 @@
                 correctIdx = 0;
             } else {
                 if(currentQ !== "") {
-                    // فحص ما إذا كان الخيار يحتوي على إشارة الإجابة الصحيحة
+                    // الكشف عن الإجابة الصحيحة للرابع والخامس معاً في الخلفية
                     if(line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
                         correctIdx = currentOpts.length;
                     }
                     
-                    // تنظيف النص تماماً من عبارة "الإجابة الصحيحة" أو النجمات لكي لا تظهر أمام الطالب
+                    // تنظيف الخيارات بالكامل لتختفي عبارة الإجابة الصحيحة والنجمات عن الطالب
                     let cleanLine = line.replace(/\(الإجابة الصحيحة\)/g, '')
                                         .replace(/الإجابة الصحيحة/g, '')
                                         .replace(/\(\*\)/g, '')
@@ -1036,14 +1036,15 @@
 
     function startTimer() {
         clearInterval(timerInterval);
-        timeLeft = 10;
+        timeLeft = 25; // ضبط العداد ليبدأ من 25 ثانية
         updateTimerDisplay();
 
         timerInterval = setInterval(() => {
             timeLeft--;
             updateTimerDisplay();
 
-            if (timeLeft <= 5 && timeLeft >= 0) {
+            // تفعيل صوت الإنذار والوميض عندما يصل العداد إلى 10 ثوانٍ أو أقل
+            if (timeLeft <= 10 && timeLeft >= 0) {
                 playAlarmSound();
             }
 
@@ -1056,8 +1057,8 @@
 
     function updateTimerDisplay() {
         const timerBox = document.getElementById('timerBox');
-        timerBox.innerText = `⏳ الوقت: ${timeLeft} ثوانٍ`;
-        if (timeLeft <= 5) {
+        timerBox.innerText = `⏳ الوقت: ${timeLeft} ثانية`;
+        if (timeLeft <= 10) {
             timerBox.classList.add('warning');
         } else {
             timerBox.classList.remove('warning');
