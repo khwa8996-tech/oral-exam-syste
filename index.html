@@ -4,560 +4,424 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة الامتحان الشفهي الذكية والمطورة</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --success: #059669;
-            --danger: #dc2626;
-            --bg-main: #f1f5f9;
+            --primary: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             --card-bg: #ffffff;
-            --text-main: #0f172a;
+            --text-main: #1e293b;
             --text-muted: #64748b;
-            --border-color: #e2e8f0;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-main);
+            background: var(--bg-gradient);
             color: var(--text-main);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-
-        .app-container {
-            max-width: 850px;
-            margin: 20px auto;
+        .container {
+            width: 100%;
+            max-width: 900px;
             background: var(--card-bg);
             padding: 35px;
-            border-radius: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
         }
-
-        .header-title {
-            text-align: center;
-            color: var(--primary);
-            margin-bottom: 25px;
-            font-size: 26px;
-            font-weight: 800;
-        }
-
-        .rooms-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .room-tile {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: white;
-            padding: 25px 15px;
-            border-radius: 16px;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .room-tile:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 20px -3px rgba(37, 99, 235, 0.3);
-        }
-
-        .room-tile h3 { margin: 0; font-size: 18px; font-weight: 700; }
-
-        .setup-panel {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            padding: 25px;
-            border-radius: 16px;
-        }
-
-        label {
-            font-weight: 700;
-            color: var(--text-main);
-            display: block;
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 14px;
-            font-size: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            background: white;
-            box-sizing: border-box;
-            resize: vertical;
-            height: 140px;
-        }
-
-        .exam-header {
+        h2 { text-align: center; color: var(--primary); margin-bottom: 30px; font-size: 28px; font-weight: 800; }
+        
+        .bubbles-box {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #eef2ff;
-            padding: 15px 25px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            border: 1px solid #c7d2fe;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 40px 0;
         }
-
-        .exam-header h4 { margin: 0; color: var(--primary); font-size: 18px; }
-
-        .timer-badge {
-            background: var(--danger);
+        .bubble {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
             color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(79,70,229,0.4);
+            transition: 0.3s;
+            border: 4px solid rgba(255,255,255,0.3);
         }
+        .bubble:hover { transform: scale(1.1); box-shadow: 0 15px 30px rgba(147,51,234,0.6); }
+        .bubble.pop { transform: scale(1.5); opacity: 0; transition: 0.3s; }
+        .bubble h3 { margin: 0; font-size: 20px; font-weight: 800; }
+        .bubble span { font-size: 12px; opacity: 0.85; margin-top: 5px; }
 
-        .student-display-card {
-            background: white;
+        .section-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 18px; margin-bottom: 20px; }
+        label { font-weight: 700; display: block; margin-top: 15px; margin-bottom: 6px; font-size: 15px; }
+        textarea, input[type="text"], button {
+            width: 100%; padding: 14px; font-size: 16px; border-radius: 12px; border: 1px solid #cbd5e1; box-sizing: border-box; background: white;
+        }
+        
+        .file-upload-box {
+            background: #eef2ff;
             border: 2px dashed var(--primary);
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .student-display-card h3 { margin: 0; font-size: 14px; color: var(--text-muted); }
-        .student-display-card h1 { margin: 5px 0 0 0; font-size: 26px; color: var(--primary); font-weight: 800; }
-
-        .question-display-card {
-            background: #fffbeb;
-            border: 1px solid #fef3c7;
-            padding: 20px;
-            border-radius: 16px;
-            font-size: 18px;
-            margin-bottom: 15px;
-            font-weight: 700;
-            color: #92400e;
-            line-height: 1.5;
-            text-align: center;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .option-card {
-            background: white;
-            border: 2px solid var(--border-color);
-            padding: 14px 18px;
+            padding: 15px;
             border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--text-main);
-            text-align: right;
-        }
-
-        .option-card:hover {
-            border-color: var(--primary);
-            background: #f8fafc;
-        }
-
-        .action-btn {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            box-sizing: border-box;
-            transition: background 0.2s;
-        }
-
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-dark); }
-        .btn-success { background-color: var(--success); color: white; margin-top: 15px; }
-        .btn-secondary { background-color: var(--text-muted); color: white; margin-top: 15px; }
-
-        #alert-notification {
             text-align: center;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 16px;
-            margin-bottom: 15px;
-            display: none;
+            margin-top: 10px;
         }
-        .notif-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .notif-danger { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        .grades-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-        .grades-table th, .grades-table td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-        }
-        .grades-table th { background-color: #f8fafc; color: var(--text-muted); font-weight: 700; }
+        textarea { resize: vertical; height: 100px; }
 
+        .student-box { background: #eef2ff; border: 2px dashed var(--primary); padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 20px; }
+        .editable-input { font-size: 26px; font-weight: 800; color: var(--primary); text-align: center; border: 2px solid transparent; background: transparent; width: 100%; }
+        .editable-input:focus { border-color: var(--primary); background: white; outline: none; }
+
+        .question-box { background: #fffbeb; border: 2px solid #fde68a; padding: 20px; border-radius: 16px; font-size: 20px; margin-bottom: 20px; text-align: center; font-weight: 800; color: #b45309; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .opt-btn { background: white; border: 2px solid #cbd5e1; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; transition: 0.2s; }
+        .opt-btn:hover { border-color: var(--primary); background: #eef2ff; }
+
+        .btn-main { background-color: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        .btn-success { background-color: var(--success); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        .btn-secondary { background-color: #64748b; color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 12px; overflow: hidden; }
+        th, td { border-bottom: 1px solid #f1f5f9; padding: 12px; text-align: center; font-size: 15px; }
+        th { background: #f8fafc; color: var(--text-muted); font-weight: 700; }
+        .table-input { border: 1px solid transparent; background: transparent; font-size: 15px; font-weight: 700; text-align: center; width: 100%; }
+        .table-input:focus { border-color: var(--primary); background: #f8fafc; outline: none; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <h2 class="header-title">منصة الامتحان الشفهي الذكية 🎓</h2>
+<div class="container">
+    <h2>منصة الامتحان الشفهي الذكية والمطورة 🎓</h2>
     
-    <!-- واجهة اختيار الغرف -->
+    <!-- واجهة الفقاعات -->
     <div id="rooms-view">
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 16px;">اختر غرفة الشعبة لبدء جلسة الاختبار الشفهي:</p>
-        <div class="rooms-container">
-            <div class="room-tile" onclick="openRoom('الرابع (أ)')"><h3>غرفة الرابع أ</h3></div>
-            <div class="room-tile" onclick="openRoom('الرابع (ب)')"><h3>غرفة الرابع ب</h3></div>
-            <div class="room-tile" onclick="openRoom('الخامس (أ)')"><h3>غرفة الخامس أ</h3></div>
-            <div class="room-tile" onclick="openRoom('الخامس (ب)')"><h3>غرفة الخامس ب</h3></div>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 16px;">اضغط على فقاعة الغرفة للدخول:</p>
+        <div class="bubbles-box">
+            <div class="bubble" onclick="selectRoom(this, 'الرابع أ', 'الرابع', 'أ')">
+                <h3>الرابع أ</h3>
+                <span>انفجار 🎈</span>
+            </div>
+            <div class="bubble" onclick="selectRoom(this, 'الرابع ب', 'الرابع', 'ب')">
+                <h3>الرابع ب</h3>
+                <span>انفجار 🎈</span>
+            </div>
+            <div class="bubble" onclick="selectRoom(this, 'الخامس أ', 'الخامس', 'أ')">
+                <h3>الخامس أ</h3>
+                <span>انفجار 🎈</span>
+            </div>
+            <div class="bubble" onclick="selectRoom(this, 'الخامس ب', 'الخامس', 'ب')">
+                <h3>الخامس ب</h3>
+                <span>انفجار 🎈</span>
+            </div>
         </div>
     </div>
 
-    <!-- واجهة إدخال الأسماء -->
-    <div id="setup-view" class="setup-panel hidden">
-        <h3 id="room-title-setup" style="color: var(--primary); text-align: center; margin-bottom: 20px;"></h3>
+    <!-- إعدادات الغرفة -->
+    <div class="section-box hidden" id="setup-view">
+        <h3 id="setup-title" style="color: var(--primary); text-align: center; margin-bottom: 15px;"></h3>
         
-        <label>📋 الصق أسماء الطلاب هنا (نسخ ولصق دفعة واحدة، كل اسم في سطر):</label>
-        <textarea id="students-textarea" placeholder="مثال:&#10;ابراهيم زيد عبد العزيز&#10;ابو عبيدة احمد جبار&#10;احمد إبراهيم مصطفى"></textarea>
+        <label>📋 أسماء الطلاب (نسخ ولصق دفعة واحدة، كل اسم في سطر):</label>
+        <textarea id="students-input" placeholder="اكتب أو الصق أسماء الطلاب هنا..."></textarea>
 
-        <button class="action-btn btn-primary" style="margin-top: 20px;" onclick="startExamSession()">بدء الجلسة الامتحانية 🚀</button>
-        <button class="action-btn btn-secondary" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
+        <!-- زر رفع ملف الأسئلة والأجوبة -->
+        <label>📚 رفع ملف الأسئلة والأجوبة (PDF أو TXT):</label>
+        <div class="file-upload-box">
+            <input type="file" id="pdf-file" accept=".pdf, .txt" onchange="loadFile(event)" style="background:transparent; border:none; padding:5px;">
+            <span style="font-size: 13px; color: var(--primary); display: block; margin-top: 5px;">اختر ملف PDF أو TXT الخاص بالأسئلة</span>
+        </div>
+
+        <label style="margin-top: 15px;">أو الصق محتوى الأسئلة يدوياً هنا:</label>
+        <textarea id="questions-input" placeholder="الصق الأسئلة والخيارات هنا..."></textarea>
+
+        <button class="btn-main" onclick="startExam()">بدء الامتحان الشفهي 🚀</button>
+        <button class="btn-secondary" onclick="goHome()">العودة للغرف 🔙</button>
     </div>
 
-    <!-- واجهة الامتحان الشفهي -->
+    <!-- شاشة الامتحان -->
     <div id="exam-view" class="hidden">
-        <div class="exam-header">
-            <h4 id="exam-room-title"></h4>
-            <div class="timer-badge" id="timer-display">45 ثانية</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #eef2ff; padding: 15px 20px; border-radius: 14px; margin-bottom: 20px;">
+            <h4 id="exam-title" style="margin:0; color:var(--primary);"></h4>
+            <div id="timer" style="color:var(--danger); font-weight:800;">45 ثانية</div>
         </div>
 
-        <div id="alert-notification"></div>
+        <div id="banner" style="text-align:center; padding:12px; border-radius:10px; font-weight:800; margin-bottom:15px; display:none;"></div>
 
-        <div class="student-display-card">
-            <h3>الطالب المستهدف حالياً:</h3>
-            <h1 id="current-student-name">--</h1>
+        <div class="student-box">
+            <h3 style="margin:0 0 8px 0; color:var(--text-muted);">الطالب المستهدف (قابل للتعديل):</h3>
+            <input type="text" id="active-student" class="editable-input" oninput="updateStudentName(this.value)">
         </div>
 
-        <div class="question-display-card" id="current-question-text">
-            جاري اختيار السؤال...
-        </div>
-
+        <div class="question-box" id="active-question">السؤال: --</div>
         <div class="options-grid" id="options-grid"></div>
 
-        <button class="action-btn btn-secondary" onclick="skipCurrentStudent()">تخطي هذا الطالب (0/10) ⏭️</button>
+        <button class="btn-secondary" onclick="skipStudent()">تخطي هذا الطالب والانتقال لغيره ⏭️</button>
 
-        <h3 style="font-size: 15px; color: var(--text-main); margin-top: 25px;">سجل الدرجات النهائي (من 10):</h3>
-        <table class="grades-table">
+        <h3 style="font-size: 16px; margin-top: 25px;">سجل درجات هذه الغرفة حصرياً:</h3>
+        <table>
             <thead>
                 <tr>
-                    <th>اسم الطالب</th>
+                    <th>اسم الطالب (تعديل)</th>
+                    <th>الصف</th>
+                    <th>الشعبة</th>
                     <th>الدرجة من 10</th>
-                    <th>الحالة</th>
                 </tr>
             </thead>
-            <tbody id="grades-table-body"></tbody>
+            <tbody id="table-body"></tbody>
         </table>
 
-        <button class="action-btn btn-success" onclick="exportExcelSheet()">📊 تصدير السجل إلى Excel</button>
-        <button class="action-btn btn-secondary" onclick="resetAndReturnRooms()">🔄 إنهاء الجلسة والعودة للغرف</button>
+        <button class="btn-success" onclick="exportExcel()">📊 تصدير السجل إلى Excel</button>
+        <button class="btn-secondary" onclick="goHome()">🔄 إنهاء الجلسة والعودة للغرف</button>
     </div>
 </div>
 
 <script>
-    let currentRoomName = "";
-    let studentsList = [];
-    let studentPointer = 0;
-    let studentGrades = {}; 
-    let examTimer = null;
-    let secondsLeft = 45;
-    let activeQuestion = null;
+    let currentKey = "", roomName = "", gradeStr = "", secStr = "";
+    let roomDB = {};
 
-    // بنك الأسئلة المنهجية الجاهزة مع الإجابة الصحيحة والخيارات المضللة
-    const questionBank = [
-        {
-            q: "ما المقصود بالصيانة الوقائية للبرمجيات (Software Preventive Maintenance)؟",
-            correct: "إجراءات وقائية تعتمد لتجنب حدوث مشكلة محتملة في تطبيق ما أو عدم توافقه مع النظام.",
-            options: [
-                "إجراءات وقائية تعتمد لتجنب حدوث مشكلة محتملة في تطبيق ما أو عدم توافقه مع النظام.",
-                "إجراءات تركز على استبدال القطع التالفة في اللوحة الأم.",
-                "حذف نظام التشغيل بالكامل وإعادة تثبيته من جديد.",
-                "زيادة سرعة معالج الحاسوب عبر رفع حرارته."
-            ]
-        },
-        {
-            q: "ما هي الغاية الأساسية من خدمة تحديث نظام التشغيل Windows بشكل منتظم؟",
-            correct: "إضافة خصائص جديدة أو تصحيح عمله بإجراء تحسينات أمنية وعامة.",
-            options: [
-                "زيادة مساحة القرص الصلب وتوليد مساحة فارغة.",
-                "إضافة خصائص جديدة أو تصحيح عمله بإجراء تحسينات أمنية وعامة.",
-                "مسح الملفات المؤقتة الخاصة بمتصفح الإنترنت.",
-                "إيقاف عمل مروحة المعالج لتبريد النظام."
-            ]
-        },
-        {
-            q: "ما هو السبب الرئيسي لنقص المساحة الخزنية بعد ترقية نظام Windows إلى نسخة أحدث؟",
-            correct: "احتفاظ النظام الجديد بنسخة احتياطية من ملفات نظام التشغيل القديم.",
-            options: [
-                "امتلاء صندوق التدوير (Recycle Bin) بالكامل.",
-                "تثبيت برامج الألعاب ذات الحجم الكبير جداً.",
-                "احتفاظ النظام الجديد بنسخة احتياطية من ملفات نظام التشغيل القديم.",
-                "وجود فيروسات خبيثة تحجز مساحة القرص."
-            ]
-        },
-        {
-            q: "ما الفرق الأساسي بين ترقية البرمجيات (Upgrade) وتحديثها (Update)؟",
-            correct: "الترقية توفر تحسينات جوهرية بإصدار جديد، بينما التحديث يقدم تصحيحات وسد ثغرات وإصلاح أخطاء.",
-            options: [
-                "الترقية توفر تحسينات جوهرية بإصدار جديد، بينما التحديث يقدم تصحيحات وسد ثغرات وإصلاح أخطاء.",
-                "التحديث يكون عبر شراء قرص ليزري جديد فقط.",
-                "الترقية تخص أجهزة الهواتف المحمولة والتحديث للحواسيب.",
-                "لا يوجد أي فرق بينهما تقنياً."
-            ]
-        },
-        {
-            q: "كيف يتم تمييز رقم الترقية ورقم التحديث في إصدارات البرامج مثل (Windows 8.1)؟",
-            correct: "الرقم أقصى اليسار (8) يمثل الترقية، والرقم بعد الفاصلة (.1) يمثل التحديث.",
-            options: [
-                "الرقم أقصى اليسار يمثل سنة الإصدار والرقم الأيمن يمثل السعر.",
-                "الرقم أقصى اليسار (8) يمثل الترقية، والرقم بعد الفاصلة (.1) يمثل التحديث.",
-                "الأرقام تعبر عن حجم الملف بالميجابايت.",
-                "ترتيب الأحرف الهجائية لاسم الشركة المنتجة."
-            ]
-        },
-        {
-            q: "ما هي أهمية أداة فحص الأقراص (Check Disk / Scandisk) في نظام التشغيل؟",
-            correct: "تشخيص الأخطاء ومحاولة تصحيحها ومعالجة المساحات التالفة على القرص الصلب.",
-            options: [
-                "تسريع تصفح الإنترنت وحذف الكوكيز.",
-                "تشخيص الأخطاء ومحاولة تصحيحها ومعالجة المساحات التالفة على القرص الصلب.",
-                "إلغاء تجزئة الملفات وترتيبها بشكل متجاور.",
-                "زيادة سرعة دوران القرص الصلب ميكانيكياً."
-            ]
-        },
-        {
-            q: "ما هو الغرض والفائدة من برنامج إلغاء تجزئة القرص الصلب (Disk Defragment)؟",
-            correct: "إعادة تنظيم مواقع البيانات المخزونة عشوائياً بشكل مساحات متجاورة لتسريع الوصول إليها.",
-            options: [
-                "حذف ملفات نظام التشغيل القديمة نهائياً.",
-                "تغيير خلفية سطح المكتب وزسومات النظام.",
-                "إعادة تنظيم مواقع البيانات المخزونة عشوائياً بشكل مساحات متجاورة لتسريع الوصول إليها.",
-                "ضغط الملفات الكبيرة لتقليل مساحتها."
-            ]
-        },
-        {
-            q: "ما الغاية من تفعيل خاصية (Storage Sense) في نظام التشغيل Windows؟",
-            correct: "حذف الملفات المؤقتة تلقائياً لغرض تحسين أداء الحاسوب ومنع بطء تنفيذ المهام.",
-            options: [
-                "حذف الملفات المؤقتة تلقائياً لغرض تحسين أداء الحاسوب ومنع بطء تنفيذ المهام.",
-                "فحص اللوحة الأم من ارتفاع درجات الحرارة.",
-                "تحديث برامج الحماية من الفيروسات أسبوعياً.",
-                "إغلاق التطبيقات المفتوحة عبر قائمة Task Manager."
-            ]
-        }
+    const defaultQ = [
+        { q: "ما المقصود بالصيانة الوقائية؟", correct: "إجراءات لتجنب المشاكل المحتملة.", options: ["إجراءات لتجنب المشاكل المحتملة.", "استبدال القطع التالفة.", "حذف نظام التشغيل.", "زيادة حرارة المعالج."] },
+        { q: "ما هي غاية تحديث نظام التشغيل؟", correct: "إضافة خصائص جديدة وتحسينات أمنية.", options: ["إضافة خصائص جديدة وتحسينات أمنية.", "زيادة مساحة القرص.", "مسح متصفح الإنترنت.", "إيقاف المروحة."] }
     ];
 
-    function playAudioTone(isSuccess) {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-
-            if (isSuccess) {
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime); 
-                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); 
-                gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.35);
-            } else {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, ctx.currentTime);
-                osc.frequency.setValueAtTime(100, ctx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.35);
+    function selectRoom(el, name, grade, sec) {
+        el.classList.add('pop');
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(`هلاووووو، ${name}`));
+        }
+        setTimeout(() => {
+            el.classList.remove('pop');
+            currentKey = sec + "_" + grade;
+            roomName = name; gradeStr = grade; secStr = sec;
+            if (!roomDB[currentKey]) {
+                roomDB[currentKey] = { students: [], records: {}, questions: [], pointer: 0 };
             }
-        } catch(err) { console.log(err); }
+            document.getElementById("setup-title").innerText = `إدارة ${name}`;
+            document.getElementById("rooms-view").classList.add("hidden");
+            document.getElementById("setup-view").classList.remove("hidden");
+        }, 300);
     }
 
-    function openRoom(roomTitle) {
-        currentRoomName = roomTitle;
-        document.getElementById('room-title-setup').innerText = `إدارة غرفة الامتحان: ${roomTitle}`;
-        document.getElementById('rooms-view').classList.add('hidden');
-        document.getElementById('setup-view').classList.remove('hidden');
+    async function loadFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.type === "application/pdf") {
+            const reader = new FileReader();
+            reader.onload = function() {
+                pdfjsLib.getDocument(new Uint8Array(this.result)).promise.then(async pdf => {
+                    let txt = "";
+                    for(let i=1; i<=pdf.numPages; i++) {
+                        let page = await pdf.getPage(i);
+                        let content = await page.getTextContent();
+                        txt += content.items.map(item => item.str).join(' ') + '\n';
+                    }
+                    document.getElementById("questions-input").value = txt;
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            const reader = new FileReader();
+            reader.onload = (ev) => { document.getElementById("questions-input").value = ev.target.result; };
+            reader.readAsText(file, "UTF-8");
+        }
     }
 
-    function startExamSession() {
-        const manualText = document.getElementById('students-textarea').value.trim();
-        if (!manualText) {
-            alert("يرجى إدخال أسماء الطلاب في خانة النص (نسخ ولصق) أولاً!");
+    function playSound(isCorrect) {
+        if (isCorrect) {
+            try {
+                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+                for(let i=0; i<4; i++) {
+                    setTimeout(() => {
+                        let buf = ctx.createBuffer(1, ctx.sampleRate*0.08, ctx.sampleRate);
+                        let data = buf.getChannelData(0);
+                        for(let j=0; j<data.length; j++) data[j] = Math.random()*2-1;
+                        let src = ctx.createBufferSource(); src.buffer = buf;
+                        let g = ctx.createGain(); g.gain.value = 0.2;
+                        src.connect(g); g.connect(ctx.destination); src.start();
+                    }, i*70);
+                }
+            } catch(e) {}
+        } else {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance("أووووو... لا لا لا!"));
+            }
+        }
+    }
+
+    function startExam() {
+        const raw = document.getElementById("students-input").value.trim();
+        if (!raw) { alert("يرجى إدخال أسماء الطلاب!"); return; }
+        let list = [...new Set(raw.split('\n').map(s => s.trim()).filter(s => s.length > 2))];
+        if (list.length === 0) { alert("أدخل أسماء صحيحة."); return; }
+
+        let recs = {};
+        list.forEach(s => recs[s] = { name: s, grade: 10 });
+
+        let qText = document.getElementById("questions-input").value.trim();
+        let qArr = defaultQ;
+        if (qText.length > 5) {
+            let parts = qText.split('س:').filter(p => p.trim().length > 5);
+            if(parts.length > 0) {
+                qArr = parts.map(p => {
+                    let lines = p.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+                    let qTitle = lines[0] || p;
+                    let opts = lines.slice(1, 5);
+                    if(opts.length < 4) opts = [qTitle.substring(0,25)+" (صحيح)", "خيار مضلل 1", "خيار مضلل 2", "خيار مضلل 3"];
+                    return { q: "س: " + qTitle, correct: opts[0], options: opts };
+                });
+            }
+        }
+
+        roomDB[currentKey] = { students: list, records: recs, questions: qArr, pointer: 0 };
+        document.getElementById("setup-view").classList.add("hidden");
+        document.getElementById("exam-view").classList.remove("hidden");
+        document.getElementById("exam-title").innerText = `غرفة: ${roomName}`;
+        renderTable();
+        loadStudent();
+    }
+
+    let timer = null, leftTime = 45, currentQ = null;
+
+    function loadStudent() {
+        let db = roomDB[currentKey];
+        if (db.pointer >= db.students.length) {
+            document.getElementById("active-student").value = "انتهت القائمة بنجاح! 🎓";
+            document.getElementById("active-question").innerText = "اكتملت الجلسة الامتحانية.";
+            document.getElementById("options-grid").innerHTML = "";
+            document.getElementById("banner").style.display = "none";
+            clearInterval(timer);
             return;
         }
 
-        studentsList = manualText.split('\n').map(s => s.trim()).filter(s => s.length > 2);
-        studentsList = [...new Set(studentsList)];
+        let stu = db.students[db.pointer];
+        currentQ = db.questions[Math.floor(Math.random() * db.questions.length)];
+        let opts = [...currentQ.options].sort(() => Math.random() - 0.5);
 
-        if (studentsList.length === 0) {
-            alert("لم يتم العثور على أسماء صالحة. يرجى التأكد من كتابة كل اسم في سطر مستقل.");
-            return;
-        }
+        document.getElementById("active-student").value = db.records[stu].name;
+        document.getElementById("active-question").innerText = currentQ.q;
+        document.getElementById("banner").style.display = "none";
 
-        studentGrades = {};
-        studentsList.forEach(s => studentGrades[s] = 0);
+        let grid = document.getElementById("options-grid");
+        grid.innerHTML = "";
+        opts.forEach((op, idx) => {
+            let b = document.createElement("button");
+            b.className = "opt-btn";
+            b.innerHTML = `<strong>${['أ', 'ب', 'ج', 'د'][idx]})</strong> ${op}`;
+            b.onclick = () => answer(op === currentQ.correct);
+            grid.appendChild(b);
+        });
 
-        document.getElementById('setup-view').classList.add('hidden');
-        document.getElementById('exam-view').classList.remove('hidden');
-        document.getElementById('exam-room-title').innerText = `غرفة امتحان: ${currentRoomName} (عدد الطلاب: ${studentsList.length})`;
-
-        studentPointer = 0;
-        updateGradesTable();
-        loadNextStudentQuestion();
-    }
-
-    function runTimer() {
-        clearInterval(examTimer);
-        secondsLeft = 45;
-        document.getElementById('timer-display').innerText = `الوقت المتبقي: ${secondsLeft} ثانية`;
-        
-        examTimer = setInterval(() => {
-            secondsLeft--;
-            document.getElementById('timer-display').innerText = `الوقت المتبقي: ${secondsLeft} ثانية`;
-            if (secondsLeft <= 0) {
-                clearInterval(examTimer);
-                playAudioTone(false);
-                recordAnswer(false, "انتهى الوقت (خطأ تلقائي)");
-            }
+        clearInterval(timer);
+        leftTime = 45;
+        document.getElementById("timer").innerText = `الوقت: ${leftTime} ث`;
+        timer = setInterval(() => {
+            leftTime--;
+            document.getElementById("timer").innerText = `الوقت: ${leftTime} ث`;
+            if (leftTime <= 0) { clearInterval(timer); playSound(false); answer(false); }
         }, 1000);
     }
 
-    function loadNextStudentQuestion() {
-        if (studentPointer >= studentsList.length) {
-            document.getElementById('current-student-name').innerText = "انتهت قائمة الطلاب بنجاح! 🎓";
-            document.getElementById('current-question-text').innerText = "اكتملت الجلسة الامتحانية لجميع طلاب الغرفة.";
-            document.getElementById('options-grid').innerHTML = "";
-            document.getElementById('alert-notification').style.display = "none";
-            clearInterval(examTimer);
-            return;
+    function updateStudentName(val) {
+        let db = roomDB[currentKey];
+        if (db.pointer < db.students.length) {
+            let old = db.students[db.pointer];
+            db.records[old].name = val;
+            db.students[db.pointer] = val;
+            renderTable();
         }
-
-        const student = studentsList[studentPointer];
-        
-        activeQuestionObj = questionBank[Math.floor(Math.random() * questionBank.length)];
-
-        let shuffledOptions = [...activeQuestionObj.options].sort(() => Math.random() - 0.5);
-
-        document.getElementById('current-student-name').innerText = student;
-        document.getElementById('current-question-text').innerText = activeQuestionObj.q;
-        document.getElementById('alert-notification').style.display = "none";
-
-        const grid = document.getElementById('options-grid');
-        grid.innerHTML = "";
-
-        shuffledOptions.forEach((opt, idx) => {
-            const btn = document.createElement('div');
-            btn.className = 'option-card';
-            btn.innerHTML = `<strong>${['أ', 'ب', 'ج', 'د'][idx]})</strong> ${opt}`;
-            btn.onclick = () => {
-                const isCorrect = (opt === activeQuestionObj.correct);
-                recordAnswer(isCorrect, opt);
-            };
-            grid.appendChild(btn);
-        });
-
-        runTimer();
     }
 
-    function skipCurrentStudent() {
-        clearInterval(examTimer);
-        recordAnswer(false, "تم تخطي السؤال");
+    function updateTableName(idx, val) {
+        let db = roomDB[currentKey];
+        let old = db.students[idx];
+        db.students[idx] = val;
+        db.records[val] = db.records[old];
+        if(old !== val) delete db.records[old];
+        if(idx === db.pointer) document.getElementById("active-student").value = val;
     }
 
-    function recordAnswer(isSuccess, chosenOptionText) {
-        clearInterval(examTimer);
-        if (studentPointer >= studentsList.length) return;
+    function skipStudent() { clearInterval(timer); playSound(false); answer(false); }
 
-        const student = studentsList[studentPointer];
-        const banner = document.getElementById('alert-notification');
+    function answer(isCorr) {
+        clearInterval(timer);
+        let db = roomDB[currentKey];
+        if(db.pointer >= db.students.length) return;
+        let stu = db.students[db.pointer];
+        let ban = document.getElementById("banner");
 
-        playAudioTone(isSuccess);
+        playSound(isCorr);
 
-        if (isSuccess) {
-            studentGrades[student] = 10;
-            banner.className = "notif-success";
-            banner.innerHTML = `✔️ إجابة صحيحة! حصل الطالب على (10/10).`;
+        if(isCorr) {
+            db.records[stu].grade = 10;
+            ban.className = "alert-success";
+            ban.style.background = "#d1fae5"; ban.style.color = "#065f46";
+            ban.innerHTML = "✔️ إجابة صحيحة (تصفيق)! تم رصد (10/10).";
         } else {
-            studentGrades[student] = 0;
-            banner.className = "notif-danger";
-            banner.innerHTML = `❌ إجابة خاطئة!<br><b>الإجابة الصحيحة هي:</b> ${activeQuestionObj.correct}`;
+            db.records[stu].grade = 0;
+            ban.className = "alert-danger";
+            ban.style.background = "#fee2e2"; ban.style.color = "#991b1b";
+            ban.innerHTML = `❌ إجابة خاطئة (أووووو لا لا لا)! الصحيحة: ${currentQ.correct}`;
         }
-        banner.style.display = "block";
+        ban.style.display = "block";
+        renderTable();
 
-        updateGradesTable();
-
-        studentPointer++;
-        setTimeout(() => {
-            loadNextStudentQuestion();
-        }, 3200);
+        db.pointer++;
+        setTimeout(() => loadStudent(), 3500);
     }
 
-    function updateGradesTable() {
-        const tbody = document.getElementById('grades-table-body');
+    function renderTable() {
+        let db = roomDB[currentKey];
+        let tbody = document.getElementById("table-body");
         tbody.innerHTML = "";
-        studentsList.forEach((stu, idx) => {
-            let grade = studentGrades[stu] !== undefined ? studentGrades[stu] : "-";
-            let status = grade === 10 ? "✔️ ممتاز (10)" : (grade === 0 && idx < studentPointer ? "❌ غير موفق (0)" : "⏳ بانتظار الدور");
-            const row = document.createElement('tr');
-            row.innerHTML = `<td><b>${stu}</b></td><td><b>${grade} / 10</b></td><td>${status}</td>`;
-            tbody.appendChild(row);
+        db.students.forEach((sKey, idx) => {
+            let r = db.records[sKey];
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><input type="text" class="table-input" value="${r.name}" oninput="updateTableName(${idx}, this.value)"></td>
+                <td><b>${gradeStr}</b></td>
+                <td><b>${secStr}</b></td>
+                <td><b>${r.grade} / 10</b></td>
+            `;
+            tbody.appendChild(tr);
         });
     }
 
-    function exportExcelSheet() {
-        const tableHTML = document.querySelector('.grades-table').outerHTML;
-        const blob = new Blob(['\ufeff' + tableHTML], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `سجل_درجات_${currentRoomName}_امتحان_شفهي.xls`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+    function exportExcel() {
+        let db = roomDB[currentKey];
+        let html = `<table><tr><th>اسم الطالب</th><th>الصف</th><th>الشعبة</th><th>الدرجة</th></tr>`;
+        db.students.forEach(sKey => {
+            let r = db.records[sKey];
+            html += `<tr><td>${r.name}</td><td>${gradeStr}</td><td>${secStr}</td><td>${r.grade}/10</td></tr>`;
+        });
+        html += `</table>`;
+        let blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `درجات_غرفة_${roomName}.xls`; a.click();
     }
 
-    function backToRooms() {
-        clearInterval(examTimer);
-        document.getElementById('setup-view').classList.add('hidden');
-        document.getElementById('rooms-view').classList.remove('hidden');
-        document.getElementById('students-textarea').value = "";
-    }
-
-    function resetAndReturnRooms() {
-        backToRooms();
-        document.getElementById('grades-table-body').innerHTML = "";
-        document.getElementById('alert-notification').style.display = "none";
+    function goHome() {
+        clearInterval(timer);
+        document.getElementById("setup-view").classList.add("hidden");
+        document.getElementById("exam-view").classList.add("hidden");
+        document.getElementById("rooms-view").classList.remove("hidden");
+        document.getElementById("students-input").value = "";
+        document.getElementById("questions-input").value = "";
+        document.getElementById("pdf-file").value = "";
     }
 </script>
 
