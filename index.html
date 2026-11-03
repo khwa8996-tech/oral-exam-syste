@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة ثانوية المتفوقين الثانية - نظام الامتحان الذكي مع المؤقت الصوتي</title>
+    <title>منصة ثانوية المتفوقين الثانية - نظام الامتحان الذكي والتزامن المحلي</title>
     <!-- مكتبة قراءة ملفات Word (.docx) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <!-- مكتبة قراءة ملفات PDF -->
@@ -16,6 +16,7 @@
         .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h1, h2 { text-align: center; color: #2c3e50; }
         
+        .backup-section { background: #dbeafe; padding: 12px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .exam-file-section { background: #eef2f3; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px dashed #cbd5e1; text-align: center; }
         .start-exam-btn { background: #8b5cf6; color: white; padding: 12px 25px; font-size: 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
         .start-exam-btn:hover { background: #7c3aed; }
@@ -35,6 +36,7 @@
         .home-btn { background: #475569; color: white; margin-bottom: 15px; }
         .clear-box-btn { background: #64748b; color: white; }
         .skip-btn { background: #f59e0b; color: white; }
+        .backup-btn { background: #0284c7; color: white; font-size: 13px; }
         ul { list-style-type: none; padding: 0; }
         li { background: #fafafa; margin-bottom: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; }
         .delete-btn { background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
@@ -69,9 +71,21 @@
 
 <div class="container" id="mainHomeContainer">
     <h1>ثانوية المتفوقين الثانية للبنين</h1>
-    <h2>سجل أسماء الطلبة وإدارة الأسئلة (مع مؤقت 10 ثوانٍ وجرس إنذار)</h2>
+    <h2>سجل أسماء الطلبة وإدارة الأسئلة (حفظ دائم على سطح المكتب بدون إنترنت)</h2>
 
-    <!-- بنك أسئلة الصف الرابع (للشعبتين أ و ب) -->
+    <!-- شريط النسخ الاحتياطي والتزامن (لحفظ كل الملفات والنتائج واسترجاعها بأي وقت) -->
+    <div class="backup-section">
+        <div>
+            <strong>💾 تزامن وحفظ البيانات:</strong> يمكنك تصدير ملف النسخة الاحتياطية لجهازك أو استيراده لأي حاسبة أخرى.
+        </div>
+        <div>
+            <button class="action-btn backup-btn" onclick="exportBackup()">📥 تحميل نسخة احتياطية</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importBackup(event)">
+            <button class="action-btn backup-btn" style="background: #059669;" onclick="document.getElementById('importFile').click()">📤 استعادة نسخة</button>
+        </div>
+    </div>
+
+    <!-- بنك أسئلة الصف الرابع -->
     <div class="exam-file-section" style="border-color: #3b82f6;">
         <h3 style="color: #1d4ed8; margin-top: 0;">📚 بنك أسئلة الصف الرابع (للشعبتين: أ، ب)</h3>
         <p style="font-size: 12px; color: #475569; margin: 4px 0;">ضع عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح (لتخزينها خلف الكواليس وإخفائها عن الطالب).</p>
@@ -82,10 +96,10 @@
         </div>
         <div id="info4" class="file-info">⚠️ لم يتم حفظ ملف للرابع بعد.</div>
         <textarea id="text4" placeholder="مثال:&#10;ما هي أهمية تحديث نظام التشغيل؟&#10;إضافة خصائص جديدة (الإجابة الصحيحة)&#10;زيادة حرارة المعالج&#10;حذف كافة التطبيقات"></textarea>
-        <button class="action-btn add-btn" onclick="saveQuestions('4')" style="margin-top: 6px; width: 100%;">💾 حفظ بنك أسئلة الرابع دائمياً (يعمل بدون إنترنت)</button>
+        <button class="action-btn add-btn" onclick="saveQuestions('4')" style="margin-top: 6px; width: 100%;">💾 حفظ بنك أسئلة الرابع دائمياً</button>
     </div>
 
-    <!-- بنك أسئلة الصف الخامس (للشعبتين أ و ب) -->
+    <!-- بنك أسئلة الصف الخامس -->
     <div class="exam-file-section" style="border-color: #10b981;">
         <h3 style="color: #047857; margin-top: 0;">📚 بنك أسئلة الصف الخامس (للشعبتين: أ، ب)</h3>
         <p style="font-size: 12px; color: #475569; margin: 4px 0;">ضع عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح.</p>
@@ -96,7 +110,7 @@
         </div>
         <div id="info5" class="file-info">⚠️ لم يتم حفظ ملف للخامس بعد.</div>
         <textarea id="text5" placeholder="مثال:&#10;ما هو الغرض من برنامج Defragment؟&#10;إعادة تنظيم مواقع البيانات (الإجابة الصحيحة)&#10;حذف نظام التشغيل&#10;تشفير البيانات"></textarea>
-        <button class="action-btn add-btn" style="background: #10b981;" onclick="saveQuestions('5')" style="margin-top: 6px; width: 100%;">💾 حفظ بنك أسئلة الخامس دائمياً (يعمل بدون إنترنت)</button>
+        <button class="action-btn add-btn" style="background: #10b981;" onclick="saveQuestions('5')" style="margin-top: 6px; width: 100%;">💾 حفظ بنك أسئلة الخامس دائمياً</button>
     </div>
 
     <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي واختيار الشعبة</button>
@@ -280,26 +294,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v24') || "";
-    let fileName5 = localStorage.getItem('fileName5_v24') || "";
+    let fileName4 = localStorage.getItem('fileName4_v25') || "";
+    let fileName5 = localStorage.getItem('fileName5_v25') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v24');
+        const saved = localStorage.getItem('schoolAppData_v25');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v24')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v25')) || [];
 
-    if(localStorage.getItem('q4_text_v24')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v24');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v24') || "[]");
+    if(localStorage.getItem('q4_text_v25')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v25');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v25') || "[]");
     }
-    if(localStorage.getItem('q5_text_v24')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v24');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v24') || "[]");
+    if(localStorage.getItem('q5_text_v25')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v25');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v25') || "[]");
     }
 
     let currentStudent = "";
@@ -313,7 +327,6 @@
     let timerInterval = null;
     let timeLeft = 10;
 
-    // توليد جرس إنذار صوتي رقمي
     function playAlarmSound() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -321,7 +334,7 @@
             const gainNode = audioCtx.createGain();
             
             osc.type = 'square';
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // تردد صوت التنبيه الحاد
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
             
             gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
@@ -336,18 +349,66 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v24', JSON.stringify(appData));
-            localStorage.setItem('examResults_v24', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v24', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v24', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v24', fileName4);
+            localStorage.setItem('schoolAppData_v25', JSON.stringify(appData));
+            localStorage.setItem('examResults_v25', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v25', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v25', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v25', fileName4);
 
-            localStorage.setItem('q5_text_v24', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v24', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v24', fileName5);
+            localStorage.setItem('q5_text_v25', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v25', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v25', fileName5);
         } catch (e) {
-            alert('تعذر الحفظ.');
+            alert('تعذر الحفظ المحلي.');
         }
+    }
+
+    // تصدير كافة البيانات كملف نسخ احتياطي ليتم حفظه على سطح المكتب أو نقله
+    function exportBackup() {
+        const backupData = {
+            appData: appData,
+            examResults: examResults,
+            q4_text: document.getElementById('text4').value,
+            q4_bank: questions4,
+            q5_text: document.getElementById('text5').value,
+            q5_bank: questions5,
+            fileName4: fileName4,
+            fileName5: fileName5
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "school_exam_backup.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    // استيراد النسخة الاحتياطية واسترجاع البيانات كاملة
+    function importBackup(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if(imported.appData) appData = imported.appData;
+                if(imported.examResults) examResults = imported.examResults;
+                if(imported.q4_text) document.getElementById('text4').value = imported.q4_text;
+                if(imported.q4_bank) questions4 = imported.q4_bank;
+                if(imported.q5_text) document.getElementById('text5').value = imported.q5_text;
+                if(imported.q5_bank) questions5 = imported.q5_bank;
+                if(imported.fileName4) fileName4 = imported.fileName4;
+                if(imported.fileName5) fileName5 = imported.fileName5;
+                
+                saveData();
+                renderLists();
+                alert('✅ تمت استعادة النسخة الاحتياطية ودمج كافة البيانات بنجاح!');
+            } catch(err) {
+                alert('❌ ملف النسخة الاحتياطية غير صالح.');
+            }
+        };
+        reader.readAsText(file);
     }
 
     function renderLists() {
@@ -406,8 +467,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v24'); localStorage.removeItem('q4_text_v24'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v24'); localStorage.removeItem('q5_text_v24'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v25'); localStorage.removeItem('q4_text_v25'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v25'); localStorage.removeItem('q5_text_v25'); }
             saveData();
             updateInfoDisplays();
         }
@@ -478,7 +539,7 @@
         
         saveData();
         updateInfoDisplays();
-        alert(`💾 تم حفظ بنك أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'} دائمياً في ذاكرة الجهاز بنجاح!`);
+        alert(`💾 تم حفظ بنك أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'} دائمياً على الجهاز بدون إنترنت!`);
     }
 
     function parseQuestions(text, grade) {
@@ -642,7 +703,6 @@
             optionsContainer.appendChild(btn);
         });
 
-        // تشغيل المؤقت (10 ثوانٍ)
         startTimer();
     }
 
@@ -655,7 +715,6 @@
             timeLeft--;
             updateTimerDisplay();
 
-            // عندما يصل إلى 4 نزولاً إلى 0، يعطي جرس إنذار
             if (timeLeft <= 4 && timeLeft >= 0) {
                 playAlarmSound();
             }
