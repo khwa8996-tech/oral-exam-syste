@@ -3,58 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة امتحانات الحاسوب الذكية - التصحيح الفوري</title>
+    <title>منصة امتحانات الحاسوب الذكية - النظام الشامل</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f1f5f9; color: #0f172a; padding: 15px; max-width: 600px; margin: auto; }
+        body { font-family: 'Arial', sans-serif; background-color: #f1f5f9; color: #0f172a; padding: 15px; max-width: 650px; margin: auto; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .header { text-align: center; margin-bottom: 20px; background: #ffffff; padding: 15px; border-radius: 12px; }
         h2 { color: #1e293b; margin-bottom: 5px; }
-        .student-select { margin-bottom: 15px; font-size: 1.1rem; }
-        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; margin-top: 5px; }
+        label { font-weight: bold; display: block; margin-bottom: 8px; color: #334155; }
+        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; margin-bottom: 15px; background: #fff; }
         .question { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; color: #334155; }
-        .options button { display: block; width: 100%; text-align: right; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .options button { display: block; width: 100% !important; text-align: right; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; font-size: 1rem; transition: 0.2s; }
         .options button:hover { background: #f8fafc; }
         .correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #166534; font-weight: bold; }
         .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
-        #result-box { text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px; background: #e0f2fe; border-radius: 8px; color: #0369a1; display: none; }
-        .btn-primary { background: #0284c7; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 1.1px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-primary { background: #0284c7; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-primary:hover { background: #0369a1; }
+        
+        /* جدول النتائج */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; font-size: 0.95rem; }
+        th { background: #0284c7; color: white; }
+        tr:nth-child(even) { background: #f8fafc; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>امتحان مادة الحاسوب الذكي</h2>
-        <!-- حدد الشعبة هنا لكل رابط ترفعه -->
-        <p id="section-title" style="color: #64748b; font-weight: bold; font-size: 1.1rem;"></p>
+        <h2>نظام امتحانات الحاسوب الذكي</h2>
+        <p style="color: #64748b; font-size: 1rem;">التصحيح الفوري وإدارة الشعب المستقلة</p>
     </div>
 
-    <!-- مرحلة اختيار اسم الطالب -->
-    <div id="login-card" class="card">
-        <div class="student-select">
-            <label for="student-name">اختر اسم الطالب:</label>
-            <select id="student-name">
-                <option value="">-- اضغط لاختيار اسمك --</option>
-                <!-- أسماء الطلاب (يمكنك تعديلها حسب كل شعبة) -->
-                <option value="أحمد محمد">أحمد محمد</option>
-                <option value="حسين علي">حسين علي</option>
-                <option value="فاطمة حسن">فاطمة حسن</option>
-                <option value="مريم أحمد">مريم أحمد</option>
-            </select>
-        </div>
-        <button class="btn-primary" onclick="startExam()">بدء الامتحان</button>
+    <!-- 1. بوابة اختيار الشعبة واسم الطالب -->
+    <div id="setup-card" class="card">
+        <label for="section-select">اختر الشعبة أو البوابة:</label>
+        <select id="section-select">
+            <option value="">-- اضغط لاختيار الشعبة --</option>
+            <option value="الرابع (أ)">الرابع (أ)</option>
+            <option value="الرابع (ب)">الرابع (ب)</option>
+            <option value="الخامس (أ)">الخامس (أ)</option>
+            <option value="الخامس (ب)">الخامس (ب)</option>
+        </select>
+
+        <label for="student-select">اختر اسم الطالب:</label>
+        <select id="student-select">
+            <option value="">-- اختر الشعبة أولاً --</option>
+        </select>
+
+        <button class="btn-primary" onclick="startExam()">دخول الامتحان</button>
     </div>
 
-    <!-- صندوق الامتحان (يظهر بعد اختيار الاسم) -->
-    <div id="exam-card" style="display: none;">
+    <!-- 2. واجهة الأسئلة -->
+    <div id="exam-card" class="card" style="display: none;">
+        <h3 id="current-info" style="color: #0284c7; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;"></h3>
         <div id="quiz-container"></div>
-        <div id="result-box"></div>
+    </div>
+
+    <!-- 3. لوحة سجل الدرجات والنتائج لكل شعبة -->
+    <div class="card">
+        <h3 style="color: #1e293b; margin-bottom: 10px;">سجل درجات الطلاب (نتائج الشعبة)</h3>
+        <div style="overflow-x: auto;">
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>اسم الطالب</th>
+                        <th>الصف والشعبة</th>
+                        <th>الدرجة من 10</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                    <tr>
+                        <td colspan="3" style="color: #94a3b8;">لا توجد نتائج مسجلة حتى الآن</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        // === قم بتغيير اسم الشعبة هنا بحسب المستودع على GitHub ===
-        document.getElementById('section-title').innerText = "الصف الرابع - شعبة أ";
+        // قاعدة بيانات أسماء الطلاب حسب الشعبة (يمكنك إضافة أو تعديل الأسماء هنا بكل سهولة)
+        const studentsData = {
+            "الرابع (أ)": ["أحمد محمد علي", "حسين جاسم", "فاطمة كريم", "موسى كاظم"],
+            "الرابع (ب)": ["زينب عبد الله", "حسن علي", "سارة أحمد", "علي رضا"],
+            "الخامس (أ)": ["محمد باقر", "زهراء حسن", "مصطفى عادل", "نور الهدى"],
+            "الخامس (ب)": ["كرار حيدر", "بنين محمد", "سجاد علي", "آية حسين"]
+        };
 
-        // بنك الأسئلة الشامل (اخترنا لك عينة، ويمكنك إضافة كل الـ 107 أسئلة هنا)
+        // بنك الأسئلة الشامل (يمكنك إضافة بقية الـ 107 أسئلة هنا)
         const allQuestions = [
             {
                 q: "ما هو مفهوم تطبيقات الأجهزة الذكية؟",
@@ -108,22 +142,46 @@
             }
         ];
 
+        let currentSection = "";
+        let currentStudent = "";
         let selectedQuestions = [];
         let score = 0;
         let answeredCount = 0;
+        let allResults = [];
+
+        // تحديث قائمة الطلاب بناءً على اختيار الشعبة
+        document.getElementById('section-select').addEventListener('change', function() {
+            let section = this.value;
+            let studentSelect = document.getElementById('student-select');
+            studentSelect.innerHTML = '<option value="">-- اختر اسم الطالب --</option>';
+            
+            if (section && studentsData[section]) {
+                studentsData[section].forEach(name => {
+                    let opt = document.createElement('option');
+                    opt.value = name;
+                    opt.innerText = name;
+                    studentSelect.appendChild(opt);
+                });
+            }
+        });
 
         function startExam() {
-            let studentName = document.getElementById('student-name').value;
-            if (!studentName) {
-                alert("الرجاء اختيار اسم الطالب أولاً!");
+            currentSection = document.getElementById('section-select').value;
+            currentStudent = document.getElementById('student-select').value;
+
+            if (!currentSection || !currentStudent) {
+                alert("الرجاء اختيار الشعبة واسم الطالب أولاً!");
                 return;
             }
 
-            // خوارزمية ذكية لاختيار 3 أسئلة عشوائية فريدة لكل طالب
+            // اختيار 3 أسئلة عشوائية فريدة لكل طالب
             selectedQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 3);
+            score = 0;
+            answeredCount = 0;
 
-            document.getElementById('login-card').style.display = 'none';
+            document.getElementById('setup-card').style.display = 'none';
             document.getElementById('exam-card').style.display = 'block';
+            document.getElementById('current-info').innerText = `الطالب: ${currentStudent} | الشعبة: ${currentSection}`;
 
             renderQuiz();
         }
@@ -134,7 +192,7 @@
 
             selectedQuestions.forEach((item, index) => {
                 let card = document.createElement('div');
-                card.className = 'card';
+                card.style.marginBottom = "20px";
                 
                 let qTitle = document.createElement('div');
                 qTitle.className = 'question';
@@ -149,29 +207,66 @@
                     btn.innerText = opt;
                     btn.onclick = function() {
                         let buttons = optDiv.querySelectorAll('button');
-                        buttons.forEach(b => b.disabled = true); // قفل الأزرار بعد الاختيار
+                        buttons.forEach(b => b.disabled = true); // قفل الأزرار فور الاختيار
                         
                         if (optIndex === item.correct) {
                             btn.classList.add('correct');
                             score++;
                         } else {
                             btn.classList.add('wrong');
-                            buttons[item.correct].classList.add('correct'); // تلوين الصحيحة تلقائياً
+                            buttons[item.correct].classList.add('correct'); // تلوين الإجابة الصحيحة باللون الأخضر تلقائياً
                         }
                         
                         answeredCount++;
                         if (answeredCount === selectedQuestions.length) {
-                            let resBox = document.getElementById('result-box');
-                            resBox.style.display = 'block';
-                            resBox.innerText = `انتهى الامتحان! نتيجتك هي: ${score} من ${selectedQuestions.length}`;
+                            setTimeout(finishExam, 1000);
                         }
                     };
-                    optDiv.appendChild(resBox = optDiv);
                     optDiv.appendChild(btn);
                 });
 
                 card.appendChild(optDiv);
                 container.appendChild(card);
+            });
+        }
+
+        function finishExam() {
+            // احتساب الدرجة من 10 بناءً على الإجابات الصحيحة من أصل 3 أسئلة
+            let finalGrade10 = Math.round((score / selectedQuestions.length) * 10);
+
+            allResults.push({
+                name: currentStudent,
+                section: currentSection,
+                grade: finalGrade10
+            });
+
+            updateResultsTable();
+
+            alert(`انتهى الاختبار يا ${currentStudent}!\nدرجتك النهائية هي: ${finalGrade10} من 10`);
+
+            document.getElementById('exam-card').style.display = 'none';
+            document.getElementById('setup-card').style.display = 'block';
+            document.getElementById('section-select').value = "";
+            document.getElementById('student-select').innerHTML = '<option value="">-- اختر الشعبة أولاً --</option>';
+        }
+
+        function updateResultsTable() {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = "";
+
+            if (allResults.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="color: #94a3b8;">لا توجد نتائج مسجلة حتى الآن</td></tr>';
+                return;
+            }
+
+            allResults.forEach(res => {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${res.name}</td>
+                    <td>${res.section}</td>
+                    <td><strong>${res.grade} / 10</strong></td>
+                `;
+                tbody.appendChild(row);
             });
         }
     </script>
