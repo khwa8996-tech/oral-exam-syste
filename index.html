@@ -3,36 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>امتحان مادة الحاسوب الذكي - التصحيح الفوري</title>
+    <title>منصة امتحانات الحاسوب الذكية - التصحيح الفوري</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f8fafc; color: #0f172a; padding: 20px; max-width: 650px; margin: auto; }
-        .header { text-align: center; margin-bottom: 25px; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        body { font-family: 'Arial', sans-serif; background-color: #f1f5f9; color: #0f172a; padding: 15px; max-width: 600px; margin: auto; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .question { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; color: #1e293b; }
+        .header { text-align: center; margin-bottom: 20px; background: #ffffff; padding: 15px; border-radius: 12px; }
+        h2 { color: #1e293b; margin-bottom: 5px; }
+        .student-select { margin-bottom: 15px; font-size: 1.1rem; }
+        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; margin-top: 5px; }
+        .question { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; color: #334155; }
         .options button { display: block; width: 100%; text-align: right; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-        .options button:hover { background: #f1f5f9; }
+        .options button:hover { background: #f8fafc; }
         .correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #166534; font-weight: bold; }
         .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
-        #result { text-align: center; font-size: 1.3rem; font-weight: bold; margin-top: 25px; padding: 15px; background: #e0f2fe; border-radius: 8px; color: #0369a1; display: none; }
+        #result-box { text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px; background: #e0f2fe; border-radius: 8px; color: #0369a1; display: none; }
+        .btn-primary { background: #0284c7; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 1.1px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2>نظام امتحان مادة الحاسوب الذكي</h2>
-        <!-- قم بتغيير اسم الشعبة هنا بحسب الرابط الذي سترفعه (مثال: الرابع - شعبة أ) -->
-        <p id="class-title" style="color: #475569; font-weight: bold; font-size: 1.1rem; margin-top: 5px;"></p>
+        <h2>امتحان مادة الحاسوب الذكي</h2>
+        <!-- حدد الشعبة هنا لكل رابط ترفعه -->
+        <p id="section-title" style="color: #64748b; font-weight: bold; font-size: 1.1rem;"></p>
     </div>
-    
-    <div id="quiz-container"></div>
-    <div id="result"></div>
+
+    <!-- مرحلة اختيار اسم الطالب -->
+    <div id="login-card" class="card">
+        <div class="student-select">
+            <label for="student-name">اختر اسم الطالب:</label>
+            <select id="student-name">
+                <option value="">-- اضغط لاختيار اسمك --</option>
+                <!-- أسماء الطلاب (يمكنك تعديلها حسب كل شعبة) -->
+                <option value="أحمد محمد">أحمد محمد</option>
+                <option value="حسين علي">حسين علي</option>
+                <option value="فاطمة حسن">فاطمة حسن</option>
+                <option value="مريم أحمد">مريم أحمد</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="startExam()">بدء الامتحان</button>
+    </div>
+
+    <!-- صندوق الامتحان (يظهر بعد اختيار الاسم) -->
+    <div id="exam-card" style="display: none;">
+        <div id="quiz-container"></div>
+        <div id="result-box"></div>
+    </div>
 
     <script>
-        // === حدد اسم الصف والشعبة هنا لكل نسخة ترفعها على GitHub ===
-        document.getElementById('class-title').innerText = "الصف الرابع - شعبة أ";
+        // === قم بتغيير اسم الشعبة هنا بحسب المستودع على GitHub ===
+        document.getElementById('section-title').innerText = "الصف الرابع - شعبة أ";
 
-        // مصفوفة الأسئلة والخيارات (يمكنك إضافة أو تعديل الأسئلة هنا)
-        const questions = [
+        // بنك الأسئلة الشامل (اخترنا لك عينة، ويمكنك إضافة كل الـ 107 أسئلة هنا)
+        const allQuestions = [
             {
                 q: "ما هو مفهوم تطبيقات الأجهزة الذكية؟",
                 options: [
@@ -41,7 +64,7 @@
                     "ج) ملفات نصية لتخزين البيانات فقط",
                     "د) أجهزة مادية لإدارة الاتصال بالإنترنت"
                 ],
-                correct: 1 // ترتيب الإجابة الصحيحة يبدأ من 0 (0 يعني الخيار الأول، 1 يعني الثاني وهكذا)
+                correct: 1
             },
             {
                 q: "من مميزات تطبيقات الأجهزة الذكية التخزين الداخلي حيث تخزن في ذاكرة الجهاز لتأدية:",
@@ -62,54 +85,95 @@
                     "د) تشغيل مروحة المعالج"
                 ],
                 correct: 1
+            },
+            {
+                q: "من الخصائص التشغيلية لتطبيقات الأجهزة الذكية التفاعل المباشر مع عتاد الجهاز مثل:",
+                options: [
+                    "أ) الكاميرا، البوصلة، GPS، مكبر الصوت والبيانات الشخصية",
+                    "ب) مزود الطاقة فقط",
+                    "ج) القرص الصلب الخارجي فقط",
+                    "د) كابلات الشحن"
+                ],
+                correct: 0
+            },
+            {
+                q: "التطبيق الذي يصمم لنظام تشغيل محدد مثل iOS أو Android ولا يعمل في نظام آخر يسمى:",
+                options: [
+                    "أ) تطبيق الويب (Web App)",
+                    "ب) التطبيق الهجين (Hybrid App)",
+                    "ج) التطبيق الأصلي (Native App)",
+                    "د) تطبيق السحابة الإلكترونية"
+                ],
+                correct: 2
             }
         ];
 
+        let selectedQuestions = [];
         let score = 0;
         let answeredCount = 0;
-        const container = document.getElementById('quiz-container');
 
-        questions.forEach((item, index) => {
-            let card = document.createElement('div');
-            card.className = 'card';
-            
-            let qTitle = document.createElement('div');
-            qTitle.className = 'question';
-            qTitle.innerText = `س ${index + 1}: ${item.q}`;
-            card.appendChild(qTitle);
+        function startExam() {
+            let studentName = document.getElementById('student-name').value;
+            if (!studentName) {
+                alert("الرجاء اختيار اسم الطالب أولاً!");
+                return;
+            }
 
-            let optDiv = document.createElement('div');
-            optDiv.className = 'options';
+            // خوارزمية ذكية لاختيار 3 أسئلة عشوائية فريدة لكل طالب
+            selectedQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 3);
 
-            item.options.forEach((opt, optIndex) => {
-                let btn = document.createElement('button');
-                btn.innerText = opt;
-                btn.onclick = function() {
-                    let buttons = optDiv.querySelectorAll('button');
-                    buttons.forEach(b => b.disabled = true); // تعطيل الأزرار بعد الاختيار لمنع التعديل
-                    
-                    if (optIndex === item.correct) {
-                        btn.classList.add('correct');
-                        score++;
-                    } else {
-                        btn.classList.add('wrong');
-                        buttons[item.correct].classList.add('correct'); // تلوين الإجابة الصحيحة باللون الأخضر تلقائياً
-                    }
-                    
-                    answeredCount++;
-                    // التحقق مما إذا أجاب الطالب على جميع الأسئلة لإظهار النتيجة النهائية
-                    if (answeredCount === questions.length) {
-                        let resDiv = document.getElementById('result');
-                        resDiv.style.display = 'block';
-                        resDiv.innerText = `لقد أتممت الاختبار بنجاح! نتيجتك النهائية هي: ${score} من ${questions.length}`;
-                    }
-                };
-                optDiv.appendChild(btn);
+            document.getElementById('login-card').style.display = 'none';
+            document.getElementById('exam-card').style.display = 'block';
+
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = "";
+
+            selectedQuestions.forEach((item, index) => {
+                let card = document.createElement('div');
+                card.className = 'card';
+                
+                let qTitle = document.createElement('div');
+                qTitle.className = 'question';
+                qTitle.innerText = `س ${index + 1}: ${item.q}`;
+                card.appendChild(qTitle);
+
+                let optDiv = document.createElement('div');
+                optDiv.className = 'options';
+
+                item.options.forEach((opt, optIndex) => {
+                    let btn = document.createElement('button');
+                    btn.innerText = opt;
+                    btn.onclick = function() {
+                        let buttons = optDiv.querySelectorAll('button');
+                        buttons.forEach(b => b.disabled = true); // قفل الأزرار بعد الاختيار
+                        
+                        if (optIndex === item.correct) {
+                            btn.classList.add('correct');
+                            score++;
+                        } else {
+                            btn.classList.add('wrong');
+                            buttons[item.correct].classList.add('correct'); // تلوين الصحيحة تلقائياً
+                        }
+                        
+                        answeredCount++;
+                        if (answeredCount === selectedQuestions.length) {
+                            let resBox = document.getElementById('result-box');
+                            resBox.style.display = 'block';
+                            resBox.innerText = `انتهى الامتحان! نتيجتك هي: ${score} من ${selectedQuestions.length}`;
+                        }
+                    };
+                    optDiv.appendChild(resBox = optDiv);
+                    optDiv.appendChild(btn);
+                });
+
+                card.appendChild(optDiv);
+                container.appendChild(card);
             });
-
-            card.appendChild(optDiv);
-            container.appendChild(card);
-        });
+        }
     </script>
 </body>
 </html>
