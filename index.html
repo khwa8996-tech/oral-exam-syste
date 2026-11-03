@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الامتحان الشفهي الذكية - مادة الحاسوب</title>
+    <title>منصة الامتحان الشفهي الذكية - مختبر الحاسوب</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         :root {
@@ -61,7 +61,6 @@
             text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
         }
 
-        /* واجهة الفقاعات التقنية الحديثة */
         .bubbles-box {
             display: flex;
             flex-wrap: wrap;
@@ -331,12 +330,13 @@
         <div class="student-box">
             <h3 style="margin:0 0 10px 0; color:var(--text-muted); font-size: 15px;">الطالب المستهدف (قابل للتعديل الفوري):</h3>
             <input type="text" id="active-student" class="editable-input" oninput="updateStudentName(this.value)">
+            <div id="question-counter" style="margin-top: 8px; font-weight: 700; color: var(--accent); font-size: 15px;">السؤال: 1 من 3</div>
         </div>
 
         <div class="question-box" id="active-question">السؤال: --</div>
         <div class="options-grid" id="options-grid"></div>
 
-        <button class="btn-secondary" onclick="skipStudent()" style="padding: 14px;">تخطي هذا الطالب والانتقال لغيره ⏭️</button>
+        <button class="btn-secondary" onclick="skipStudent()" style="padding: 14px;">تخطي هذا السؤال والانتقال لغيره ⏭️</button>
 
         <h3 style="font-size: 18px; margin-top: 35px; color: var(--accent);">سجل درجات هذه الغرفة حصرياً:</h3>
         <table>
@@ -362,23 +362,19 @@
 
     const defaultQ = [
         { q: "ما المقصود بالصيانة الوقائية للبرمجيات في الحاسوب؟", correct: "إجراءات وقائية تعتمد لتجنب مشكلة محتملة.", options: ["إجراءات وقائية تعتمد لتجنب مشكلة محتملة.", "إجراءات تركز على استبدال القطع التالفة.", "حذف نظام التشغيل بالكامل.", "زيادة سرعة المعالج."] },
-        { q: "ما هي الغاية الأساسية من تحديث نظام التشغيل Windows؟", correct: "إضافة خصائص جديدة وتحسينات أمنية.", options: ["إضافة خصائص جديدة وتحسينات أمنية.", "زيادة مساحة القرص الصلب.", "مسح متصفح الإنترنت.", "إيقاف مروحة المعالج."] }
+        { q: "ما هي الغاية الأساسية من تحديث نظام التشغيل Windows؟", correct: "إضافة خصائص جديدة وتحسينات أمنية.", options: ["إضافة خصائص جديدة وتحسينات أمنية.", "زيادة مساحة القرص الصلب.", "مسح متصفح الإنترنت.", "إيقاف مروحة المعالج."] },
+        { q: "ما هو جهاز التوجيه (Router) في شبكات الحاسوب؟", correct: "جهاز يربط الشبكات ببعضها ويوجه البيانات.", options: ["جهاز يربط الشبكات ببعضها ويوجه البيانات.", "شاشة عرض البيانات.", "وحدة المعالجة المركزية.", "أداة لتبريد المعالج."] }
     ];
 
+    // دالة تصحيح وعكس النصوص العربية المقلوبة في ملفات الـ PDF بشكل كامل
     function fixReversedArabic(text) {
         if (!text) return "";
         let lines = text.split('\n');
         let fixedLines = lines.map(line => {
             let trimmed = line.trim();
-            if (trimmed.length > 0 && /[\u0600-\u06FF]/.test(trimmed)) {
-                let words = trimmed.split(' ');
-                let fixedWords = words.map(word => {
-                    if (word.length > 2 && !/[ابتثجحخدذرزسشصضطظعغفقكلمنهوية]/.test(word[0])) {
-                        return word.split('').reverse().join('');
-                    }
-                    return word;
-                });
-                return fixedWords.join(' ');
+            if (trimmed.length > 0) {
+                let reversed = trimmed.split('').reverse().join('');
+                return reversed;
             }
             return line;
         });
@@ -397,7 +393,7 @@
             roomName = name; gradeStr = grade; secStr = sec;
             
             if (!roomDB[currentKey]) {
-                roomDB[currentKey] = { students: [], records: {}, questions: [], pointer: 0 };
+                roomDB[currentKey] = { students: [], records: {}, questions: [], pointer: 0, qIndex: 0, studentScore: 0 };
             }
 
             let savedStudents = localStorage.getItem("students_" + currentKey);
@@ -492,7 +488,7 @@
         if (list.length === 0) { alert("أدخل أسماء صحيحة."); return; }
 
         let recs = {};
-        list.forEach(s => recs[s] = { name: s, grade: 10 });
+        list.forEach(s => recs[s] = { name: s, grade: 0 });
 
         let qText = document.getElementById("questions-input").value.trim();
         let qArr = defaultQ;
@@ -510,7 +506,7 @@
             }
         }
 
-        roomDB[currentKey] = { students: list, records: recs, questions: qArr, pointer: 0 };
+        roomDB[currentKey] = { students: list, records: recs, questions: qArr, pointer: 0, qIndex: 0, studentScore: 0 };
         document.getElementById("setup-view").classList.add("hidden");
         document.getElementById("exam-view").classList.remove("hidden");
         document.getElementById("exam-title").innerText = `غرفة: ${roomName}`;
@@ -523,15 +519,22 @@
     function loadStudent() {
         let db = roomDB[currentKey];
         if (db.pointer >= db.students.length) {
-            document.getElementById("active-student").value = "انتهت القائمة بنجاح! 🎓";
-            document.getElementById("active-question").innerText = "اكتملت الجلسة الامتحانية.";
+            document.getElementById("active-student").value = "انتهت قائمة الطلاب بنجاح! 🎓";
+            document.getElementById("question-counter").innerText = "اكتمل الاختبار";
+            document.getElementById("active-question").innerText = "تم تقييم جميع الطلاب ورصد الدرجات في الجدول.";
             document.getElementById("options-grid").innerHTML = "";
             document.getElementById("banner").style.display = "none";
             clearInterval(timer);
             return;
         }
 
+        if (db.qIndex === 0) {
+            db.studentScore = 0;
+        }
+
         let stu = db.students[db.pointer];
+        document.getElementById("question-counter").innerText = `السؤال: ${db.qIndex + 1} من 3`;
+
         currentQ = db.questions[Math.floor(Math.random() * db.questions.length)];
         let opts = [...currentQ.options].sort(() => Math.random() - 0.5);
 
@@ -590,25 +593,32 @@
         playSound(isCorr);
 
         if(isCorr) {
-            db.records[stu].grade = 10;
-            ban.className = "alert-success";
+            db.studentScore += 1;
             ban.style.background = "rgba(52, 211, 153, 0.15)";
             ban.style.color = "#34d399";
             ban.style.border = "1px solid #34d399";
-            ban.innerHTML = "✔️ إجابة صحيحة (تصفيق)! تم رصد (10/10).";
+            ban.innerHTML = "✔️ إجابة صحيحة (تصفيق)!";
         } else {
-            db.records[stu].grade = 0;
-            ban.className = "alert-danger";
             ban.style.background = "rgba(248, 113, 113, 0.15)";
             ban.style.color = "#f87171";
             ban.style.border = "1px solid #f87171";
             ban.innerHTML = `❌ إجابة خاطئة (أووووو لا لا لا)! الصحيحة: ${currentQ.correct}`;
         }
         ban.style.display = "block";
-        renderTable();
 
-        db.pointer++;
-        setTimeout(() => loadStudent(), 3500);
+        db.qIndex++;
+
+        if (db.qIndex >= 3) {
+            let finalGrade = Math.round((db.studentScore / 3) * 10);
+            db.records[stu].grade = finalGrade;
+            renderTable();
+
+            db.pointer++;
+            db.qIndex = 0;
+            setTimeout(() => loadStudent(), 3500);
+        } else {
+            setTimeout(() => loadStudent(), 2500);
+        }
     }
 
     function renderTable() {
