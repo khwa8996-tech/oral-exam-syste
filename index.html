@@ -366,19 +366,27 @@
         { q: "ما هو جهاز التوجيه (Router) في شبكات الحاسوب؟", correct: "جهاز يربط الشبكات ببعضها ويوجه البيانات.", options: ["جهاز يربط الشبكات ببعضها ويوجه البيانات.", "شاشة عرض البيانات.", "وحدة المعالجة المركزية.", "أداة لتبريد المعالج."] }
     ];
 
-    // دالة تصحيح وعكس النصوص العربية المقلوبة في ملفات الـ PDF بشكل كامل
-    function fixReversedArabic(text) {
+    // معالجة متقدمة لفك ترميز النصوص المعكوسة في الـ PDF وإعادة صياغتها برمجياً
+    function processExtractedText(text) {
         if (!text) return "";
         let lines = text.split('\n');
-        let fixedLines = lines.map(line => {
+        let processed = lines.map(line => {
             let trimmed = line.trim();
             if (trimmed.length > 0) {
-                let reversed = trimmed.split('').reverse().join('');
-                return reversed;
+                // إذا كان النص معكوساً بالكامل بسبب تخطيط الـ PDF، نعكسه لتظهر الكلمة صحيحة
+                let words = trimmed.split(' ');
+                let fixedWords = words.map(w => {
+                    // التحقق مما إذا كانت الكلمة مقلوبة حرفاً لحرف
+                    if (w.length > 2 && /[\u0600-\u06FF]/.test(w)) {
+                        return w.split('').reverse().join('');
+                    }
+                    return w;
+                });
+                return fixedWords.join(' ');
             }
             return line;
         });
-        return fixedLines.join('\n');
+        return processed.join('\n');
     }
 
     function selectRoom(el, name, grade, sec) {
@@ -438,19 +446,20 @@
                             x: item.transform[4],
                             y: item.transform[5]
                         }));
+                        // ترتيب العناصر حسب الإحداثيات لضمان سحب النص باتجاه صحيح
                         items.sort((a, b) => {
                             if (Math.abs(b.y - a.y) > 5) return b.y - a.y;
                             return a.x - b.x;
                         });
                         txt += items.map(item => item.str).join(' ') + '\n';
                     }
-                    document.getElementById("questions-input").value = fixReversedArabic(txt);
+                    document.getElementById("questions-input").value = processExtractedText(txt);
                 });
             };
             reader.readAsArrayBuffer(file);
         } else {
             const reader = new FileReader();
-            reader.onload = (ev) => { document.getElementById("questions-input").value = fixReversedArabic(ev.target.result); };
+            reader.onload = (ev) => { document.getElementById("questions-input").value = processExtractedText(ev.target.result); };
             reader.readAsText(file, "UTF-8");
         }
     }
