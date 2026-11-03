@@ -20,6 +20,7 @@
         .section-content.active { display: block; }
         .controls { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
         input[type="text"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 60%; }
+        textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box; margin-top: 10px; text-align: right; }
         button.action-btn { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
         .add-btn { background: #2ecc71; color: white; }
         .reset-btn { background: #e74c3c; color: white; }
@@ -57,14 +58,16 @@
     <h1>ثانوية المتفوقين الثانية للبنين</h1>
     <h2>سجل أسماء الطلبة وإدارة الأسئلة والنتائج</h2>
 
-    <!-- قسم رفع الأسئلة وبدء النظام -->
+    <!-- قسم إدارة الأسئلة (إدخال مباشر أو ملف نصي نظيف لتجنب الرموز) -->
     <div class="exam-file-section">
-        <h3>📄 غرفة إدارة ملف الأسئلة الشامل (حصراً من الملف المرفوع)</h3>
-        <input type="file" id="examFileInput" style="display: none;" onchange="handleExamFileUpload(event)">
-        <button class="action-btn upload-btn" onclick="document.getElementById('examFileInput').click()">رفع / استبدال ملف الأسئلة (TXT)</button>
-        <div id="fileInfoDisplay" class="file-info">⚠️ يرجى رفع ملف أسئلة نصي (TXT) ليعتمد النظام عليه حصراً.</div>
+        <h3>📄 غرفة إدارة الأسئلة (إدخال نصي مباشر لضمان الوضوح)</h3>
+        <p style="font-size: 13px; color: #64748b; margin: 5px 0;">يمكنك لصق الأسئلة هنا مباشرة (كل سؤال يليه الخيارات):</p>
+        <textarea id="questionsTextArea" placeholder="مثال:&#10;ما هو وحدة المعالجة المركزية؟&#10;CPU&#10;RAM&#10;Hard Disk"></textarea>
+        <button class="action-btn add-btn" onclick="saveManualQuestions()" style="margin-top: 10px; width: 100%;">حفظ بنك الأسئلة النصي</button>
         
-        <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي (3 أسئلة من الملف)</button>
+        <div id="fileInfoDisplay" class="file-info" style="margin-top: 10px;">⚠️ يرجى إدخال أو لصق الأسئلة في المربع أعلاه لضمان ظهورها بشكل عربى نقي ودقيق.</div>
+        
+        <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي (3 أسئلة)</button>
     </div>
 
     <!-- التبويبات للشعب -->
@@ -166,7 +169,7 @@
 
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #cbd5e1;">
 
-        <!-- قسم غرفة النتائج مع أزرار الحذف والتصفير -->
+        <!-- غرفة النتائج -->
         <div class="results-header">
             <h3 style="margin: 0;">📊 غرفة النتائج النهائية</h3>
             <button class="action-btn reset-btn" onclick="clearAllResults()" style="padding: 6px 12px; font-size: 13px;">🗑️ تصفير وحذف كل النتائج</button>
@@ -245,18 +248,20 @@
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v10');
+        const saved = localStorage.getItem('schoolAppData_v12');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v10')) || [];
-    let savedExamFile = localStorage.getItem('examFileName_v10') || "";
-    let loadedQuestionsFromStorage = localStorage.getItem('examQuestions_v10');
+    let examResults = JSON.parse(localStorage.getItem('examResults_v12')) || [];
+    let loadedQuestionsFromStorage = localStorage.getItem('examQuestions_v12');
 
     if(loadedQuestionsFromStorage) {
-        try { questionBank = JSON.parse(loadedQuestionsFromStorage); } catch(e) {}
+        try { 
+            questionBank = JSON.parse(loadedQuestionsFromStorage); 
+            document.getElementById('questionsTextArea').value = localStorage.getItem('rawQuestionsText_v12') || "";
+        } catch(e) {}
     }
 
     let currentStudent = "";
@@ -264,13 +269,13 @@
     let selectedQuestions = [];
     let currentQuestionIdx = 0;
     let studentCorrectAnswers = 0;
-    let totalAnsweredOrSkipped = 0;
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v10', JSON.stringify(appData));
-            localStorage.setItem('examResults_v10', JSON.stringify(examResults));
-            localStorage.setItem('examQuestions_v10', JSON.stringify(questionBank));
+            localStorage.setItem('schoolAppData_v12', JSON.stringify(appData));
+            localStorage.setItem('examResults_v12', JSON.stringify(examResults));
+            localStorage.setItem('examQuestions_v12', JSON.stringify(questionBank));
+            localStorage.setItem('rawQuestionsText_v12', document.getElementById('questionsTextArea').value);
         } catch (e) {
             alert('تعذر الحفظ.');
         }
@@ -329,35 +334,25 @@
         }
     }
 
-    function handleExamFileUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                parseQuestionsFromFile(content);
-                savedExamFile = file.name;
-                localStorage.setItem('examFileName_v10', savedExamFile);
-                saveData();
-                updateFileDisplay();
-                alert(`تم استخراج الأسئلة من الملف (${file.name}) بنجاح وعددها: ${questionBank.length} سؤال.`);
-            };
-            reader.readAsText(file, 'UTF-8');
+    // حفظ الأسئلة من النص المباشر لمنع أي رموز مشفرة
+    function saveManualQuestions() {
+        const text = document.getElementById('questionsTextArea').value.trim();
+        if(!text) {
+            alert('يرجى كتابة أو لصق الأسئلة أولاً.');
+            return;
         }
-    }
 
-    function parseQuestionsFromFile(text) {
         let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         let parsed = [];
         let currentQ = null;
         let currentOpts = [];
 
         for(let line of lines) {
-            if(line.startsWith('س:') || line.startsWith('السؤال') || line.includes('?')) {
+            if(line.includes('?') || line.startsWith('س:') || line.startsWith('السؤال')) {
                 if(currentQ && currentOpts.length > 0) {
                     parsed.push({ q: currentQ, options: [...currentOpts], correct: 0 });
                 }
-                currentQ = line.replace(/^(س:|السؤال)\s*/, '');
+                currentQ = line;
                 currentOpts = [];
             } else {
                 if(currentOpts.length < 3) {
@@ -378,20 +373,24 @@
                 correct: 0
             }));
         }
+
+        saveData();
+        updateFileDisplay();
+        alert(`تم حفظ الأسئلة بنجاح! عدد الأسئلة الجاهزة للاستخدام: ${questionBank.length}`);
     }
 
     function updateFileDisplay() {
         const display = document.getElementById('fileInfoDisplay');
-        if (savedExamFile && questionBank.length > 0) {
-            display.innerHTML = `✅ الملف النشط: <strong>${savedExamFile}</strong> (يحتوي على ${questionBank.length} سؤال - محفوض ودائم)`;
+        if (questionBank.length > 0) {
+            display.innerHTML = `✅ بنك الأسئلة جاهز ويحتوي على: <strong>${questionBank.length} سؤال</strong> (محفوظ ودائم)`;
         } else {
-            display.innerHTML = `⚠️ يرجى رفع ملف أسئلة نصي (TXT) ليعتمد النظام عليه حصراً.`;
+            display.innerHTML = `⚠️ يرجى إدخال أو لصق الأسئلة في المربع أعلاه ليعتمد النظام عليها حصراً.`;
         }
     }
 
     function openExamModal() {
         if(questionBank.length === 0) {
-            alert('⚠️ تنبيه: لم تقم برفع ملف أسئلة أو الملف فارغ! يرجى رفع ملف أسئلة صالح أولاً.');
+            alert('⚠️ تنبيه: بنك الأسئلة فارغ! يرجى إدخال وحفظ الأسئلة في المربع النصي أولاً.');
             return;
         }
         document.getElementById('examModal').style.display = 'flex';
@@ -406,7 +405,7 @@
 
     function startStudentExam() {
         if(questionBank.length === 0) {
-            alert('لا توجد أسئلة مرفوعة!');
+            alert('لا توجد أسئلة مسجلة!');
             return;
         }
         const secKey = document.getElementById('examSectionSelect').value;
@@ -423,7 +422,6 @@
         selectedQuestions = shuffled.slice(0, Math.min(3, questionBank.length));
         currentQuestionIdx = 0;
         studentCorrectAnswers = 0;
-        totalAnsweredOrSkipped = 0;
 
         document.getElementById('studentInfoBanner').innerText = `🎓 الطالب: ${currentStudent} | الشعبة: ${currentSectionName}`;
         document.getElementById('setupExamDiv').style.display = 'none';
@@ -473,7 +471,6 @@
         });
     }
 
-    // دالة تخطي السؤال دون احتسابه في الإجابات
     function skipQuestion() {
         document.getElementById('feedbackMsg').innerHTML = `<span style="color: #f59e0b;">⏭️ تم تخطي السؤال.</span>`;
         setTimeout(() => {
@@ -488,8 +485,8 @@
     }
 
     function finishStudentExam() {
-        // حساب الدرجة من 10 بناءً على الأسئلة التي أجاب عليها الطالب
-        let finalGrade = selectedQuestions.length > 0 ? Math.round((studentCorrectAnswers / selectedQuestions.length) * 10) : 0;
+        let maxQ = selectedQuestions.length;
+        let finalGrade = maxQ > 0 ? Math.round((studentCorrectAnswers / maxQ) * 10) : 0;
 
         examResults.unshift({
             name: currentStudent,
