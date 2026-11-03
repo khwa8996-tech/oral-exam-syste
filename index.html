@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة ثانوية المتفوقين الثانية - نظام الامتحان الذكي والنتائج</title>
+    <title>منصة ثانوية المتفوقين الثانية - نظام الامتحان الذكي</title>
     <style>
         body { font-family: Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -24,6 +24,7 @@
         .add-btn { background: #2ecc71; color: white; }
         .reset-btn { background: #e74c3c; color: white; }
         .upload-btn { background: #3b82f6; color: white; }
+        .skip-btn { background: #f59e0b; color: white; }
         ul { list-style-type: none; padding: 0; }
         li { background: #fafafa; margin-bottom: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; }
         .delete-btn { background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
@@ -58,12 +59,12 @@
 
     <!-- قسم رفع الأسئلة وبدء النظام -->
     <div class="exam-file-section">
-        <h3>📄 غرفة إدارة الأسئلة والامتحان الذكي</h3>
+        <h3>📄 غرفة إدارة ملف الأسئلة الشامل (حصراً من الملف المرفوع)</h3>
         <input type="file" id="examFileInput" style="display: none;" onchange="handleExamFileUpload(event)">
-        <button class="action-btn upload-btn" onclick="document.getElementById('examFileInput').click()">رفع / استبدال ملف الأسئلة الشامل</button>
-        <div id="fileInfoDisplay" class="file-info">لا يوجد ملف أسئلة مرفوع حالياً (يعمل البنك الافتراضي للأسئلة).</div>
+        <button class="action-btn upload-btn" onclick="document.getElementById('examFileInput').click()">رفع / استبدال ملف الأسئلة (TXT)</button>
+        <div id="fileInfoDisplay" class="file-info">⚠️ يرجى رفع ملف أسئلة نصي (TXT) ليعتمد النظام عليه حصراً.</div>
         
-        <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي (3 أسئلة لكل طالب)</button>
+        <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي (3 أسئلة من الملف)</button>
     </div>
 
     <!-- التبويبات للشعب -->
@@ -157,7 +158,10 @@
 
             <div id="feedbackMsg" style="font-weight: bold; font-size: 16px; margin: 10px 0; min-height: 25px;"></div>
             
-            <button id="nextQuestionBtn" class="action-btn add-btn" style="display:none; width: 100%; padding: 10px; font-size: 16px;" onclick="loadNextQuestion()">السؤال التالي ➡️</button>
+            <div style="display: flex; gap: 10px;">
+                <button id="skipQuestionBtn" class="action-btn skip-btn" style="flex: 1; padding: 10px; font-size: 16px;" onclick="skipQuestion()">تخطي السؤال ⏭️</button>
+                <button id="nextQuestionBtn" class="action-btn add-btn" style="display:none; flex: 2; padding: 10px; font-size: 16px;" onclick="loadNextQuestion()">السؤال التالي ➡️</button>
+            </div>
         </div>
 
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #cbd5e1;">
@@ -237,35 +241,36 @@
         ]
     };
 
-    let questionBank = [
-        { q: "ما هو المكون المسؤول عن معالجة البيانات وتنفيذ التعليمات في الحاسوب؟", options: ["وحدة المعالجة المركزية (CPU)", "الذاكرة العشوائية (RAM)", "قرص التخزين الصلب"], correct: 0 },
-        { q: "أي من وحدات التخزين التالية تعتبر ذاكرة مؤقتة تفقد محتوياتها عند انقطاع التيار؟", options: ["RAM", "SSD", "HDD"], correct: 0 },
-        { q: "ما هي لغة التنسيق الأساسية المستخدمة لتصميم وتلوين صفحات الويب؟", options: ["CSS", "HTML", "Python"], correct: 0 },
-        { q: "ما هو النظام المستخدم لربط الحواسيب محلياً عبر أجهزة التوجيه (Routers)؟", options: ["شبكة محلية (LAN)", "قاعدة بيانات محلية", "نظام تشغيل ويندوز"], correct: 0 },
-        { q: "أي مما يلي يعتبر من البرمجيات التطبيقية للمكتبات ومعالجة النصوص؟", options: ["Microsoft Word", "Firebase", "Windows Server"], correct: 0 }
-    ];
+    let questionBank = [];
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v8');
+        const saved = localStorage.getItem('schoolAppData_v10');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v8')) || [];
-    let savedExamFile = localStorage.getItem('examFileName_v8') || "";
+    let examResults = JSON.parse(localStorage.getItem('examResults_v10')) || [];
+    let savedExamFile = localStorage.getItem('examFileName_v10') || "";
+    let loadedQuestionsFromStorage = localStorage.getItem('examQuestions_v10');
+
+    if(loadedQuestionsFromStorage) {
+        try { questionBank = JSON.parse(loadedQuestionsFromStorage); } catch(e) {}
+    }
 
     let currentStudent = "";
     let currentSectionName = "";
     let selectedQuestions = [];
     let currentQuestionIdx = 0;
     let studentCorrectAnswers = 0;
+    let totalAnsweredOrSkipped = 0;
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v8', JSON.stringify(appData));
-            localStorage.setItem('examResults_v8', JSON.stringify(examResults));
+            localStorage.setItem('schoolAppData_v10', JSON.stringify(appData));
+            localStorage.setItem('examResults_v10', JSON.stringify(examResults));
+            localStorage.setItem('examQuestions_v10', JSON.stringify(questionBank));
         } catch (e) {
             alert('تعذر الحفظ.');
         }
@@ -327,23 +332,68 @@
     function handleExamFileUpload(event) {
         const file = event.target.files[0];
         if (file) {
-            savedExamFile = file.name;
-            localStorage.setItem('examFileName_v8', savedExamFile);
-            updateFileDisplay();
-            alert(`تم رفع واستبدال ملف الأسئلة بنجاح: ${file.name}`);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                parseQuestionsFromFile(content);
+                savedExamFile = file.name;
+                localStorage.setItem('examFileName_v10', savedExamFile);
+                saveData();
+                updateFileDisplay();
+                alert(`تم استخراج الأسئلة من الملف (${file.name}) بنجاح وعددها: ${questionBank.length} سؤال.`);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+    }
+
+    function parseQuestionsFromFile(text) {
+        let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        let parsed = [];
+        let currentQ = null;
+        let currentOpts = [];
+
+        for(let line of lines) {
+            if(line.startsWith('س:') || line.startsWith('السؤال') || line.includes('?')) {
+                if(currentQ && currentOpts.length > 0) {
+                    parsed.push({ q: currentQ, options: [...currentOpts], correct: 0 });
+                }
+                currentQ = line.replace(/^(س:|السؤال)\s*/, '');
+                currentOpts = [];
+            } else {
+                if(currentOpts.length < 3) {
+                    currentOpts.push(line);
+                }
+            }
+        }
+        if(currentQ && currentOpts.length > 0) {
+            parsed.push({ q: currentQ, options: [...currentOpts], correct: 0 });
+        }
+
+        if(parsed.length > 0) {
+            questionBank = parsed;
+        } else {
+            questionBank = lines.map(l => ({
+                q: l,
+                options: ["صحيح", "خطأ", "غير ذلك"],
+                correct: 0
+            }));
         }
     }
 
     function updateFileDisplay() {
         const display = document.getElementById('fileInfoDisplay');
-        if (savedExamFile) {
-            display.innerHTML = `✅ الملف النشط: <strong>${savedExamFile}</strong> (محفوظ ودائم)`;
+        if (savedExamFile && questionBank.length > 0) {
+            display.innerHTML = `✅ الملف النشط: <strong>${savedExamFile}</strong> (يحتوي على ${questionBank.length} سؤال - محفوض ودائم)`;
         } else {
-            display.innerHTML = `⚠️ يعمل بنك الأسئلة الافتراضي الشامل.`;
+            display.innerHTML = `⚠️ يرجى رفع ملف أسئلة نصي (TXT) ليعتمد النظام عليه حصراً.`;
         }
     }
 
     function openExamModal() {
+        if(questionBank.length === 0) {
+            alert('⚠️ تنبيه: لم تقم برفع ملف أسئلة أو الملف فارغ! يرجى رفع ملف أسئلة صالح أولاً.');
+            return;
+        }
         document.getElementById('examModal').style.display = 'flex';
         document.getElementById('setupExamDiv').style.display = 'block';
         document.getElementById('activeExamArea').style.display = 'none';
@@ -355,6 +405,10 @@
     }
 
     function startStudentExam() {
+        if(questionBank.length === 0) {
+            alert('لا توجد أسئلة مرفوعة!');
+            return;
+        }
         const secKey = document.getElementById('examSectionSelect').value;
         const students = appData[secKey];
         if(!students || students.length === 0) {
@@ -366,9 +420,10 @@
         currentSectionName = secKey === '4a' ? 'الرابع (أ)' : secKey === '4b' ? 'الرابع (ب)' : secKey === '5a' ? 'الخامس (أ)' : 'الخامس (ب)';
         
         let shuffled = [...questionBank].sort(() => 0.5 - Math.random());
-        selectedQuestions = shuffled.slice(0, 3);
+        selectedQuestions = shuffled.slice(0, Math.min(3, questionBank.length));
         currentQuestionIdx = 0;
         studentCorrectAnswers = 0;
+        totalAnsweredOrSkipped = 0;
 
         document.getElementById('studentInfoBanner').innerText = `🎓 الطالب: ${currentStudent} | الشعبة: ${currentSectionName}`;
         document.getElementById('setupExamDiv').style.display = 'none';
@@ -378,15 +433,16 @@
     }
 
     function loadQuestion() {
-        if(currentQuestionIdx >= 3) {
+        if(currentQuestionIdx >= selectedQuestions.length) {
             finishStudentExam();
             return;
         }
 
-        document.getElementById('questionCounter').innerText = `السؤال رقم ${currentQuestionIdx + 1} من 3`;
+        document.getElementById('questionCounter').innerText = `السؤال رقم ${currentQuestionIdx + 1} من ${selectedQuestions.length}`;
         const qObj = selectedQuestions[currentQuestionIdx];
         document.getElementById('questionText').innerText = `س: ${qObj.q}`;
         document.getElementById('feedbackMsg').innerText = '';
+        document.getElementById('skipQuestionBtn').style.display = 'block';
         document.getElementById('nextQuestionBtn').style.display = 'none';
 
         const optionsContainer = document.getElementById('optionsContainer');
@@ -410,10 +466,20 @@
                     document.getElementById('feedbackMsg').innerHTML = `<span style="color: #ef4444;">❌ إجابة خاطئة!</span>`;
                 }
 
+                document.getElementById('skipQuestionBtn').style.display = 'none';
                 document.getElementById('nextQuestionBtn').style.display = 'block';
             };
             optionsContainer.appendChild(btn);
         });
+    }
+
+    // دالة تخطي السؤال دون احتسابه في الإجابات
+    function skipQuestion() {
+        document.getElementById('feedbackMsg').innerHTML = `<span style="color: #f59e0b;">⏭️ تم تخطي السؤال.</span>`;
+        setTimeout(() => {
+            currentQuestionIdx++;
+            loadQuestion();
+        }, 700);
     }
 
     function loadNextQuestion() {
@@ -422,7 +488,8 @@
     }
 
     function finishStudentExam() {
-        let finalGrade = Math.round((studentCorrectAnswers / 3) * 10);
+        // حساب الدرجة من 10 بناءً على الأسئلة التي أجاب عليها الطالب
+        let finalGrade = selectedQuestions.length > 0 ? Math.round((studentCorrectAnswers / selectedQuestions.length) * 10) : 0;
 
         examResults.unshift({
             name: currentStudent,
@@ -432,12 +499,11 @@
         saveData();
         renderResultsTable();
 
-        alert(`انتهى امتحان الطالب: ${currentStudent}\nالنتيجة: ${studentCorrectAnswers} من 3 إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nسيتم الان الانتقال تلقائياً لطالب جديد.`);
+        alert(`انتهى امتحان الطالب: ${currentStudent}\nالنتيجة: ${studentCorrectAnswers} إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nسيتم الآن الانتقال تلقائياً لطالب جديد.`);
 
         startStudentExam();
     }
 
-    // حذف نتيجة طالب محدد من جدول النتائج
     function deleteResult(index) {
         if(confirm('هل أنت متأكد من حذف نتيجة هذا الطالب؟')) {
             examResults.splice(index, 1);
@@ -446,7 +512,6 @@
         }
     }
 
-    // تصفير وحذف كل النتائج دفعة واحدة
     function clearAllResults() {
         if(confirm('⚠️ هل أنت متأكد من حذف وتصفير جميع النتائج نهائياً والبدء من جديد؟')) {
             examResults = [];
