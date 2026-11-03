@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الامتحان الشفهي الذكية - الإصدار الاحترافي</title>
-    <!-- مكتبة قراءة ملفات الـ PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <title>منصة الامتحان الشفهي الذكية والمطورة</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -29,35 +27,35 @@
         }
 
         .app-container {
-            max-width: 900px;
+            max-width: 850px;
             margin: 20px auto;
             background: var(--card-bg);
-            padding: 40px;
+            padding: 35px;
             border-radius: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .header-title {
             text-align: center;
             color: var(--primary);
-            margin-bottom: 30px;
-            font-size: 28px;
+            margin-bottom: 25px;
+            font-size: 26px;
             font-weight: 800;
         }
 
         .rooms-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            gap: 15px;
             margin-top: 20px;
         }
 
         .room-tile {
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: white;
-            padding: 30px 20px;
-            border-radius: 18px;
+            padding: 25px 15px;
+            border-radius: 16px;
             text-align: center;
             cursor: pointer;
             box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
@@ -65,21 +63,18 @@
         }
 
         .room-tile:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 20px -3px rgba(37, 99, 235, 0.3);
         }
 
-        .room-tile h3 { margin: 0; font-size: 20px; font-weight: 700; }
-        .room-tile span { font-size: 13px; opacity: 0.85; margin-top: 5px; display: block; }
+        .room-tile h3 { margin: 0; font-size: 18px; font-weight: 700; }
 
         .setup-panel {
             background: #f8fafc;
             border: 1px solid var(--border-color);
-            padding: 30px;
-            border-radius: 20px;
+            padding: 25px;
+            border-radius: 16px;
         }
-
-        .file-upload-group { margin-bottom: 20px; }
 
         label {
             font-weight: 700;
@@ -89,7 +84,7 @@
             font-size: 15px;
         }
 
-        input[type="file"], textarea {
+        textarea {
             width: 100%;
             padding: 14px;
             font-size: 15px;
@@ -97,36 +92,8 @@
             border: 1px solid var(--border-color);
             background: white;
             box-sizing: border-box;
-        }
-
-        textarea { resize: vertical; height: 80px; margin-top: 8px; }
-
-        .progress-container {
-            width: 100%;
-            background-color: #e2e8f0;
-            border-radius: 10px;
-            margin-top: 8px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 14px;
-            background-color: var(--success);
-            text-align: center;
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-            transition: width 0.3s ease;
-        }
-
-        .status-badge {
-            font-size: 13px;
-            color: var(--success);
-            font-weight: 600;
-            margin-top: 5px;
-            display: block;
+            resize: vertical;
+            height: 140px;
         }
 
         .exam-header {
@@ -136,7 +103,7 @@
             background: #eef2ff;
             padding: 15px 25px;
             border-radius: 14px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border: 1px solid #c7d2fe;
         }
 
@@ -153,42 +120,42 @@
 
         .student-display-card {
             background: white;
-            border: 2px solid var(--primary);
-            padding: 25px;
+            border: 2px dashed var(--primary);
+            padding: 20px;
             border-radius: 16px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .student-display-card h3 { margin: 0; font-size: 14px; color: var(--text-muted); }
-        .student-display-card h1 { margin: 8px 0 0 0; font-size: 28px; color: var(--primary); font-weight: 800; }
+        .student-display-card h1 { margin: 5px 0 0 0; font-size: 26px; color: var(--primary); font-weight: 800; }
 
         .question-display-card {
             background: #fffbeb;
             border: 1px solid #fef3c7;
-            padding: 22px;
+            padding: 20px;
             border-radius: 16px;
             font-size: 18px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 700;
             color: #92400e;
-            line-height: 1.6;
+            line-height: 1.5;
             text-align: center;
         }
 
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .option-card {
             background: white;
             border: 2px solid var(--border-color);
-            padding: 16px 20px;
-            border-radius: 14px;
-            font-size: 16px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -196,7 +163,10 @@
             text-align: right;
         }
 
-        .option-card:hover { border-color: var(--primary); background: #f8fafc; }
+        .option-card:hover {
+            border-color: var(--primary);
+            background: #f8fafc;
+        }
 
         .action-btn {
             width: 100%;
@@ -207,19 +177,21 @@
             border: none;
             cursor: pointer;
             box-sizing: border-box;
+            transition: background 0.2s;
         }
 
         .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
         .btn-success { background-color: var(--success); color: white; margin-top: 15px; }
         .btn-secondary { background-color: var(--text-muted); color: white; margin-top: 15px; }
 
         #alert-notification {
             text-align: center;
-            padding: 15px;
-            border-radius: 14px;
+            padding: 14px;
+            border-radius: 12px;
             font-weight: 800;
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 15px;
             display: none;
         }
         .notif-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
@@ -228,14 +200,14 @@
         .grades-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
             background: white;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border-color);
         }
         .grades-table th, .grades-table td {
-            padding: 12px 15px;
+            padding: 12px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
             font-size: 14px;
@@ -252,56 +224,27 @@
     
     <!-- واجهة اختيار الغرف -->
     <div id="rooms-view">
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 16px;">يرجى اختيار غرفة الشعبة لبدء جلسة الاختبار الشفهي:</p>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 16px;">اختر غرفة الشعبة لبدء جلسة الاختبار الشفهي:</p>
         <div class="rooms-container">
-            <div class="room-tile" onclick="openRoom('الرابع (أ)')">
-                <h3>غرفة الرابع أ</h3>
-                <span>إدارة الأسماء والمحاضرات</span>
-            </div>
-            <div class="room-tile" onclick="openRoom('الرابع (ب)')">
-                <h3>غرفة الرابع ب</h3>
-                <span>إدارة الأسماء والمحاضرات</span>
-            </div>
-            <div class="room-tile" onclick="openRoom('الخامس (أ)')">
-                <h3>غرفة الخامس أ</h3>
-                <span>إدارة الأسماء والمحاضرات</span>
-            </div>
-            <div class="room-tile" onclick="openRoom('الخامس (ب)')">
-                <h3>غرفة الخامس ب</h3>
-                <span>إدارة الأسماء والمحاضرات</span>
-            </div>
+            <div class="room-tile" onclick="openRoom('الرابع (أ)')"><h3>غرفة الرابع أ</h3></div>
+            <div class="room-tile" onclick="openRoom('الرابع (ب)')"><h3>غرفة الرابع ب</h3></div>
+            <div class="room-tile" onclick="openRoom('الخامس (أ)')"><h3>غرفة الخامس أ</h3></div>
+            <div class="room-tile" onclick="openRoom('الخامس (ب)')"><h3>غرفة الخامس ب</h3></div>
         </div>
     </div>
 
-    <!-- واجهة الإعدادات ورفع الملفات مع عداد التقدم -->
-    <div id="setup-view" class="setup-view hidden">
-        <h3 id="room-title-setup" style="color: var(--primary); text-align: center; margin-bottom: 25px;"></h3>
+    <!-- واجهة إدخال الأسماء -->
+    <div id="setup-view" class="setup-panel hidden">
+        <h3 id="room-title-setup" style="color: var(--primary); text-align: center; margin-bottom: 20px;"></h3>
         
-        <div class="file-upload-group">
-            <label>📁 ملف كشف أسماء الطلاب (PDF أو TXT)</label>
-            <input type="file" id="students-file" accept=".pdf, .txt" multiple>
-            <div id="students-progress-box" class="progress-container">
-                <div id="students-progress-bar" class="progress-bar">0%</div>
-            </div>
-            <span id="students-status" class="status-badge"></span>
-            <textarea id="students-manual" placeholder="أو أدخل أسماء الطلاب يدوياً (كل اسم في سطر)..."></textarea>
-        </div>
+        <label>📋 الصق أسماء الطلاب هنا (نسخ ولصق دفعة واحدة، كل اسم في سطر):</label>
+        <textarea id="students-textarea" placeholder="مثال:&#10;ابراهيم زيد عبد العزيز&#10;ابو عبيدة احمد جبار&#10;احمد إبراهيم مصطفى"></textarea>
 
-        <div class="file-upload-group">
-            <label>📚 ملف المحاضرة أو الملخص المنهجي (PDF أو TXT)</label>
-            <input type="file" id="lecture-file" accept=".pdf, .txt" multiple>
-            <div id="lecture-progress-box" class="progress-container">
-                <div id="lecture-progress-bar" class="progress-bar">0%</div>
-            </div>
-            <span id="lecture-status" class="status-badge"></span>
-            <textarea id="lecture-manual" placeholder="أو الصق محتوى المحاضرة والأسئلة يدوياً هنا..."></textarea>
-        </div>
-
-        <button id="start-exam-btn" class="action-btn btn-primary" onclick="startExamSession()">بدء جلسة الامتحان الشفهي 🚀</button>
+        <button class="action-btn btn-primary" style="margin-top: 20px;" onclick="startExamSession()">بدء الجلسة الامتحانية 🚀</button>
         <button class="action-btn btn-secondary" onclick="backToRooms()">العودة لاختيار الغرف 🔙</button>
     </div>
 
-    <!-- واجهة الامتحان التفاعلية الفردية -->
+    <!-- واجهة الامتحان الشفهي -->
     <div id="exam-view" class="hidden">
         <div class="exam-header">
             <h4 id="exam-room-title"></h4>
@@ -316,20 +259,20 @@
         </div>
 
         <div class="question-display-card" id="current-question-text">
-            جاري تحميل السؤال...
+            جاري اختيار السؤال...
         </div>
 
         <div class="options-grid" id="options-grid"></div>
 
-        <button class="action-btn btn-secondary" onclick="skipCurrentStudent()">تخطي هذا الطالب والانتقال لغيره ⏭️</button>
+        <button class="action-btn btn-secondary" onclick="skipCurrentStudent()">تخطي هذا الطالب (0/10) ⏭️</button>
 
-        <h3 style="font-size: 16px; color: var(--text-main); margin-top: 30px;">سجل الدرجات المعتمد:</h3>
+        <h3 style="font-size: 15px; color: var(--text-main); margin-top: 25px;">سجل الدرجات النهائي (من 10):</h3>
         <table class="grades-table">
             <thead>
                 <tr>
                     <th>اسم الطالب</th>
-                    <th>السؤال المطروح</th>
-                    <th>التقييم والدرجة</th>
+                    <th>الدرجة من 10</th>
+                    <th>الحالة</th>
                 </tr>
             </thead>
             <tbody id="grades-table-body"></tbody>
@@ -343,63 +286,95 @@
 <script>
     let currentRoomName = "";
     let studentsList = [];
-    let questionsList = [];
     let studentPointer = 0;
-    let questionPointer = 0;
-    let activeQuestionObj = null;
+    let studentGrades = {}; 
     let examTimer = null;
     let secondsLeft = 45;
+    let activeQuestion = null;
 
-    let cachedStudentsText = "";
-    let cachedLectureText = "";
-
-    // معالجة ملفات الطلاب مع عداد التقدم
-    document.getElementById('students-file').addEventListener('change', async (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-            const progBox = document.getElementById('students-progress-box');
-            const progBar = document.getElementById('students-progress-bar');
-            progBox.style.display = "block";
-            progBar.style.width = "10%";
-            progBar.innerText = "10%";
-
-            let combined = "";
-            for (let i = 0; i < files.length; i++) {
-                let f = files[i];
-                let txt = f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f);
-                combined += txt + "\n";
-                let percent = Math.round(((i + 1) / files.length) * 100);
-                progBar.style.width = percent + "%";
-                progBar.innerText = percent + "%";
-            }
-            cachedStudentsText = combined;
-            document.getElementById('students-status').innerText = `✓ تم قراءة ملف أسماء الطلاب بنجاح.`;
+    // بنك الأسئلة المنهجية الجاهزة مع الإجابة الصحيحة والخيارات المضللة
+    const questionBank = [
+        {
+            q: "ما المقصود بالصيانة الوقائية للبرمجيات (Software Preventive Maintenance)؟",
+            correct: "إجراءات وقائية تعتمد لتجنب حدوث مشكلة محتملة في تطبيق ما أو عدم توافقه مع النظام.",
+            options: [
+                "إجراءات وقائية تعتمد لتجنب حدوث مشكلة محتملة في تطبيق ما أو عدم توافقه مع النظام.",
+                "إجراءات تركز على استبدال القطع التالفة في اللوحة الأم.",
+                "حذف نظام التشغيل بالكامل وإعادة تثبيته من جديد.",
+                "زيادة سرعة معالج الحاسوب عبر رفع حرارته."
+            ]
+        },
+        {
+            q: "ما هي الغاية الأساسية من خدمة تحديث نظام التشغيل Windows بشكل منتظم؟",
+            correct: "إضافة خصائص جديدة أو تصحيح عمله بإجراء تحسينات أمنية وعامة.",
+            options: [
+                "زيادة مساحة القرص الصلب وتوليد مساحة فارغة.",
+                "إضافة خصائص جديدة أو تصحيح عمله بإجراء تحسينات أمنية وعامة.",
+                "مسح الملفات المؤقتة الخاصة بمتصفح الإنترنت.",
+                "إيقاف عمل مروحة المعالج لتبريد النظام."
+            ]
+        },
+        {
+            q: "ما هو السبب الرئيسي لنقص المساحة الخزنية بعد ترقية نظام Windows إلى نسخة أحدث؟",
+            correct: "احتفاظ النظام الجديد بنسخة احتياطية من ملفات نظام التشغيل القديم.",
+            options: [
+                "امتلاء صندوق التدوير (Recycle Bin) بالكامل.",
+                "تثبيت برامج الألعاب ذات الحجم الكبير جداً.",
+                "احتفاظ النظام الجديد بنسخة احتياطية من ملفات نظام التشغيل القديم.",
+                "وجود فيروسات خبيثة تحجز مساحة القرص."
+            ]
+        },
+        {
+            q: "ما الفرق الأساسي بين ترقية البرمجيات (Upgrade) وتحديثها (Update)؟",
+            correct: "الترقية توفر تحسينات جوهرية بإصدار جديد، بينما التحديث يقدم تصحيحات وسد ثغرات وإصلاح أخطاء.",
+            options: [
+                "الترقية توفر تحسينات جوهرية بإصدار جديد، بينما التحديث يقدم تصحيحات وسد ثغرات وإصلاح أخطاء.",
+                "التحديث يكون عبر شراء قرص ليزري جديد فقط.",
+                "الترقية تخص أجهزة الهواتف المحمولة والتحديث للحواسيب.",
+                "لا يوجد أي فرق بينهما تقنياً."
+            ]
+        },
+        {
+            q: "كيف يتم تمييز رقم الترقية ورقم التحديث في إصدارات البرامج مثل (Windows 8.1)؟",
+            correct: "الرقم أقصى اليسار (8) يمثل الترقية، والرقم بعد الفاصلة (.1) يمثل التحديث.",
+            options: [
+                "الرقم أقصى اليسار يمثل سنة الإصدار والرقم الأيمن يمثل السعر.",
+                "الرقم أقصى اليسار (8) يمثل الترقية، والرقم بعد الفاصلة (.1) يمثل التحديث.",
+                "الأرقام تعبر عن حجم الملف بالميجابايت.",
+                "ترتيب الأحرف الهجائية لاسم الشركة المنتجة."
+            ]
+        },
+        {
+            q: "ما هي أهمية أداة فحص الأقراص (Check Disk / Scandisk) في نظام التشغيل؟",
+            correct: "تشخيص الأخطاء ومحاولة تصحيحها ومعالجة المساحات التالفة على القرص الصلب.",
+            options: [
+                "تسريع تصفح الإنترنت وحذف الكوكيز.",
+                "تشخيص الأخطاء ومحاولة تصحيحها ومعالجة المساحات التالفة على القرص الصلب.",
+                "إلغاء تجزئة الملفات وترتيبها بشكل متجاور.",
+                "زيادة سرعة دوران القرص الصلب ميكانيكياً."
+            ]
+        },
+        {
+            q: "ما هو الغرض والفائدة من برنامج إلغاء تجزئة القرص الصلب (Disk Defragment)؟",
+            correct: "إعادة تنظيم مواقع البيانات المخزونة عشوائياً بشكل مساحات متجاورة لتسريع الوصول إليها.",
+            options: [
+                "حذف ملفات نظام التشغيل القديمة نهائياً.",
+                "تغيير خلفية سطح المكتب وزسومات النظام.",
+                "إعادة تنظيم مواقع البيانات المخزونة عشوائياً بشكل مساحات متجاورة لتسريع الوصول إليها.",
+                "ضغط الملفات الكبيرة لتقليل مساحتها."
+            ]
+        },
+        {
+            q: "ما الغاية من تفعيل خاصية (Storage Sense) في نظام التشغيل Windows؟",
+            correct: "حذف الملفات المؤقتة تلقائياً لغرض تحسين أداء الحاسوب ومنع بطء تنفيذ المهام.",
+            options: [
+                "حذف الملفات المؤقتة تلقائياً لغرض تحسين أداء الحاسوب ومنع بطء تنفيذ المهام.",
+                "فحص اللوحة الأم من ارتفاع درجات الحرارة.",
+                "تحديث برامج الحماية من الفيروسات أسبوعياً.",
+                "إغلاق التطبيقات المفتوحة عبر قائمة Task Manager."
+            ]
         }
-    });
-
-    // معالجة ملفات المحاضرات مع عداد التقدم
-    document.getElementById('lecture-file').addEventListener('change', async (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-            const progBox = document.getElementById('lecture-progress-box');
-            const progBar = document.getElementById('lecture-progress-bar');
-            progBox.style.display = "block";
-            progBar.style.width = "10%";
-            progBar.innerText = "10%";
-
-            let combined = "";
-            for (let i = 0; i < files.length; i++) {
-                let f = files[i];
-                let txt = f.type === "application/pdf" ? await parsePDFFile(f) : await parseTXTFile(f);
-                combined += txt + "\n";
-                let percent = Math.round(((i + 1) / files.length) * 100);
-                progBar.style.width = percent + "%";
-                progBar.innerText = percent + "%";
-            }
-            cachedLectureText = combined;
-            document.getElementById('lecture-status').innerText = `✓ تم قراءة ملفات المحاضرات واستخراج محتواها بنجاح.`;
-        }
-    });
+    ];
 
     function playAudioTone(isSuccess) {
         try {
@@ -430,109 +405,35 @@
 
     function openRoom(roomTitle) {
         currentRoomName = roomTitle;
-        document.getElementById('room-title-setup').innerText = `إدارة غرفة الامتحان الشفهي: ${roomTitle}`;
+        document.getElementById('room-title-setup').innerText = `إدارة غرفة الامتحان: ${roomTitle}`;
         document.getElementById('rooms-view').classList.add('hidden');
         document.getElementById('setup-view').classList.remove('hidden');
     }
 
-    async function parsePDFFile(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = function() {
-                const typedArray = new Uint8Array(this.result);
-                pdfjsLib.getDocument(typedArray).promise.then(async (pdf) => {
-                    let textExtracted = "";
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const content = await page.getTextContent();
-                        textExtracted += content.items.map(item => item.str).join(' ') + '\n';
-                    }
-                    resolve(textExtracted);
-                }).catch(() => resolve(""));
-            };
-            reader.readAsArrayBuffer(file);
-        });
-    }
-
-    async function parseTXTFile(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.readAsText(file, 'UTF-8');
-        });
-    }
-
-    function cleanNames(text) {
-        let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 4);
-        let valid = [];
-        for (let l of lines) {
-            if (!l.includes("ثانوية") && !l.includes("المتفوقين") && !l.includes("سجل") && 
-                !l.includes("العام الدراسي") && !l.includes("المادة") && !l.includes("الصف")) {
-                let cleaned = l.replace(/^[\d\-\–\.\s١٢٣٤٥٦٧٨٩٠]+/, '').trim();
-                if (cleaned.length > 3) {
-                    valid.push(cleaned);
-                }
-            }
-        }
-        return valid.length > 0 ? valid : lines;
-    }
-
-    async function startExamSession() {
-        const manualStudents = document.getElementById('students-manual').value.trim();
-        const manualLecture = document.getElementById('lecture-manual').value.trim();
-
-        let rawNames = manualStudents ? manualStudents.split('\n') : [];
-        let rawLectures = manualLecture ? manualLecture : "";
-
-        if (cachedStudentsText) {
-            rawNames = rawNames.concat(cleanNames(cachedStudentsText));
-        }
-
-        if (cachedLectureText) {
-            rawLectures += cachedLectureText + '\n';
-        }
-
-        studentsList = [...new Set(rawNames.map(s => s.trim()).filter(s => s.length > 2))];
-
-        let sentences = rawLectures.split('.').map(s => s.trim()).filter(s => s.length > 10);
-        if (sentences.length < 3) {
-            sentences = rawLectures.split('\n').map(s => s.trim()).filter(s => s.length > 5);
-        }
-        if (sentences.length === 0) {
-            // أسئلة افتراضية في حال لم يتم رفع ملف محاضرة لضمان عمل النظام بسلاسة
-            sentences = [
-                "ما هو المفهوم الأساسي لصيانة الحاسوب والبرمجيات",
-                "ما هي إجراءات الصيانة الوقائية لنظام التشغيل",
-                "ما الفرق بين ترقية وتحديث البرمجيات"
-            ];
-        }
-
-        questionsList = sentences.map(s => {
-            let correctOption = s.length > 35 ? s.substring(0, 35) + "..." : s;
-            return {
-                text: "س: " + (s.length > 65 ? s.substring(0, 65) + "..." : s),
-                correct: correctOption,
-                options: [
-                    correctOption,
-                    "إجراء غير معتمد ولا يؤثر في تشغيل النظام",
-                    "عملية تؤدي لتوقف التطبيقات كلياً وبشكل مفاجئ",
-                    "خيار غير صحيح تم توليده برمجياً للاختبار"
-                ].sort(() => Math.random() - 0.5)
-            };
-        });
-
-        if (studentsList.length === 0) {
-            alert("يرجى التأكد من إرفاق ملف أسماء الطلاب أو إدخالهم يدوياً!");
+    function startExamSession() {
+        const manualText = document.getElementById('students-textarea').value.trim();
+        if (!manualText) {
+            alert("يرجى إدخال أسماء الطلاب في خانة النص (نسخ ولصق) أولاً!");
             return;
         }
+
+        studentsList = manualText.split('\n').map(s => s.trim()).filter(s => s.length > 2);
+        studentsList = [...new Set(studentsList)];
+
+        if (studentsList.length === 0) {
+            alert("لم يتم العثور على أسماء صالحة. يرجى التأكد من كتابة كل اسم في سطر مستقل.");
+            return;
+        }
+
+        studentGrades = {};
+        studentsList.forEach(s => studentGrades[s] = 0);
 
         document.getElementById('setup-view').classList.add('hidden');
         document.getElementById('exam-view').classList.remove('hidden');
         document.getElementById('exam-room-title').innerText = `غرفة امتحان: ${currentRoomName} (عدد الطلاب: ${studentsList.length})`;
 
         studentPointer = 0;
-        questionPointer = 0;
-        document.getElementById('grades-table-body').innerHTML = "";
+        updateGradesTable();
         loadNextStudentQuestion();
     }
 
@@ -563,17 +464,19 @@
         }
 
         const student = studentsList[studentPointer];
-        activeQuestionObj = questionsList[questionPointer % questionsList.length];
-        questionPointer++;
+        
+        activeQuestionObj = questionBank[Math.floor(Math.random() * questionBank.length)];
+
+        let shuffledOptions = [...activeQuestionObj.options].sort(() => Math.random() - 0.5);
 
         document.getElementById('current-student-name').innerText = student;
-        document.getElementById('current-question-text').innerText = activeQuestionObj.text;
+        document.getElementById('current-question-text').innerText = activeQuestionObj.q;
         document.getElementById('alert-notification').style.display = "none";
 
         const grid = document.getElementById('options-grid');
         grid.innerHTML = "";
 
-        activeQuestionObj.options.forEach((opt, idx) => {
+        shuffledOptions.forEach((opt, idx) => {
             const btn = document.createElement('div');
             btn.className = 'option-card';
             btn.innerHTML = `<strong>${['أ', 'ب', 'ج', 'د'][idx]})</strong> ${opt}`;
@@ -589,7 +492,7 @@
 
     function skipCurrentStudent() {
         clearInterval(examTimer);
-        recordAnswer(false, "تم تخطي السؤال (0)");
+        recordAnswer(false, "تم تخطي السؤال");
     }
 
     function recordAnswer(isSuccess, chosenOptionText) {
@@ -598,30 +501,38 @@
 
         const student = studentsList[studentPointer];
         const banner = document.getElementById('alert-notification');
-        let textResult = "";
 
         playAudioTone(isSuccess);
 
         if (isSuccess) {
+            studentGrades[student] = 10;
             banner.className = "notif-success";
-            banner.innerText = "✔️ إجابة صحيحة! تمت إضافة (+3) درجات بنجاح.";
-            textResult = "✔️ صح (+3)";
+            banner.innerHTML = `✔️ إجابة صحيحة! حصل الطالب على (10/10).`;
         } else {
+            studentGrades[student] = 0;
             banner.className = "notif-danger";
-            banner.innerText = "❌ إجابة خاطئة! تم تسجيل (0) درجات.";
-            textResult = "❌ خطأ (0)";
+            banner.innerHTML = `❌ إجابة خاطئة!<br><b>الإجابة الصحيحة هي:</b> ${activeQuestionObj.correct}`;
         }
         banner.style.display = "block";
 
-        const tbody = document.getElementById('grades-table-body');
-        const row = document.createElement('tr');
-        row.innerHTML = `<td><b>${student}</b></td><td style="color:var(--text-muted);">${activeQuestionObj.text}</td><td><b>${textResult}</b></td>`;
-        tbody.appendChild(row);
+        updateGradesTable();
 
         studentPointer++;
         setTimeout(() => {
             loadNextStudentQuestion();
-        }, 1800);
+        }, 3200);
+    }
+
+    function updateGradesTable() {
+        const tbody = document.getElementById('grades-table-body');
+        tbody.innerHTML = "";
+        studentsList.forEach((stu, idx) => {
+            let grade = studentGrades[stu] !== undefined ? studentGrades[stu] : "-";
+            let status = grade === 10 ? "✔️ ممتاز (10)" : (grade === 0 && idx < studentPointer ? "❌ غير موفق (0)" : "⏳ بانتظار الدور");
+            const row = document.createElement('tr');
+            row.innerHTML = `<td><b>${stu}</b></td><td><b>${grade} / 10</b></td><td>${status}</td>`;
+            tbody.appendChild(row);
+        });
     }
 
     function exportExcelSheet() {
@@ -640,16 +551,7 @@
         clearInterval(examTimer);
         document.getElementById('setup-view').classList.add('hidden');
         document.getElementById('rooms-view').classList.remove('hidden');
-        document.getElementById('students-manual').value = "";
-        document.getElementById('lecture-manual').value = "";
-        document.getElementById('students-file').value = "";
-        document.getElementById('lecture-file').value = "";
-        document.getElementById('students-status').innerText = "";
-        document.getElementById('lecture-status').innerText = "";
-        document.getElementById('students-progress-box').style.display = "none";
-        document.getElementById('lecture-progress-box').style.display = "none";
-        cachedStudentsText = "";
-        cachedLectureText = "";
+        document.getElementById('students-textarea').value = "";
     }
 
     function resetAndReturnRooms() {
