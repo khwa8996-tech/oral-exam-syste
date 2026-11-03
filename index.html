@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة امتحانات الحاسوب الذكية - النسخة التلقائية العشوائية</title>
+    <title>منصة امتحانات الحاسوب الذكية - إدارة الشعب المستقلة</title>
     <!-- مكتبات قراءة كافة صيغ الملفات (PDF, Word, Excel, TXT, JSON) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
@@ -77,7 +77,7 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         }
 
-        textarea { resize: vertical; height: 100px; }
+        textarea { resize: vertical; height: 120px; }
 
         .question {
             font-weight: 700;
@@ -188,10 +188,10 @@
 
     <div class="header">
         <h2>نظام امتحانات الحاسوب الذكي</h2>
-        <p>الاختيار العشوائي التلقائي للطلاب والتصحيح الفوري</p>
+        <p>إدارة الشعب المستقلة، التعديل الفوري للأسماء، والتصحيح التلقائي</p>
     </div>
 
-    <!-- خطوة 1: لوحة الإعدادات وادخال الأسماء والأسئلة -->
+    <!-- 1. لوحة إعداد الشعبة والأسماء والأسئلة -->
     <div id="setup-card" class="card">
         <label for="grade-select">اختر الصف الدراسي:</label>
         <select id="grade-select">
@@ -201,36 +201,46 @@
         </select>
 
         <label for="section-select">اختر الشعبة:</label>
-        <select id="section-select">
+        <select id="section-select" onchange="loadSectionNamesIntoBox()">
             <option value="">-- اختر الشعبة --</option>
             <option value="أ">شعبة (أ)</option>
             <option value="ب">شعبة (ب)</option>
         </select>
 
         <div class="inline-box">
-            <label>👥 إدخال أسماء طلاب الشعبة يدوياً (اكتب كل اسم في سطر):</label>
+            <label>👥 قائمة أسماء طلاب الشعبة المختارة (اكتب كل اسم في سطر، ويمكنك التعديل عليها مباشرة):</label>
             <textarea id="manual-students" placeholder="أحمد محمد علي&#10;حسين جاسم&#10;فاطمة كريم"></textarea>
-            <button class="btn-secondary" onclick="loadManualStudents()">حفظ قائمة الطلاب 📝</button>
+            <button class="btn-secondary" onclick="saveSectionStudents()">حفظ أسماء هذه الشعبة 📝</button>
             
-            <label style="margin-top: 10px;">أو ارفع ملف أسماء (PDF, Word, Excel, TXT):</label>
+            <label style="margin-top: 10px;">أو ارفع ملف أسماء لهذه الشعبة (PDF, Word, Excel, TXT):</label>
             <input type="file" id="students-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt">
         </div>
 
-        <label for="questions-file">ارفع ملف الأسئلة (يدعم PDF, Word, Excel, CSV, JSON, TXT):</label>
+        <label for="questions-file">ارفع بنك الأسئلة الشامل (يدعم PDF, Word, Excel, CSV, JSON, TXT):</label>
         <input type="file" id="questions-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.json,.txt">
 
         <div id="status-names" style="font-weight: bold; color: var(--success); margin-bottom: 15px; text-align: center;"></div>
 
-        <button class="btn-primary" onclick="startRandomExamSession()">بدء الاختبار العشوائي التلقائي 🚀</button>
+        <button class="btn-primary" onclick="startRandomExamSession()">بدء الاختبار العشوائي للشعبة 🚀</button>
     </div>
 
-    <!-- خطوة 2: واجهة الامتحان والتصحيح الفوري -->
+    <!-- 1.5 نافذة مراجعة وتعديل اسم الطالب العشوائي قبل بدء الأسئلة -->
+    <div id="edit-student-card" class="card" style="display: none; text-align: center;">
+        <h3 style="color: var(--primary); margin-bottom: 15px;">✏️ مراجعة وتعديل اسم الطالب</h3>
+        <p style="color: var(--text-muted); margin-bottom: 15px;">اختيار النظام العشوائي للطالب التالي. يمكنك تعديل الاسم أدناه إذا رغبت قبل الانتقال للأسئلة:</p>
+        
+        <input type="text" id="editable-student-name" style="font-size: 1.2rem; font-weight: bold; text-align: center; color: var(--primary);">
+        
+        <button class="btn-primary" onclick="confirmStudentAndStartQuiz()">اعتماد الاسم وبدء الأسئلة الثلاثة ✨</button>
+    </div>
+
+    <!-- 2. واجهة الامتحان والتصحيح الفوري -->
     <div id="exam-card" class="card" style="display: none;">
         <h3 id="current-info" style="color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;"></h3>
         <div id="quiz-container"></div>
     </div>
 
-    <!-- خطوة 3: جدول النتائج الفاخر -->
+    <!-- 3. جدول النتائج الفاخر -->
     <div class="card">
         <h3 style="color: #1e293b; margin-bottom: 15px; font-size: 1.2rem;">📊 سجل درجات الطلاب المباشر</h3>
         <div style="overflow-x: auto;">
@@ -252,25 +262,51 @@
     </div>
 
     <script>
-        let loadedStudents = [];
+        // تخزين الأسماء لكل شعبة على حدة
+        let sectionDatastore = {
+            "الرابع-أ": [],
+            "الرابع-ب": [],
+            "الخامس-أ": [],
+            "الخامس-ب": []
+        };
+
         let remainingStudents = [];
         let loadedQuestions = [];
         let selectedGrade = "";
         let selectedSection = "";
+        let currentKey = "";
         let currentStudent = "";
         let selectedQuestions = [];
         let score = 0;
         let answeredCount = 0;
         let allResults = [];
 
-        function loadManualStudents() {
-            let text = document.getElementById('manual-students').value;
-            if (!text.trim()) {
-                alert("الرجاء كتابة أسماء الطلاب أولاً في الصندوق!");
+        // عند تغيير الشعبة أو الصف، يتم جلب الأسماء المخزنة مسبقاً لتلك الشعبة إن وجدت
+        function loadSectionNamesIntoBox() {
+            let grade = document.getElementById('grade-select').value;
+            let section = document.getElementById('section-select').value;
+            if (grade && section) {
+                let key = `${grade}-${section}`;
+                let textarea = document.getElementById('manual-students');
+                textarea.value = sectionDatastore[key].join("\n");
+                document.getElementById('status-names').innerText = `📁 تم تحميل أسماء ${grade} - شعبة (${section}) المحفوظة (${sectionDatastore[key].length} طالب).`;
+            }
+        }
+
+        document.getElementById('grade-select').addEventListener('change', loadSectionNamesIntoBox);
+
+        // حفظ أسماء الشعبة الحالية يدوياً
+        function saveSectionStudents() {
+            let grade = document.getElementById('grade-select').value;
+            let section = document.getElementById('section-select').value;
+            if (!grade || !section) {
+                alert("الرجاء اختيار الصف والشعبة أولاً!");
                 return;
             }
-            loadedStudents = text.split(/\r\n|\n/).map(s => s.trim()).filter(s => s !== "");
-            document.getElementById('status-names').innerText = `✅ تم حفظ ${loadedStudents.length} طالباً بنجاح!`;
+            let text = document.getElementById('manual-students').value;
+            let key = `${grade}-${section}`;
+            sectionDatastore[key] = text.split(/\r\n|\n/).map(s => s.trim()).filter(s => s !== "");
+            document.getElementById('status-names').innerText = `✅ تم حفظ أسماء ${grade} - شعبة (${section}) بنجاح (${sectionDatastore[key].length} طالب)!`;
         }
 
         async function parseUniversalFile(file) {
@@ -303,13 +339,23 @@
             }
         }
 
+        // رفع ملف الأسماء وتخزينه للشعبة المختارة
         document.getElementById('students-file').addEventListener('change', async function(e) {
+            let grade = document.getElementById('grade-select').value;
+            let section = document.getElementById('section-select').value;
+            if (!grade || !section) {
+                alert("الرجاء اختيار الصف والشعبة أولاً قبل رفع الملف!");
+                this.value = "";
+                return;
+            }
             let file = e.target.files[0];
             if (!file) return;
             try {
                 let rawText = await parseUniversalFile(file);
-                loadedStudents = rawText.split(/\r\n|\n|,/).map(s => s.trim()).filter(s => s !== "" && s.length > 2);
-                document.getElementById('status-names').innerText = `✅ تم تحميل ${loadedStudents.length} طالباً من الملف بنجاح!`;
+                let key = `${grade}-${section}`;
+                sectionDatastore[key] = rawText.split(/\r\n|\n|,/).map(s => s.trim()).filter(s => s !== "" && s.length > 2);
+                document.getElementById('manual-students').value = sectionDatastore[key].join("\n");
+                document.getElementById('status-names').innerText = `✅ تم استهاف وحفظ ${sectionDatastore[key].length} طالباً من الملف لـ ${grade} - شعبة (${section})!`;
             } catch (err) {
                 alert("⚠️ حدث خطأ أثناء قراءة ملف الطلاب.");
             }
@@ -384,36 +430,58 @@
                 return;
             }
 
-            if (loadedStudents.length === 0) {
-                alert("الرجاء إدخال أسماء الطلاب يدوياً أو رفع ملف الأسماء أولاً!");
+            currentKey = `${selectedGrade}-${selectedSection}`;
+            // تأكد من حفظ التعديلات الموجودة في صندوق النصوص أولاً
+            saveSectionStudents();
+
+            if (sectionDatastore[currentKey].length === 0) {
+                alert("⚠️ لا توجد أسماء مسجلة لهذه الشعبة! يجيب إدخال الأسماء أو رفع ملفها أولاً.");
                 return;
             }
 
-            // نسخت قائمة الطلاب لنبدأ الاختيار العشوائي بدون تكرار حتى ينتهوا
-            remainingStudents = [...loadedStudents];
-            nextRandomStudent();
+            remainingStudents = [...sectionDatastore[currentKey]];
+            pickNextRandomStudent();
         }
 
-        function nextRandomStudent() {
+        // اختيار طالب عشوائي وعرض نافذة التعديل
+        function pickNextRandomStudent() {
             if (remainingStudents.length === 0) {
-                alert("🎉 مبروك! لقد أتم جميع الطلاب في هذه الشعبة الاختبار بنجاح.");
-                document.getElementById('exam-card').style.display = 'none';
+                alert("🎉 مبروك! لقد أتم جميع طلاب هذه الشعبة الاختبار بنجاح.");
+                document.getElementById('edit-student-card').style.display = 'none';
                 document.getElementById('setup-card').style.display = 'block';
                 return;
             }
 
-            // اختيار طالب عشوائياً من القائمة المتبقية
             let randomIndex = Math.floor(Math.random() * remainingStudents.length);
-            currentStudent = remainingStudents.splice(randomIndex, 1)[0]; // إزالته لكي لا يتكرر
+            currentStudent = remainingStudents.splice(randomIndex, 1)[0];
+
+            // عرض واجهة التعديل والمراجعة للاسم قبل بدء الأسئلة
+            document.getElementById('setup-card').style.display = 'none';
+            document.getElementById('exam-card').style.display = 'none';
+            
+            let editCard = document.getElementById('edit-student-card');
+            editCard.style.display = 'block';
+            document.getElementById('editable-student-name').value = currentStudent;
+        }
+
+        // اعتماد الاسم (بعد التعديل اليدوي إن أردت) وبدء الامتحان
+        function confirmStudentAndStartQuiz() {
+            let inputField = document.getElementById('editable-student-name');
+            let updatedName = inputField.value.trim();
+            if (!updatedName) {
+                alert("الرجاء عدم إبقاء اسم الطالب فارغاً!");
+                return;
+            }
+            currentStudent = updatedName;
 
             let activeQuestions = (loadedQuestions.length > 0) ? loadedQuestions : defaultQuestions;
             selectedQuestions = [...activeQuestions].sort(() => 0.5 - Math.random()).slice(0, 3);
             score = 0;
             answeredCount = 0;
 
-            document.getElementById('setup-card').style.display = 'none';
+            document.getElementById('edit-student-card').style.display = 'none';
             document.getElementById('exam-card').style.display = 'block';
-            document.getElementById('current-info').innerHTML = `👤 دور الطالب (عشوائي): <strong>${currentStudent}</strong> | <span class="badge">${selectedGrade} - شعبة (${selectedSection})</span>`;
+            document.getElementById('current-info').innerHTML = `👤 الطالب الحالي: <strong>${currentStudent}</strong> | <span class="badge">${selectedGrade} - شعبة (${selectedSection})</span>`;
 
             renderQuiz();
         }
@@ -474,8 +542,8 @@
 
             updateResultsTable();
 
-            // انتقال فوري وتلقائي للطالب العشوائي التالي دون أي تدخل
-            nextRandomStudent();
+            // الانتقال الفوري والتلقائي لاختيار الطالب العشوائي التالي مع إمكانية تعديل اسمه
+            pickNextRandomStudent();
         }
 
         function updateResultsTable() {
