@@ -109,16 +109,16 @@
 <div class="container" id="mainHomeContainer">
     <header>
         <h1>ثانوية المتفوقين الثانية للبنين</h1>
-        <h2>نظام إدارة الاختبارات الشفهية والطلبة (مع إضافة نصية دفعة واحدة وحفظ دائم)</h2>
+        <h2>نظام إدارة الاختبارات الشفهية والطلبة (نسخة مطورة ومستقرة تماماً)</h2>
     </header>
 
     <!-- شريط النسخ الاحتياطي والتزامن -->
     <div class="backup-section">
         <span>💾 تزامن وحفظ البيانات (للنقل بين الأجهزة أو سطح المكتب):</span>
         <div style="display: flex; gap: 8px;">
-            <button class="action-btn backup-btn" onclick="exportBackup()">📥 تصدير نسخة</button>
+            <button class="action-btn backup-btn" type="button" onclick="exportBackup()">📥 تصدير نسخة</button>
             <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importBackup(event)">
-            <button class="action-btn backup-btn" style="background: #059669;" onclick="document.getElementById('importFile').click()">📤 استعادة نسخة</button>
+            <button class="action-btn backup-btn" type="button" style="background: #059669;" onclick="document.getElementById('importFile').click()">📤 استعادة نسخة</button>
         </div>
     </div>
 
@@ -130,12 +130,12 @@
             <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 10px 0;">ضع عبارة (الإجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
             <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
                 <input type="file" id="file4" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '4')">
-                <button class="action-btn upload-btn" onclick="document.getElementById('file4').click()">📁 رفع ملف</button>
-                <button class="action-btn clear-box-btn" onclick="clearBox('4')">🗑️ مسح</button>
+                <button class="action-btn upload-btn" type="button" onclick="document.getElementById('file4').click()">📁 رفع ملف</button>
+                <button class="action-btn clear-box-btn" type="button" onclick="clearBox('4')">🗑️ مسح</button>
             </div>
             <div id="info4" class="file-info">⚠️ لم يتم حفظ أسئلة للرابع بعد.</div>
             <textarea id="text4" placeholder="مثال:&#10;ما هي أهمية نظام التشغيل؟&#10;إدارة الموارد (الإجابة الصحيحة)&#10;زيادة الحرارة&#10;حذف الملفات"></textarea>
-            <button class="action-btn add-btn" onclick="saveQuestions('4')" style="margin-top: 10px; width: 100%; justify-content: center;">💾 حفظ بنك الرابع</button>
+            <button class="action-btn add-btn" type="button" onclick="saveQuestions('4')" style="margin-top: 10px; width: 100%; justify-content: center;">💾 حفظ بنك الرابع</button>
         </div>
 
         <!-- الصف الخامس -->
@@ -144,42 +144,41 @@
             <p style="font-size: 11px; color: var(--text-muted); margin: 4px 0 10px 0;">ضع عبارة (الإجابة الصحيحة) أو (*) بجانب الخيار الصحيح.</p>
             <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
                 <input type="file" id="file5" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '5')">
-                <button class="action-btn upload-btn" style="background: #10b981;" onclick="document.getElementById('file5').click()">📁 رفع ملف</button>
-                <button class="action-btn clear-box-btn" onclick="clearBox('5')">🗑️ مسح</button>
+                <button class="action-btn upload-btn" type="button" style="background: #10b981;" onclick="document.getElementById('file5').click()">📁 رفع ملف</button>
+                <button class="action-btn clear-box-btn" type="button" onclick="clearBox('5')">🗑️ مسح</button>
             </div>
             <div id="info5" class="file-info">⚠️ لم يتم حفظ أسئلة للخامس بعد.</div>
             <textarea id="text5" placeholder="مثال:&#10;ما هو الغرض من Defragment؟&#10;إعادة تنظيم البيانات (الإجابة الصحيحة)&#10;حذف النظام&#10;تشفير القرص"></textarea>
-            <button class="action-btn add-btn" style="background: #10b981; margin-top: 10px; width: 100%; justify-content: center;" onclick="saveQuestions('5')">💾 حفظ بنك الخامس</button>
+            <button class="action-btn add-btn" type="button" onclick="saveQuestions('5')" style="margin-top: 10px; width: 100%; justify-content: center;" onclick="saveQuestions('5')">💾 حفظ بنك الخامس</button>
         </div>
     </div>
 
-    <button class="start-exam-btn" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي واختيار الشعبة</button>
+    <button class="start-exam-btn" type="button" onclick="openExamModal()">🚀 بدء الامتحان التفاعلي واختيار الشعبة</button>
 
     <!-- التبويبات للشعب -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('sec-4a', event)">الرابع (أ)</button>
-        <button class="tab-btn" onclick="switchTab('sec-4b', event)">الرابع (ب)</button>
-        <button class="tab-btn" onclick="switchTab('sec-5a', event)">الخامس (أ)</button>
-        <button class="tab-btn" onclick="switchTab('sec-5b', event)">الخامس (ب)</button>
+        <button class="tab-btn active" type="button" onclick="switchTab('sec-4a', event)">الرابع (أ)</button>
+        <button class="tab-btn" type="button" onclick="switchTab('sec-4b', event)">الرابع (ب)</button>
+        <button class="tab-btn" type="button" onclick="switchTab('sec-5a', event)">الخامس (أ)</button>
+        <button class="tab-btn" type="button" onclick="switchTab('sec-5b', event)">الخامس (ب)</button>
     </div>
 
     <!-- الرابع أ -->
     <div id="sec-4a" class="section-content active">
         <h3 style="margin-top:0; color:#1e1b4b;">إدارة طلاب شعبة الرابع (أ)</h3>
         
-        <!-- خانة إضافة أسماء متعددة نصياً دفعة واحدة -->
         <div class="bulk-box">
             <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
             <textarea id="bulkInput-4a" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
-            <button class="action-btn add-btn" onclick="addBulkStudents('4a')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
+            <button class="action-btn add-btn" type="button" onclick="addBulkStudents('4a')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-4a" placeholder="أدخل اسم طالب مفرد...">
-                <button class="action-btn add-btn" onclick="addStudent('4a')">➕ إضافة</button>
+                <button class="action-btn add-btn" type="button" onclick="addStudent('4a')">➕ إضافة</button>
             </div>
-            <button class="action-btn reset-btn" onclick="resetData('4a')">🔄 إعادة ضبط القائمة</button>
+            <button class="action-btn reset-btn" type="button" onclick="resetData('4a')">🔄 إعادة ضبط القائمة</button>
         </div>
         <ul id="list-4a"></ul>
     </div>
@@ -191,15 +190,15 @@
         <div class="bulk-box">
             <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
             <textarea id="bulkInput-4b" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
-            <button class="action-btn add-btn" onclick="addBulkStudents('4b')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
+            <button class="action-btn add-btn" type="button" onclick="addBulkStudents('4b')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-4b" placeholder="أدخل اسم طالب مفرد...">
-                <button class="action-btn add-btn" onclick="addStudent('4b')">➕ إضافة</button>
+                <button class="action-btn add-btn" type="button" onclick="addStudent('4b')">➕ إضافة</button>
             </div>
-            <button class="action-btn reset-btn" onclick="resetData('4b')">🔄 إعادة ضبط القائمة</button>
+            <button class="action-btn reset-btn" type="button" onclick="resetData('4b')">🔄 إعادة ضبط القائمة</button>
         </div>
         <ul id="list-4b"></ul>
     </div>
@@ -211,15 +210,15 @@
         <div class="bulk-box">
             <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
             <textarea id="bulkInput-5a" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
-            <button class="action-btn add-btn" onclick="addBulkStudents('5a')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
+            <button class="action-btn add-btn" type="button" onclick="addBulkStudents('5a')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-5a" placeholder="أدخل اسم طالب مفرد...">
-                <button class="action-btn add-btn" onclick="addStudent('5a')">➕ إضافة</button>
+                <button class="action-btn add-btn" type="button" onclick="addStudent('5a')">➕ إضافة</button>
             </div>
-            <button class="action-btn reset-btn" onclick="resetData('5a')">🔄 إعادة ضبط القائمة</button>
+            <button class="action-btn reset-btn" type="button" onclick="resetData('5a')">🔄 إعادة ضبط القائمة</button>
         </div>
         <ul id="list-5a"></ul>
     </div>
@@ -231,15 +230,15 @@
         <div class="bulk-box">
             <label>📝 إضافة عدة أسماء نصياً دفعة واحدة (كل اسم في سطر مستقل):</label>
             <textarea id="bulkInput-5b" placeholder="اكتب أو الصق الأسماء هنا، كل اسم في سطر..."></textarea>
-            <button class="action-btn add-btn" onclick="addBulkStudents('5b')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
+            <button class="action-btn add-btn" type="button" onclick="addBulkStudents('5b')" style="margin-top: 8px; width: 100%; justify-content: center;">📥 إضافة القائمة النصية إلى الشعبة</button>
         </div>
 
         <div class="controls">
             <div style="flex-grow: 1; display: flex; gap: 8px;">
                 <input type="text" id="input-5b" placeholder="أدخل اسم طالب مفرد...">
-                <button class="action-btn add-btn" onclick="addStudent('5b')">➕ إضافة</button>
+                <button class="action-btn add-btn" type="button" onclick="addStudent('5b')">➕ إضافة</button>
             </div>
-            <button class="action-btn reset-btn" onclick="resetData('5b')">🔄 إعادة ضبط القائمة</button>
+            <button class="action-btn reset-btn" type="button" onclick="resetData('5b')">🔄 إعادة ضبط القائمة</button>
         </div>
         <ul id="list-5b"></ul>
     </div>
@@ -248,7 +247,7 @@
 <!-- نافذة الامتحان وغرفة النتائج -->
 <div id="examModal">
     <div class="modal-content">
-        <button class="action-btn home-btn" onclick="closeExamModal()">🏠 العودة للصفحة الرئيسية</button>
+        <button class="action-btn home-btn" type="button" onclick="closeExamModal()">🏠 العودة للصفحة الرئيسية</button>
         
         <h2 style="color: #1e1b4b; margin-bottom: 15px;">غرفة الامتحان والنتائج التفاعلية</h2>
         
@@ -260,7 +259,7 @@
                 <option value="5a">الخامس (أ) - يعتمد أسئلة الخامس</option>
                 <option value="5b">الخامس (ب) - يعتمد أسئلة الخامس</option>
             </select>
-            <button class="action-btn add-btn" onclick="startStudentExam()" style="padding: 9px 18px; margin-top: 5px;">🎯 بدء امتحان طالب عشوائي (3 أسئلة)</button>
+            <button class="action-btn add-btn" type="button" onclick="startStudentExam()" style="padding: 9px 18px; margin-top: 5px;">🎯 بدء امتحان طالب عشوائي (3 أسئلة)</button>
         </div>
 
         <div id="activeExamArea" style="display: none;">
@@ -281,8 +280,8 @@
             <div id="feedbackMsg" style="font-weight: bold; font-size: 16px; margin: 10px 0; min-height: 25px;"></div>
             
             <div style="display: flex; gap: 10px;">
-                <button id="skipQuestionBtn" class="action-btn skip-btn" style="flex: 1; padding: 12px; font-size: 15px; justify-content: center;" onclick="skipQuestion()">⏭️ تخطي السؤال</button>
-                <button id="nextQuestionBtn" class="action-btn add-btn" style="display:none; flex: 2; padding: 12px; font-size: 15px; justify-content: center;" onclick="loadNextQuestion()">السؤال التالي ➡️</button>
+                <button id="skipQuestionBtn" class="action-btn skip-btn" type="button" style="flex: 1; padding: 12px; font-size: 15px; justify-content: center;" onclick="skipQuestion()">⏭️ تخطي السؤال</button>
+                <button id="nextQuestionBtn" class="action-btn add-btn" type="button" style="display:none; flex: 2; padding: 12px; font-size: 15px; justify-content: center;" onclick="loadNextQuestion()">السؤال التالي ➡️</button>
             </div>
         </div>
 
@@ -291,7 +290,7 @@
         <!-- غرفة النتائج -->
         <div class="results-header">
             <h3 style="margin: 0; color: #1e1b4b; font-size: 18px;">📊 سجل النتائج النهائية</h3>
-            <button class="action-btn reset-btn" onclick="clearAllResults()" style="padding: 6px 12px; font-size: 12px;">🗑️ تفريغ كل النتائج</button>
+            <button class="action-btn reset-btn" type="button" onclick="clearAllResults()" style="padding: 6px 12px; font-size: 12px;">🗑️ تفريغ كل النتائج</button>
         </div>
 
         <div style="max-height: 180px; overflow-y: auto; margin-top: 10px;">
@@ -363,26 +362,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v30') || "";
-    let fileName5 = localStorage.getItem('fileName5_v30') || "";
+    let fileName4 = localStorage.getItem('fileName4_v31') || "";
+    let fileName5 = localStorage.getItem('fileName5_v31') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v30');
+        const saved = localStorage.getItem('schoolAppData_v31');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v30')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v31')) || [];
 
-    if(localStorage.getItem('q4_text_v30')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v30');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v30') || "[]");
+    if(localStorage.getItem('q4_text_v31')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v31');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v31') || "[]");
     }
-    if(localStorage.getItem('q5_text_v30')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v30');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v30') || "[]");
+    if(localStorage.getItem('q5_text_v31')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v31');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v31') || "[]");
     }
 
     let currentStudent = "";
@@ -418,15 +417,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v30', JSON.stringify(appData));
-            localStorage.setItem('examResults_v30', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v30', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v30', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v30', fileName4);
+            localStorage.setItem('schoolAppData_v31', JSON.stringify(appData));
+            localStorage.setItem('examResults_v31', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v31', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v31', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v31', fileName4);
 
-            localStorage.setItem('q5_text_v30', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v30', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v30', fileName5);
+            localStorage.setItem('q5_text_v31', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v31', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v31', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -515,7 +514,6 @@
         }
     }
 
-    // إضافة أسماء متعددة نصياً دفعة واحدة من المربع النصي
     function addBulkStudents(sec) {
         const textarea = document.getElementById(`bulkInput-${sec}`);
         const text = textarea.value.trim();
@@ -540,6 +538,7 @@
         }
     }
 
+    // دالة حذف طالب مفرد محسنة ومضمونة الاستجابة
     function deleteStudent(sec, index) {
         if (confirm('هل أنت متأكد من حذف هذا الطالب من القائمة؟')) {
             appData[sec].splice(index, 1);
@@ -548,6 +547,7 @@
         }
     }
 
+    // دالة إعادة ضبط الشعبة وإعادتها للقائمة الافتراضية
     function resetData(sec) {
         if (confirm(`هل أنت متأكد من إعادة ضبط وتصفير قائمة أسماء الشعبة (${sec}) وإعادتها للوضع الافتراضي؟`)) {
             appData[sec] = [...defaultData[sec]];
@@ -560,8 +560,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v30'); localStorage.removeItem('q4_text_v30'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v30'); localStorage.removeItem('q5_text_v30'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v31'); localStorage.removeItem('q4_text_v31'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v31'); localStorage.removeItem('q5_text_v31'); }
             saveData();
             updateInfoDisplays();
         }
@@ -774,6 +774,7 @@
         qObj.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
+            btn.type = 'button';
             btn.innerText = `${idx + 1}. ${opt}`;
             btn.onclick = function() {
                 clearInterval(timerInterval);
