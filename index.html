@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة امتحانات الحاسوب الذكية - الإصدار الفاخر</title>
+    <title>منصة امتحانات الحاسوب الذكية - النسخة التلقائية العشوائية</title>
     <!-- مكتبات قراءة كافة صيغ الملفات (PDF, Word, Excel, TXT, JSON) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
@@ -33,23 +33,14 @@
             background: var(--bg-gradient);
             color: white;
             text-align: center;
-            padding: 30px 20px;
+            padding: 25px 20px;
             border-radius: 20px;
             box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
             margin-bottom: 25px;
         }
 
-        .header h2 {
-            margin: 0 0 10px 0;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .header p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 1.05rem;
-        }
+        .header h2 { margin: 0 0 8px 0; font-size: 1.7rem; font-weight: 700; }
+        .header p { margin: 0; opacity: 0.9; font-size: 1rem; }
 
         .card {
             background: var(--card-bg);
@@ -68,23 +59,25 @@
             font-size: 0.95rem;
         }
 
-        select, input[type="file"] {
+        select, input[type="file"], textarea, input[type="text"] {
             width: 100%;
-            padding: 14px;
+            padding: 12px 14px;
             border-radius: 10px;
             border: 2px solid #e2e8f0;
             font-size: 1rem;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: #fff;
             box-sizing: border-box;
             transition: all 0.3s ease;
         }
 
-        select:focus, input[type="file"]:focus {
+        select:focus, input:focus, textarea:focus {
             border-color: var(--primary);
             outline: none;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         }
+
+        textarea { resize: vertical; height: 100px; }
 
         .question {
             font-weight: 700;
@@ -109,10 +102,7 @@
             color: #334155;
         }
 
-        .options button:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-        }
+        .options button:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
         .correct {
             background: #ecfdf5 !important;
@@ -134,16 +124,26 @@
             padding: 14px;
             width: 100%;
             border-radius: 12px;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             cursor: pointer;
             font-weight: bold;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
-        .btn-primary:active {
-            transform: scale(0.98);
+        .btn-secondary {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 15px;
         }
+
+        .btn-secondary:hover { background: #0284c7; }
 
         table {
             width: 100%;
@@ -162,15 +162,8 @@
             font-size: 0.95rem;
         }
 
-        th {
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
-        }
-
-        tr:nth-child(even) {
-            background: #f8fafc;
-        }
+        th { background: var(--primary); color: white; font-weight: 600; }
+        tr:nth-child(even) { background: #f8fafc; }
 
         .badge {
             display: inline-block;
@@ -181,16 +174,24 @@
             background: #e0e7ff;
             color: #3730a3;
         }
+        
+        .inline-box {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px dashed #cbd5e1;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h2>نظام امتحانات الحاسوب الذكي</h2>
-        <p>الواجهة الاحترافية الشاملة - دعم كافة صيغ الملفات والتصحيح الفوري</p>
+        <p>الاختيار العشوائي التلقائي للطلاب والتصحيح الفوري</p>
     </div>
 
-    <!-- خطوة 1: اختيار الصف والشعبة ورفع الملفات بأي صيغة -->
+    <!-- خطوة 1: لوحة الإعدادات وادخال الأسماء والأسئلة -->
     <div id="setup-card" class="card">
         <label for="grade-select">اختر الصف الدراسي:</label>
         <select id="grade-select">
@@ -206,18 +207,21 @@
             <option value="ب">شعبة (ب)</option>
         </select>
 
-        <label for="students-file">ملف أسماء الطلاب (يدعم PDF, Word, Excel, CSV, TXT):</label>
-        <input type="file" id="students-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt">
+        <div class="inline-box">
+            <label>👥 إدخال أسماء طلاب الشعبة يدوياً (اكتب كل اسم في سطر):</label>
+            <textarea id="manual-students" placeholder="أحمد محمد علي&#10;حسين جاسم&#10;فاطمة كريم"></textarea>
+            <button class="btn-secondary" onclick="loadManualStudents()">حفظ قائمة الطلاب 📝</button>
+            
+            <label style="margin-top: 10px;">أو ارفع ملف أسماء (PDF, Word, Excel, TXT):</label>
+            <input type="file" id="students-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt">
+        </div>
 
-        <label for="questions-file">ملف الأسئلة (يدعم PDF, Word, Excel, CSV, JSON, TXT):</label>
+        <label for="questions-file">ارفع ملف الأسئلة (يدعم PDF, Word, Excel, CSV, JSON, TXT):</label>
         <input type="file" id="questions-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.json,.txt">
 
-        <label for="student-select">اختر اسم الطالب:</label>
-        <select id="student-select">
-            <option value="">-- يرجى رفع ملف الأسماء أولاً --</option>
-        </select>
+        <div id="status-names" style="font-weight: bold; color: var(--success); margin-bottom: 15px; text-align: center;"></div>
 
-        <button class="btn-primary" onclick="startExam()">بدء الامتحان الفوري 🚀</button>
+        <button class="btn-primary" onclick="startRandomExamSession()">بدء الاختبار العشوائي التلقائي 🚀</button>
     </div>
 
     <!-- خطوة 2: واجهة الامتحان والتصحيح الفوري -->
@@ -249,6 +253,7 @@
 
     <script>
         let loadedStudents = [];
+        let remainingStudents = [];
         let loadedQuestions = [];
         let selectedGrade = "";
         let selectedSection = "";
@@ -258,19 +263,25 @@
         let answeredCount = 0;
         let allResults = [];
 
-        // محرك ذكي شامل لقراءة جميع أنواع الملفات (PDF, Word, Excel, CSV, TXT, JSON)
+        function loadManualStudents() {
+            let text = document.getElementById('manual-students').value;
+            if (!text.trim()) {
+                alert("الرجاء كتابة أسماء الطلاب أولاً في الصندوق!");
+                return;
+            }
+            loadedStudents = text.split(/\r\n|\n/).map(s => s.trim()).filter(s => s !== "");
+            document.getElementById('status-names').innerText = `✅ تم حفظ ${loadedStudents.length} طالباً بنجاح!`;
+        }
+
         async function parseUniversalFile(file) {
             let extension = file.name.split('.').pop().toLowerCase();
-            
             if (extension === 'txt' || extension === 'json') {
                 return await file.text();
-            } 
-            else if (extension === 'docx') {
+            } else if (extension === 'docx') {
                 let arrayBuffer = await file.arrayBuffer();
                 let result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
                 return result.value;
-            } 
-            else if (extension === 'pdf') {
+            } else if (extension === 'pdf') {
                 let arrayBuffer = await file.arrayBuffer();
                 let pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 let text = "";
@@ -281,56 +292,38 @@
                     text += pageText + "\n";
                 }
                 return text;
-            } 
-            else if (extension === 'xlsx' || extension === 'xls' || extension === 'csv') {
+            } else if (extension === 'xlsx' || extension === 'xls' || extension === 'csv') {
                 let arrayBuffer = await file.arrayBuffer();
                 let workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 let firstSheetName = workbook.SheetNames[0];
                 let worksheet = workbook.Sheets[firstSheetName];
-                let text = XLSX.utils.sheet_to_csv(worksheet);
-                return text;
-            } 
-            else {
-                throw new Error("صيغة الملف غير مدعومة");
+                return XLSX.utils.sheet_to_csv(worksheet);
+            } else {
+                throw new Error("صيغة غير مدعومة");
             }
         }
 
-        // معالجة ملف الأسماء بأي صيغة
         document.getElementById('students-file').addEventListener('change', async function(e) {
             let file = e.target.files[0];
             if (!file) return;
             try {
                 let rawText = await parseUniversalFile(file);
                 loadedStudents = rawText.split(/\r\n|\n|,/).map(s => s.trim()).filter(s => s !== "" && s.length > 2);
-                
-                let studentSelect = document.getElementById('student-select');
-                studentSelect.innerHTML = '<option value="">-- اختر اسم الطالب --</option>';
-                loadedStudents.forEach(name => {
-                    let opt = document.createElement('option');
-                    opt.value = name;
-                    opt.innerText = name;
-                    studentSelect.appendChild(opt);
-                });
-                alert("✨ تم تحميل واستخراج أسماء الطلاب بنجاح!");
+                document.getElementById('status-names').innerText = `✅ تم تحميل ${loadedStudents.length} طالباً من الملف بنجاح!`;
             } catch (err) {
-                alert("⚠️ حدث خطأ أثناء قراءة ملف الطلاب. تأكد من صحة الملف.");
+                alert("⚠️ حدث خطأ أثناء قراءة ملف الطلاب.");
             }
         });
 
-        // معالجة ملف الأسئلة بأي صيغة
         document.getElementById('questions-file').addEventListener('change', async function(e) {
             let file = e.target.files[0];
             if (!file) return;
             try {
                 let rawText = await parseUniversalFile(file);
                 let extension = file.name.split('.').pop().toLowerCase();
-                
                 if (extension === 'json') {
                     loadedQuestions = JSON.parse(rawText);
                 } else {
-                    // تحويل النصوص المستخرجة من PDF/Word/Excel إلى بنك أسئلة تلقائي
-                    let lines = rawText.split(/\r\n|\n/).map(s => s.trim()).filter(s => s !== "");
-                    // إذا لم يكن مصاغاً كـ JSON، نستخدم البنك الاحترافي ونقوم بدمجه
                     loadedQuestions = defaultQuestions;
                 }
                 alert("✨ تم تحميل بنك الأسئلة بنجاح!");
@@ -339,7 +332,6 @@
             }
         });
 
-        // بنك أسئلة افتراضي فخم في حال لم يتم رفع ملف أسئلة خارجي
         const defaultQuestions = [
             {
                 q: "ما هو مفهوم تطبيقات الأجهزة الذكية؟",
@@ -383,26 +375,45 @@
             }
         ];
 
-        function startExam() {
+        function startRandomExamSession() {
             selectedGrade = document.getElementById('grade-select').value;
             selectedSection = document.getElementById('section-select').value;
-            currentStudent = document.getElementById('student-select').value;
 
-            if (!selectedGrade || !selectedSection || !currentStudent) {
-                alert("الرجاء اختيار الصف، الشعبة، واسم الطالب بالكامل!");
+            if (!selectedGrade || !selectedSection) {
+                alert("الرجاء اختيار الصف والشعبة أولاً!");
                 return;
             }
 
-            let activeQuestions = (loadedQuestions.length > 0) ? loadedQuestions : defaultQuestions;
+            if (loadedStudents.length === 0) {
+                alert("الرجاء إدخال أسماء الطلاب يدوياً أو رفع ملف الأسماء أولاً!");
+                return;
+            }
 
-            // اختيار 3 أسئلة عشوائية فريدة لكل طالب
+            // نسخت قائمة الطلاب لنبدأ الاختيار العشوائي بدون تكرار حتى ينتهوا
+            remainingStudents = [...loadedStudents];
+            nextRandomStudent();
+        }
+
+        function nextRandomStudent() {
+            if (remainingStudents.length === 0) {
+                alert("🎉 مبروك! لقد أتم جميع الطلاب في هذه الشعبة الاختبار بنجاح.");
+                document.getElementById('exam-card').style.display = 'none';
+                document.getElementById('setup-card').style.display = 'block';
+                return;
+            }
+
+            // اختيار طالب عشوائياً من القائمة المتبقية
+            let randomIndex = Math.floor(Math.random() * remainingStudents.length);
+            currentStudent = remainingStudents.splice(randomIndex, 1)[0]; // إزالته لكي لا يتكرر
+
+            let activeQuestions = (loadedQuestions.length > 0) ? loadedQuestions : defaultQuestions;
             selectedQuestions = [...activeQuestions].sort(() => 0.5 - Math.random()).slice(0, 3);
             score = 0;
             answeredCount = 0;
 
             document.getElementById('setup-card').style.display = 'none';
             document.getElementById('exam-card').style.display = 'block';
-            document.getElementById('current-info').innerHTML = `👤 الطالب: <strong>${currentStudent}</strong> | <span class="badge">${selectedGrade} - شعبة (${selectedSection})</span>`;
+            document.getElementById('current-info').innerHTML = `👤 دور الطالب (عشوائي): <strong>${currentStudent}</strong> | <span class="badge">${selectedGrade} - شعبة (${selectedSection})</span>`;
 
             renderQuiz();
         }
@@ -440,7 +451,7 @@
                         
                         answeredCount++;
                         if (answeredCount === selectedQuestions.length) {
-                            setTimeout(finishExam, 1000);
+                            setTimeout(finishAndProceed, 1200);
                         }
                     };
                     optDiv.appendChild(btn);
@@ -451,7 +462,7 @@
             });
         }
 
-        function finishExam() {
+        function finishAndProceed() {
             let finalGrade10 = Math.round((score / selectedQuestions.length) * 10);
             let fullSectionName = `${selectedGrade} - شعبة (${selectedSection})`;
 
@@ -463,11 +474,8 @@
 
             updateResultsTable();
 
-            alert(`🎉 أحسنت يا ${currentStudent}!\nدرجتك النهائية هي: ${finalGrade10} من 10`);
-
-            document.getElementById('exam-card').style.display = 'none';
-            document.getElementById('setup-card').style.display = 'block';
-            document.getElementById('student-select').value = "";
+            // انتقال فوري وتلقائي للطالب العشوائي التالي دون أي تدخل
+            nextRandomStudent();
         }
 
         function updateResultsTable() {
