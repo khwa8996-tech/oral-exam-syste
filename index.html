@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة الامتحان الشفهي الذكية - مختبر الحاسوب</title>
+    <!-- مكتبة قراءة ملفات الـ PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- مكتبة قراءة ملفات الـ Word (.docx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
     <style>
         :root {
             --tech-dark: #090d16;
@@ -305,10 +308,10 @@
         <textarea id="students-input" placeholder="أدخل أسماء الطلاب هنا..."></textarea>
         <button class="btn-danger" onclick="clearSavedStudents()" style="display:none;" id="clear-btn">🗑️ مسح الأسماء المحفوظة لهذه الغرفة</button>
 
-        <label style="margin-top: 20px;">📚 رفع ملف الأسئلة والأجوبة (PDF أو TXT):</label>
+        <label style="margin-top: 20px;">📚 رفع ملف الأسئلة (PDF, Word .docx, أو TXT):</label>
         <div class="file-upload-box">
-            <input type="file" id="pdf-file" accept=".pdf, .txt" onchange="loadFile(event)" style="background:transparent; border:none; padding:5px; color:var(--text-main);">
-            <span style="font-size: 13px; color: var(--primary); display: block; margin-top: 5px;">اختر ملف PDF أو TXT الخاص بمنهج الحاسوب</span>
+            <input type="file" id="any-file" accept=".pdf, .docx, .txt" onchange="loadAnyFile(event)" style="background:transparent; border:none; padding:5px; color:var(--text-main);">
+            <span style="font-size: 13px; color: var(--primary); display: block; margin-top: 5px;">يدعم جميع الصيغ (PDF, Word, TXT) تلقائياً</span>
         </div>
 
         <label style="margin-top: 20px;">أو الصق محتوى الأسئلة يدوياً هنا:</label>
@@ -366,14 +369,13 @@
         { q: "ما هو جهاز التوجيه (Router) في شبكات الحاسوب؟", correct: "جهاز يربط الشبكات ببعضها ويوجه البيانات.", options: ["جهاز يربط الشبكات ببعضها ويوجه البيانات.", "شاشة عرض البيانات.", "وحدة المعالجة المركزية.", "أداة لتبريد المعالج."] }
     ];
 
-    // محرك تصحيح متطور لإعادة تجميع الكلمات المقلوبة في ملفات PDF المدرسية وعكس اتجاهها برمجياً
-    function smartFixArabicPDF(rawText) {
+    // دالة تصحيح النصوص العربية المقلوبة في الـ PDF
+    function fixPdfArabicText(rawText) {
         if (!rawText) return "";
         let lines = rawText.split('\n');
         let fixedLines = lines.map(line => {
             let trimmed = line.trim();
             if (trimmed.length > 0) {
-                // تقسيم السطر إلى كلمات، ثم تصحيح انعكاس الحروف داخل كل كلمة، ثم إعادة ترتيب الكلمات بالاتجاه الصحيح
                 let words = trimmed.split(/\s+/);
                 let correctedWords = words.map(word => {
                     if (/[\u0600-\u06FF]/.test(word)) {
@@ -429,10 +431,13 @@
         }
     }
 
-    async function loadFile(e) {
+    // دعم رفع أي صيغة ملف (PDF, Word .docx, TXT)
+    async function loadAnyFile(e) {
         const file = e.target.files[0];
         if (!file) return;
-        if (file.type === "application/pdf") {
+        const fileName = file.name.toLowerCase();
+
+        if (fileName.endsWith('.pdf')) {
             const reader = new FileReader();
             reader.onload = function() {
                 pdfjsLib.getDocument(new Uint8Array(this.result)).promise.then(async pdf => {
@@ -445,21 +450,32 @@
                             x: item.transform[4],
                             y: item.transform[5]
                         }));
-                        // تجميع وترتيب العناصر بناءً على الإحداثيات العمودية والأفقية لملف الـ PDF
                         items.sort((a, b) => {
                             if (Math.abs(b.y - a.y) > 5) return b.y - a.y;
-                            return b.x - a.x; // ترتيب معاكس ذكي لملفات الـ PDF المعكوسة
+                            return b.x - a.x;
                         });
                         txt += items.map(item => item.str).join(' ') + '\n';
                     }
-                    // تمرير النص المستخرج على محرك التصحيح الذكي
-                    document.getElementById("questions-input").value = smartFixArabicPDF(txt);
+                    document.getElementById("questions-input").value = fixPdfArabicText(txt);
                 });
             };
             reader.readAsArrayBuffer(file);
-        } else {
+        } else if (fileName.endsWith('.docx')) {
             const reader = new FileReader();
-            reader.onload = (ev) => { document.getElementById("questions-input").value = smartFixArabicPDF(ev.target.result); };
+            reader.onload = function(event) {
+                mammoth.extractRawText({ arrayBuffer: event.target.result })
+                    .then(result => {
+                        document.getElementById("questions-input").value = result.value;
+                    })
+                    .catch(err => {
+                        alert("حدث خطأ أثناء قراءة ملف الـ Word.");
+                    });
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            // ملف نصي عادي TXT
+            const reader = new FileReader();
+            reader.onload = (ev) => { document.getElementById("questions-input").value = ev.target.result; };
             reader.readAsText(file, "UTF-8");
         }
     }
@@ -667,7 +683,7 @@
         document.getElementById("rooms-view").classList.remove("hidden");
         document.getElementById("students-input").value = "";
         document.getElementById("questions-input").value = "";
-        document.getElementById("pdf-file").value = "";
+        document.getElementById("any-file").value = "";
     }
 </script>
 
