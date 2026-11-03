@@ -3,568 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة امتحانات الحاسوب الذكية - إدارة الشعب المستقلة</title>
-    <!-- مكتبات قراءة كافة صيغ الملفات (PDF, Word, Excel, TXT, JSON) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>منصة ثانوية المتفوقين الثانية - سجل الأسماء</title>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --success: #10b981;
-            --danger: #ef4444;
-            --bg-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8fafc;
-            color: var(--text-main);
-            padding: 20px;
-            max-width: 700px;
-            margin: auto;
-        }
-
-        .header {
-            background: var(--bg-gradient);
-            color: white;
-            text-align: center;
-            padding: 25px 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
-            margin-bottom: 25px;
-        }
-
-        .header h2 { margin: 0 0 8px 0; font-size: 1.7rem; font-weight: 700; }
-        .header p { margin: 0; opacity: 0.9; font-size: 1rem; }
-
-        .card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-            border: 1px solid #e2e8f0;
-        }
-
-        label {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-main);
-            font-size: 0.95rem;
-        }
-
-        select, input[type="file"], textarea, input[type="text"] {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-            font-size: 1rem;
-            margin-bottom: 15px;
-            background: #fff;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        select:focus, input:focus, textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-        }
-
-        textarea { resize: vertical; height: 120px; }
-
-        .question {
-            font-weight: 700;
-            font-size: 1.15rem;
-            margin-bottom: 20px;
-            color: #1e293b;
-            line-height: 1.5;
-        }
-
-        .options button {
-            display: block;
-            width: 100% !important;
-            text-align: right;
-            padding: 14px 18px;
-            margin: 10px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            background: #fff;
-            cursor: pointer;
-            font-size: 1.05rem;
-            transition: all 0.2s ease;
-            color: #334155;
-        }
-
-        .options button:hover { background: #f1f5f9; border-color: #cbd5e1; }
-
-        .correct {
-            background: #ecfdf5 !important;
-            border-color: var(--success) !important;
-            color: #065f46 !important;
-            font-weight: bold;
-        }
-
-        .wrong {
-            background: #fef2f2 !important;
-            border-color: var(--danger) !important;
-            color: #991b1b !important;
-        }
-
-        .btn-primary {
-            background: var(--bg-gradient);
-            color: white;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-            transition: transform 0.2s ease;
-        }
-
-        .btn-secondary {
-            background: #0ea5e9;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .btn-secondary:hover { background: #0284c7; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-
-        th, td {
-            border: 1px solid #f1f5f9;
-            padding: 12px;
-            text-align: center;
-            font-size: 0.95rem;
-        }
-
-        th { background: var(--primary); color: white; font-weight: 600; }
-        tr:nth-child(even) { background: #f8fafc; }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-        
-        .inline-box {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px dashed #cbd5e1;
-            margin-bottom: 15px;
-        }
+        body { font-family: Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: #2c3e50; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; background: #e0e0e0; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; }
+        .tab-btn.active { background: #3498db; color: #fff; }
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+        .controls { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
+        input[type="text"] { padding: 8px; width: 60%; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        button.action-btn { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+        .add-btn { background: #2ecc71; color: white; }
+        .reset-btn { background: #e74c3c; color: white; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #fafafa; margin-bottom: 8px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; }
+        .delete-btn { background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2>نظام امتحانات الحاسوب الذكي</h2>
-        <p>إدارة الشعب المستقلة، التعديل الفوري للأسماء، والتصحيح التلقائي</p>
+<div class="container">
+    <h1>ثانوية المتفوقين الثانية للبنين</h1>
+    <h2>سجل أسماء الطلبة</h2>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('sec-4a')">الرابع (أ)</button>
+        <button class="tab-btn" onclick="switchTab('sec-4b')">الرابع (ب)</button>
+        <button class="tab-btn" onclick="switchTab('sec-5a')">الخامس (أ)</button>
+        <button class="tab-btn" onclick="switchTab('sec-5b')">الخامس (ب)</button>
     </div>
 
-    <!-- 1. لوحة إعداد الشعبة والأسماء والأسئلة -->
-    <div id="setup-card" class="card">
-        <label for="grade-select">اختر الصف الدراسي:</label>
-        <select id="grade-select">
-            <option value="">-- اختر الصف --</option>
-            <option value="الرابع">الصف الرابع</option>
-            <option value="الخامس">الصف الخامس</option>
-        </select>
-
-        <label for="section-select">اختر الشعبة:</label>
-        <select id="section-select" onchange="loadSectionNamesIntoBox()">
-            <option value="">-- اختر الشعبة --</option>
-            <option value="أ">شعبة (أ)</option>
-            <option value="ب">شعبة (ب)</option>
-        </select>
-
-        <div class="inline-box">
-            <label>👥 قائمة أسماء طلاب الشعبة المختارة (اكتب كل اسم في سطر، ويمكنك التعديل عليها مباشرة):</label>
-            <textarea id="manual-students" placeholder="أحمد محمد علي&#10;حسين جاسم&#10;فاطمة كريم"></textarea>
-            <button class="btn-secondary" onclick="saveSectionStudents()">حفظ أسماء هذه الشعبة 📝</button>
-            
-            <label style="margin-top: 10px;">أو ارفع ملف أسماء لهذه الشعبة (PDF, Word, Excel, TXT):</label>
-            <input type="file" id="students-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.txt">
+    <!-- الرابع أ -->
+    <div id="sec-4a" class="section-content active">
+        <h3>شعبة الرابع (أ)</h3>
+        <div class="controls">
+            <div>
+                <input type="text" id="input-4a" placeholder="أدخل اسم طالب جديد...">
+                <button class="action-btn add-btn" onclick="addStudent('4a')">إضافة طالب</button>
+            </div>
+            <button class="action-btn reset-btn" onclick="resetData('4a')">تصفير / بدء من جديد</button>
         </div>
-
-        <label for="questions-file">ارفع بنك الأسئلة الشامل (يدعم PDF, Word, Excel, CSV, JSON, TXT):</label>
-        <input type="file" id="questions-file" accept=".pdf,.docx,.xlsx,.xls,.csv,.json,.txt">
-
-        <div id="status-names" style="font-weight: bold; color: var(--success); margin-bottom: 15px; text-align: center;"></div>
-
-        <button class="btn-primary" onclick="startRandomExamSession()">بدء الاختبار العشوائي للشعبة 🚀</button>
+        <ul id="list-4a"></ul>
     </div>
 
-    <!-- 1.5 نافذة مراجعة وتعديل اسم الطالب العشوائي قبل بدء الأسئلة -->
-    <div id="edit-student-card" class="card" style="display: none; text-align: center;">
-        <h3 style="color: var(--primary); margin-bottom: 15px;">✏️ مراجعة وتعديل اسم الطالب</h3>
-        <p style="color: var(--text-muted); margin-bottom: 15px;">اختيار النظام العشوائي للطالب التالي. يمكنك تعديل الاسم أدناه إذا رغبت قبل الانتقال للأسئلة:</p>
-        
-        <input type="text" id="editable-student-name" style="font-size: 1.2rem; font-weight: bold; text-align: center; color: var(--primary);">
-        
-        <button class="btn-primary" onclick="confirmStudentAndStartQuiz()">اعتماد الاسم وبدء الأسئلة الثلاثة ✨</button>
-    </div>
-
-    <!-- 2. واجهة الامتحان والتصحيح الفوري -->
-    <div id="exam-card" class="card" style="display: none;">
-        <h3 id="current-info" style="color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;"></h3>
-        <div id="quiz-container"></div>
-    </div>
-
-    <!-- 3. جدول النتائج الفاخر -->
-    <div class="card">
-        <h3 style="color: #1e293b; margin-bottom: 15px; font-size: 1.2rem;">📊 سجل درجات الطلاب المباشر</h3>
-        <div style="overflow-x: auto;">
-            <table id="results-table">
-                <thead>
-                    <tr>
-                        <th>اسم الطالب</th>
-                        <th>الصف والشعبة</th>
-                        <th>الدرجة النهائية</th>
-                    </tr>
-                </thead>
-                <tbody id="results-body">
-                    <tr>
-                        <td colspan="3" style="color: #94a3b8; padding: 20px;">لا توجد نتائج مسجلة حتى الآن</td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- الرابع ب -->
+    <div id="sec-4b" class="section-content">
+        <h3>شعبة الرابع (ب)</h3>
+        <div class="controls">
+            <div>
+                <input type="text" id="input-4b" placeholder="أدخل اسم طالب جديد...">
+                <button class="action-btn add-btn" onclick="addStudent('4b')">إضافة طالب</button>
+            </div>
+            <button class="action-btn reset-btn" onclick="resetData('4b')">تصفير / بدء من جديد</button>
         </div>
+        <ul id="list-4b"></ul>
     </div>
 
-    <script>
-        // تخزين الأسماء لكل شعبة على حدة
-        let sectionDatastore = {
-            "الرابع-أ": [],
-            "الرابع-ب": [],
-            "الخامس-أ": [],
-            "الخامس-ب": []
-        };
+    <!-- الخامس أ -->
+    <div id="sec-5a" class="section-content">
+        <h3>شعبة الخامس (أ)</h3>
+        <div class="controls">
+            <div>
+                <input type="text" id="input-5a" placeholder="أدخل اسم طالب جديد...">
+                <button class="action-btn add-btn" onclick="addStudent('5a')">إضافة طالب</button>
+            </div>
+            <button class="action-btn reset-btn" onclick="resetData('5a')">تصفير / بدء من جديد</button>
+        </div>
+        <ul id="list-5a"></ul>
+    </div>
 
-        let remainingStudents = [];
-        let loadedQuestions = [];
-        let selectedGrade = "";
-        let selectedSection = "";
-        let currentKey = "";
-        let currentStudent = "";
-        let selectedQuestions = [];
-        let score = 0;
-        let answeredCount = 0;
-        let allResults = [];
+    <!-- الخامس ب -->
+    <div id="sec-5b" class="section-content">
+        <h3>شعبة الخامس (ب)</h3>
+        <div class="controls">
+            <div>
+                <input type="text" id="input-5b" placeholder="أدخل اسم طالب جديد...">
+                <button class="action-btn add-btn" onclick="addStudent('5b')">إضافة طالب</button>
+            </div>
+            <button class="action-btn reset-btn" onclick="resetData('5b')">تصفير / بدء من جديد</button>
+        </div>
+        <ul id="list-5b"></ul>
+    </div>
+</div>
 
-        // عند تغيير الشعبة أو الصف، يتم جلب الأسماء المخزنة مسبقاً لتلك الشعبة إن وجدت
-        function loadSectionNamesIntoBox() {
-            let grade = document.getElementById('grade-select').value;
-            let section = document.getElementById('section-select').value;
-            if (grade && section) {
-                let key = `${grade}-${section}`;
-                let textarea = document.getElementById('manual-students');
-                textarea.value = sectionDatastore[key].join("\n");
-                document.getElementById('status-names').innerText = `📁 تم تحميل أسماء ${grade} - شعبة (${section}) المحفوظة (${sectionDatastore[key].length} طالب).`;
-            }
-        }
+<script>
+    // البيانات الاأساسية الافتراضية
+    const defaultData = {
+        "4a": [
+            "ابراهيم زيد عبد العزيز احمد", "ابو عبيدة احمد جبار يوسف", "احمد إبراهيم مصطفى", "احمد حازم عراك حمد", 
+            "احمد علاء خلف عواد", "انس عمر حميد عويد", "اوس احمد عبد اللطيف حسين", "اوس عمار خليل يوسف", 
+            "اوس مصطفى محمد سويلم", "الايهم عمر فتاح كامل", "ايهم مصطفى إسماعيل خلف", "حارث مؤنس شوكت محمد", 
+            "حسن رائد عبد الغفور حسن", "الحسن زيد فاخر محمد", "حسن عمار ياسين خليل", "سلطان مصطفى دحام سالم", 
+            "عبد الرحمن خالد حسن حبيب", "عبد الرحمن هاني رسمي عبد الحميد", "عبد العزيز ظافر خير الله", "عبد الله جمال جبير", 
+            "عبد الله صدام محيسن علي", "عبد الله مقداد حمید جوهان", "عبد الملك عمار حكمت عويد", "عثمان علي نافع نوري", 
+            "عمرو أسامة يونس خلف", "ليث محمد مالك عبد الرحمن", "مالك احمد محمد سويلم", "محمد احمد محمد دخيل", 
+            "محمد دريد مجيد حميد", "محمد الامين احمد سلمان عبيد", "هيثم وعد خليل إبراهيم", "وليد نوري وليد خلف", 
+            "ياسين هيثم عفتان فرحان", "يوسف احمد فتاح صبحي"
+        ],
+        "4b": [
+            "إبراهيم منذر رزوقي مصطفى", "ابوبكر ظافر هاني زبار", "احمد محمد نافع حافظ", "اسید قاسم خلف طعيس", 
+            "انس عبد الستار جعيجر عبد", "اوس بهاء نافع فرحان", "ايمن اثير طارق نعمان", "ايمن رياض علوان عبد", 
+            "ايمن نزار رحيم حماد", "بشار ضياء محمود نجيل", "بشير إسماعيل عارف", "حارث مثنى حمد شبيب", 
+            "الحارث مثنى عبد المنعم عبد المجيد", "حذيفة محمد صالح فهمي", "حيدر علي حميد عايد", "زيد عمر صالح فهمي", 
+            "عبد الرحمن طالب احمد عبد اللطيف", "عبد الرحمن مؤید رشید داود", "عبد الله إبراهيم خالد عبد الكريم", 
+            "عبد الله احمد طالب ياسين", "عبد الله ادهم قدوري جاسم", "عبد الله حیدر ثائر داود", "عمرو عبد الحكيم عبد الكريم مرعي", 
+            "لبيب خالد وليد عبد العزيز", "ليث هيثم محمد دعيجل", "محمد رفعت رسمي محسن", "مصطفى سعد عارف صداك", 
+            "مصطفى ياسر عبدالستار مطر", "مهند حاتم إسماعيل محمد", "مؤمن ضياء نافع فرحان", "وليد خالد جمعة مطر", 
+            "الوليد خالد وليد كاظم", "يحيى احمد رحومي رجب"
+        ],
+        "5a": [
+            "إبراهيم بهاء الدين عبد الستار فرج", "احمد محمد احمد فياض", "ادهم هيثم عفتان فرحان", "انس عيسى خلف محمد", 
+            "ايمن علي رشيد إبراهيم", "ايهم اكرم كمال حماد", "بكر احمد هيثم لطفي", "تمام احمد رحومي رجب", 
+            "حارث حسين عويد محمود", "حسين علي عبدالاله خضير", "خطاب ماجد فاضل منصور", "خليل هيثم خليل إبراهيم", 
+            "زيد حازم محمد فتاح", "صهيب تحرير مهدي عواد", "عبد الله إبراهيم إسماعيل محسن", "عبد الملك ياسين فالح ياسين", 
+            "عبيدة علاء خلف عواد", "علي ثائر بدر دحام", "عمر صفاء طالب صالح", "غيث صلاح مطر عياش", 
+            "غيث عقيل شاكر محمود", "ليث سيف ليث يونس", "مجد احمد خلف محمد", "محمد صدام محمد عبد", 
+            "محمد ليث عبود رشيد", "مصطفى قصي مجيد جاسم", "معتصم عمار موفق محمد", "منتظر جمال روكان احمد", 
+            "ياسين احمد حميد حمود", "ياسين ياسر محسن يوسف", "يحيى حسين مهدي حجلان", "يوسف احمد عبد محمد", 
+            "يوسف درید مجید جاسم", "يوسف عمر خير الله جميل", "يوسف ليث الدين صلاح حبيب", "يوسف ناظم عبد الوهاب محمد"
+        ],
+        "5b": [
+            "ابراهيم مناف عبد المطلب احمد", "احمد حسين عبد الحليم عبد الرحمن", "احمد فلاح حسن علي", "احمد وسام قاسم عبد الرحمن", 
+            "اغر حسین دهام سوید", "امجد عدي مجيد دويح", "أنور وليد فرج حمادي", "بهاء الدين بسام عبد محل", 
+            "تيم اوس حسن عطية", "جمال مالك جمال عبد", "حذيفة مثنى حازم يوسف", "خطاب عمر فتاح كامل", 
+            "رامي حسام محمد سويد", "سراج الدين فراس عبد الرحمن", "سعد رافع عبدالله عبد", "سيف احمد علي احمد", 
+            "طه موفق زعال خلف", "عبد الرحمن إسماعيل حمدي خليل", "عبد الرحمن همام طالب ياسين", "عبد الله قتيبة فرحان داود", 
+            "عبد الله محمد طارق عبد الجبار", "عبد المهيمن سنان حسن إسماعيل", "علي منذر مهدي صالح", "عمر محمد حسن بتال", 
+            "غيث جمال جياد عبد الله", "مجتبى مصطفى إسماعيل نايف", "محمد حميد صالح حسن", "محمد عكرمة جاسم محمد", 
+            "محمد مولود فريد هادي", "محمد ناظم إبراهيم عيادة", "معتز سعد محمد مخلف", "مهند عبد الحكيم عبد الكريم مرعي", 
+            "مهند محمد عواد امین", "يمان خالد وليد محمد", "يوسف احمد مشعل محمد", "يوسف ضياء كامل رزيج"
+        ]
+    };
 
-        document.getElementById('grade-select').addEventListener('change', loadSectionNamesIntoBox);
+    // تحميل البيانات من التخزين المحلي أو استخدام الافتراضية
+    let appData = JSON.parse(localStorage.getItem('schoolData')) || defaultData;
 
-        // حفظ أسماء الشعبة الحالية يدوياً
-        function saveSectionStudents() {
-            let grade = document.getElementById('grade-select').value;
-            let section = document.getElementById('section-select').value;
-            if (!grade || !section) {
-                alert("الرجاء اختيار الصف والشعبة أولاً!");
-                return;
-            }
-            let text = document.getElementById('manual-students').value;
-            let key = `${grade}-${section}`;
-            sectionDatastore[key] = text.split(/\r\n|\n/).map(s => s.trim()).filter(s => s !== "");
-            document.getElementById('status-names').innerText = `✅ تم حفظ أسماء ${grade} - شعبة (${section}) بنجاح (${sectionDatastore[key].length} طالب)!`;
-        }
+    function saveData() {
+        localStorage.setItem('schoolData', JSON.stringify(appData));
+    }
 
-        async function parseUniversalFile(file) {
-            let extension = file.name.split('.').pop().toLowerCase();
-            if (extension === 'txt' || extension === 'json') {
-                return await file.text();
-            } else if (extension === 'docx') {
-                let arrayBuffer = await file.arrayBuffer();
-                let result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-                return result.value;
-            } else if (extension === 'pdf') {
-                let arrayBuffer = await file.arrayBuffer();
-                let pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                let text = "";
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    let page = await pdf.getPage(i);
-                    let content = await page.getTextContent();
-                    let pageText = content.items.map(item => item.str).join(" ");
-                    text += pageText + "\n";
-                }
-                return text;
-            } else if (extension === 'xlsx' || extension === 'xls' || extension === 'csv') {
-                let arrayBuffer = await file.arrayBuffer();
-                let workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                let firstSheetName = workbook.SheetNames[0];
-                let worksheet = workbook.Sheets[firstSheetName];
-                return XLSX.utils.sheet_to_csv(worksheet);
-            } else {
-                throw new Error("صيغة غير مدعومة");
-            }
-        }
-
-        // رفع ملف الأسماء وتخزينه للشعبة المختارة
-        document.getElementById('students-file').addEventListener('change', async function(e) {
-            let grade = document.getElementById('grade-select').value;
-            let section = document.getElementById('section-select').value;
-            if (!grade || !section) {
-                alert("الرجاء اختيار الصف والشعبة أولاً قبل رفع الملف!");
-                this.value = "";
-                return;
-            }
-            let file = e.target.files[0];
-            if (!file) return;
-            try {
-                let rawText = await parseUniversalFile(file);
-                let key = `${grade}-${section}`;
-                sectionDatastore[key] = rawText.split(/\r\n|\n|,/).map(s => s.trim()).filter(s => s !== "" && s.length > 2);
-                document.getElementById('manual-students').value = sectionDatastore[key].join("\n");
-                document.getElementById('status-names').innerText = `✅ تم استهاف وحفظ ${sectionDatastore[key].length} طالباً من الملف لـ ${grade} - شعبة (${section})!`;
-            } catch (err) {
-                alert("⚠️ حدث خطأ أثناء قراءة ملف الطلاب.");
-            }
-        });
-
-        document.getElementById('questions-file').addEventListener('change', async function(e) {
-            let file = e.target.files[0];
-            if (!file) return;
-            try {
-                let rawText = await parseUniversalFile(file);
-                let extension = file.name.split('.').pop().toLowerCase();
-                if (extension === 'json') {
-                    loadedQuestions = JSON.parse(rawText);
-                } else {
-                    loadedQuestions = defaultQuestions;
-                }
-                alert("✨ تم تحميل بنك الأسئلة بنجاح!");
-            } catch (err) {
-                alert("⚠️ حدث خطأ أثناء قراءة ملف الأسئلة.");
-            }
-        });
-
-        const defaultQuestions = [
-            {
-                q: "ما هو مفهوم تطبيقات الأجهزة الذكية؟",
-                options: [
-                    "أ) برامج مخصصة لتشغيل الأجهزة المكتبية فقط",
-                    "ب) برامج مكتوبة بلغات برمجية تتوافق مع أنظمة تشغيل الأجهزة الذكية وتقدم خدمات في شتى المجالات",
-                    "ج) ملفات نصية لتخزين البيانات فقط",
-                    "د) أجهزة مادية لإدارة الاتصال بالإنترنت"
-                ],
-                correct: 1
-            },
-            {
-                q: "من مميزات تطبيقات الأجهزة الذكية التخزين الداخلي حيث تخزن في ذاكرة الجهاز لتأدية:",
-                options: [
-                    "أ) مهام مصممة لأجلها مثل تطبيقات الطقس",
-                    "ب) ألعاب فيديو فقط",
-                    "ج) ملفات نظام التشغيل الأساسية فقط",
-                    "د) نسخ احتياطية للنظام القديم"
-                ],
-                correct: 0
-            },
-            {
-                q: "تتطلب بعض تطبيقات الأجهزة الذكية إنترنت لـ:",
-                options: [
-                    "أ) حذف الملفات المؤقتة تلقائياً",
-                    "ب) تحديث المحتوى وتفعيل التزامن بين جهازين",
-                    "ج) زيادة مساحة القرص الصلب",
-                    "د) تشغيل مروحة المعالج"
-                ],
-                correct: 1
-            },
-            {
-                q: "التطبيق الذي يصمم لنظام تشغيل محدد مثل iOS أو Android ولا يعمل في نظام آخر يسمى:",
-                options: [
-                    "أ) تطبيق الويب (Web App)",
-                    "ب) التطبيق الهجين (Hybrid App)",
-                    "ج) التطبيق الأصلي (Native App)",
-                    "د) تطبيق السحابة الإلكترونية"
-                ],
-                correct: 2
-            }
-        ];
-
-        function startRandomExamSession() {
-            selectedGrade = document.getElementById('grade-select').value;
-            selectedSection = document.getElementById('section-select').value;
-
-            if (!selectedGrade || !selectedSection) {
-                alert("الرجاء اختيار الصف والشعبة أولاً!");
-                return;
-            }
-
-            currentKey = `${selectedGrade}-${selectedSection}`;
-            // تأكد من حفظ التعديلات الموجودة في صندوق النصوص أولاً
-            saveSectionStudents();
-
-            if (sectionDatastore[currentKey].length === 0) {
-                alert("⚠️ لا توجد أسماء مسجلة لهذه الشعبة! يجيب إدخال الأسماء أو رفع ملفها أولاً.");
-                return;
-            }
-
-            remainingStudents = [...sectionDatastore[currentKey]];
-            pickNextRandomStudent();
-        }
-
-        // اختيار طالب عشوائي وعرض نافذة التعديل
-        function pickNextRandomStudent() {
-            if (remainingStudents.length === 0) {
-                alert("🎉 مبروك! لقد أتم جميع طلاب هذه الشعبة الاختبار بنجاح.");
-                document.getElementById('edit-student-card').style.display = 'none';
-                document.getElementById('setup-card').style.display = 'block';
-                return;
-            }
-
-            let randomIndex = Math.floor(Math.random() * remainingStudents.length);
-            currentStudent = remainingStudents.splice(randomIndex, 1)[0];
-
-            // عرض واجهة التعديل والمراجعة للاسم قبل بدء الأسئلة
-            document.getElementById('setup-card').style.display = 'none';
-            document.getElementById('exam-card').style.display = 'none';
-            
-            let editCard = document.getElementById('edit-student-card');
-            editCard.style.display = 'block';
-            document.getElementById('editable-student-name').value = currentStudent;
-        }
-
-        // اعتماد الاسم (بعد التعديل اليدوي إن أردت) وبدء الامتحان
-        function confirmStudentAndStartQuiz() {
-            let inputField = document.getElementById('editable-student-name');
-            let updatedName = inputField.value.trim();
-            if (!updatedName) {
-                alert("الرجاء عدم إبقاء اسم الطالب فارغاً!");
-                return;
-            }
-            currentStudent = updatedName;
-
-            let activeQuestions = (loadedQuestions.length > 0) ? loadedQuestions : defaultQuestions;
-            selectedQuestions = [...activeQuestions].sort(() => 0.5 - Math.random()).slice(0, 3);
-            score = 0;
-            answeredCount = 0;
-
-            document.getElementById('edit-student-card').style.display = 'none';
-            document.getElementById('exam-card').style.display = 'block';
-            document.getElementById('current-info').innerHTML = `👤 الطالب الحالي: <strong>${currentStudent}</strong> | <span class="badge">${selectedGrade} - شعبة (${selectedSection})</span>`;
-
-            renderQuiz();
-        }
-
-        function renderQuiz() {
-            const container = document.getElementById('quiz-container');
-            container.innerHTML = "";
-
-            selectedQuestions.forEach((item, index) => {
-                let card = document.createElement('div');
-                card.style.marginBottom = "25px";
-                
-                let qTitle = document.createElement('div');
-                qTitle.className = 'question';
-                qTitle.innerText = `س ${index + 1}: ${item.q}`;
-                card.appendChild(qTitle);
-
-                let optDiv = document.createElement('div');
-                optDiv.className = 'options';
-
-                item.options.forEach((opt, optIndex) => {
-                    let btn = document.createElement('button');
-                    btn.innerText = opt;
-                    btn.onclick = function() {
-                        let buttons = optDiv.querySelectorAll('button');
-                        buttons.forEach(b => b.disabled = true); // قفل الأزرار فور الاختيار
-                        
-                        if (optIndex === item.correct) {
-                            btn.classList.add('correct');
-                            score++;
-                        } else {
-                            btn.classList.add('wrong');
-                            buttons[item.correct].classList.add('correct'); // تلوين الصحيحة تلقائياً
-                        }
-                        
-                        answeredCount++;
-                        if (answeredCount === selectedQuestions.length) {
-                            setTimeout(finishAndProceed, 1200);
-                        }
-                    };
-                    optDiv.appendChild(btn);
-                });
-
-                card.appendChild(optDiv);
-                container.appendChild(card);
+    function renderLists() {
+        for (let sec in appData) {
+            const ul = document.getElementById(`list-${sec}`);
+            ul.innerHTML = '';
+            appData[sec].forEach((name, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${index + 1}. ${name}</span> <button class="delete-btn" onclick="deleteStudent('${sec}', ${index})">حذف</button>`;
+                ul.appendChild(li);
             });
         }
+    }
 
-        function finishAndProceed() {
-            let finalGrade10 = Math.round((score / selectedQuestions.length) * 10);
-            let fullSectionName = `${selectedGrade} - شعبة (${selectedSection})`;
+    function switchTab(secId) {
+        document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(secId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
 
-            allResults.push({
-                name: currentStudent,
-                section: fullSectionName,
-                grade: finalGrade10
-            });
-
-            updateResultsTable();
-
-            // الانتقال الفوري والتلقائي لاختيار الطالب العشوائي التالي مع إمكانية تعديل اسمه
-            pickNextRandomStudent();
+    function addStudent(sec) {
+        const input = document.getElementById(`input-${sec}`);
+        const name = input.value.trim();
+        if (name) {
+            appData[sec].push(name);
+            saveData();
+            renderLists();
+            input.value = '';
+        } else {
+            alert('يرجى ادخال اسم الطالب بشكل صحيح.');
         }
+    }
 
-        function updateResultsTable() {
-            const tbody = document.getElementById('results-body');
-            tbody.innerHTML = "";
-
-            if (allResults.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="color: #94a3b8; padding: 20px;">لا توجد نتائج مسجلة حتى الآن</td></tr>';
-                return;
-            }
-
-            allResults.forEach(res => {
-                let row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${res.name}</strong></td>
-                    <td><span class="badge">${res.section}</span></td>
-                    <td><strong style="color: var(--primary); font-size: 1.1rem;">${res.grade} / 10</strong></td>
-                `;
-                tbody.appendChild(row);
-            });
+    function deleteStudent(sec, index) {
+        if (confirm('هل أنت متأكد من حذف هذا الطالب؟')) {
+            appData[sec].splice(index, 1);
+            saveData();
+            renderLists();
         }
-    </script>
+    }
+
+    function resetData(sec) {
+        if (confirm('هل أنت متأكد من إعادة تعيين الشعبة إلى القائمة الأصلية؟')) {
+            appData[sec] = [...defaultData[sec]];
+            saveData();
+            renderLists();
+        }
+    }
+
+    // التشغيل الأولي
+    renderLists();
+</script>
+
 </body>
 </html>
