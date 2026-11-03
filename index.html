@@ -69,7 +69,7 @@
     <!-- بنك أسئلة الصف الرابع (للشعبتين أ و ب) -->
     <div class="exam-file-section" style="border-color: #3b82f6;">
         <h3 style="color: #1d4ed8; margin-top: 0;">📚 بنك أسئلة الصف الرابع (للشعبتين: أ، ب)</h3>
-        <p style="font-size: 12px; color: #475569; margin: 4px 0;">اكتب بجانب الخيار الصحيح عبارتها ليتعرف عليها النظام ويقوم بإخفائها عن الطالب أثناء الامتحان.</p>
+        <p style="font-size: 12px; color: #475569; margin: 4px 0;">ضع عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح ليتعرف عليه النظام ويقوم بإخفائه عن الطالب تلقائياً.</p>
         <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
             <input type="file" id="file4" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '4')">
             <button class="action-btn upload-btn" onclick="document.getElementById('file4').click()">📁 رفع ملف أسئلة الرابع</button>
@@ -83,14 +83,14 @@
     <!-- بنك أسئلة الصف الخامس (للشعبتين أ و ب) -->
     <div class="exam-file-section" style="border-color: #10b981;">
         <h3 style="color: #047857; margin-top: 0;">📚 بنك أسئلة الصف الخامس (للشعبتين: أ، ب)</h3>
-        <p style="font-size: 12px; color: #475569; margin: 4px 0;">اكتب عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح ليتعرف عليه النظام ويخفيه عن الطالب.</p>
+        <p style="font-size: 12px; color: #475569; margin: 4px 0;">ضع عبارة (الإجابة الصحيحة) بجانب الخيار الصحيح ليتعرف عليه النظام ويخفيه عن الطالب.</p>
         <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
             <input type="file" id="file5" accept=".docx,.pdf,.txt" style="display: none;" onchange="handleFileUpload(event, '5')">
             <button class="action-btn upload-btn" style="background: #10b981;" onclick="document.getElementById('file5').click()">📁 رفع ملف أسئلة الخامس</button>
             <button class="action-btn clear-box-btn" onclick="clearBox('5')">🗑️ مسح</button>
         </div>
         <div id="info5" class="file-info">⚠️ لم يتم رفع ملف للخامس بعد.</div>
-        <textarea id="text5" placeholder="مثال:&#10;ما هي لغة البرمجة؟&#10;Python (الإجابة الصحيحة)&#10;HTML&#10;CSS"></textarea>
+        <textarea id="text5" placeholder="مثال:&#10;ما هو الغرض من برنامج Defragment؟&#10;إعادة تنظيم مواقع البيانات (الإجابة الصحيحة)&#10;حذف نظام التشغيل&#10;تشفير البيانات"></textarea>
         <button class="action-btn add-btn" style="background: #10b981;" onclick="saveQuestions('5')" style="margin-top: 6px; width: 100%;">حفظ بنك أسئلة الخامس دائمياً</button>
     </div>
 
@@ -272,26 +272,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v21') || "";
-    let fileName5 = localStorage.getItem('fileName5_v21') || "";
+    let fileName4 = localStorage.getItem('fileName4_v22') || "";
+    let fileName5 = localStorage.getItem('fileName5_v22') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v21');
+        const saved = localStorage.getItem('schoolAppData_v22');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v21')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v22')) || [];
 
-    if(localStorage.getItem('q4_text')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank') || "[]");
+    if(localStorage.getItem('q4_text_v22')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v22');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v22') || "[]");
     }
-    if(localStorage.getItem('q5_text')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank') || "[]");
+    if(localStorage.getItem('q5_text_v22')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v22');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v22') || "[]");
     }
 
     let currentStudent = "";
@@ -304,15 +304,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v21', JSON.stringify(appData));
-            localStorage.setItem('examResults_v21', JSON.stringify(examResults));
-            localStorage.setItem('q4_text', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v21', fileName4);
+            localStorage.setItem('schoolAppData_v22', JSON.stringify(appData));
+            localStorage.setItem('examResults_v22', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v22', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v22', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v22', fileName4);
 
-            localStorage.setItem('q5_text', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v21', fileName5);
+            localStorage.setItem('q5_text_v22', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v22', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v22', fileName5);
         } catch (e) {
             alert('تعذر الحفظ.');
         }
@@ -374,8 +374,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; }
-            else { questions5 = []; fileName5 = ""; }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v22'); localStorage.removeItem('q4_text_v22'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v22'); localStorage.removeItem('q5_text_v22'); }
             saveData();
             updateInfoDisplays();
         }
@@ -449,7 +449,7 @@
         alert(`تم حفظ بنك أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'} دائمياً بنجاح!`);
     }
 
-    // تحليل الأسئلة ومعرفة الإجابة الصحيحة وحذف كلمة (الإجابة الصحيحة) لتظهر نظيفة للطالب
+    // تحليل دقيق لاستخراج الإجابة الصحيحة خلف الكواليس وحذفها نهائياً من العرض
     function parseQuestions(text, grade) {
         let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         let parsed = [];
@@ -462,23 +462,27 @@
                 if(currentQ !== "" && currentOpts.length > 0) {
                     parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
                 }
-                // تنظيف عنوان السؤال من أي ترقيم سابق أو مسافات
                 currentQ = line.replace(/^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?)\s*/, '').trim();
                 currentOpts = [];
                 correctIdx = 0;
             } else {
                 if(currentQ !== "") {
-                    // التحقق إذا كان الخيار يحتوي على عبارة الإجابة الصحيحة أو علامة النجمة
+                    // التحقق ما إذا كان الخيار يحتوي على إشارة الإجابة الصحيحة
+                    let isCorrect = false;
                     if(line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
-                        correctIdx = currentOpts.length; // تحديد مكان الإجابة الصحيحة
-                        // تنظيف النص تماماً وحذف عبارة الإجابة الصحيحة لكي لا تظهر أمام الطالب
-                        line = line.replace(/\(الإجابة الصحيحة\)/g, '')
-                                   .replace(/الإجابة الصحيحة/g, '')
-                                   .replace(/\(\*\)/g, '')
-                                   .replace(/\*/g, '')
-                                   .trim();
+                        isCorrect = true;
+                        correctIdx = currentOpts.length;
                     }
-                    currentOpts.push(line);
+                    
+                    // تنظيف النص تماماً وإزالة العبارة أو الأقواس والرموز لكي لا تظهر نهائياً للطالب
+                    let cleanLine = line.replace(/\(الإجابة الصحيحة\)/g, '')
+                                        .replace(/الإجابة الصحيحة/g, '')
+                                        .replace(/\(\*\)/g, '')
+                                        .replace(/\*/g, '')
+                                        .replace(/\(\s*\)/g, '')
+                                        .trim();
+
+                    currentOpts.push(cleanLine);
                     
                     if(currentOpts.length === 3) {
                         parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
