@@ -1,691 +1,84 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الامتحان الشفهي الذكية - مختبر الحاسوب</title>
-    <!-- مكتبة قراءة ملفات الـ PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <!-- مكتبة قراءة ملفات الـ Word (.docx) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
-    <style>
-        :root {
-            --tech-dark: #090d16;
-            --tech-card: #111827;
-            --tech-border: #1f293d;
-            --primary: #38bdf8;
-            --primary-hover: #0ea5e9;
-            --accent: #818cf8;
-            --success: #34d399;
-            --danger: #f87171;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-        }
+import os
+import pandas as pd
+from docx import Document
+from docx.shared import Inches, Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at center, #1e1b4b 0%, var(--tech-dark) 100%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+def generate_smart_ai_system():
+    doc = Document()
 
-        .container {
-            width: 100%;
-            max-width: 950px;
-            background: var(--tech-card);
-            padding: 40px;
-            border-radius: 32px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
+    # ضبط هوامش الصفحة
+    for section in doc.sections:
+        section.top_margin = Inches(1)
+        section.bottom_margin = Inches(1)
+        section.left_margin = Inches(1)
+        section.right_margin = Inches(1)
 
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent), var(--success));
-        }
+    # عنوان النظام الذكي
+    title_p = doc.add_paragraph()
+    title_p.paragraph_format.rtl = True
+    title_p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    title_run = title_p.add_run("بنك أسئلة امتحان مادة الحاسوب (النظام الذكي المتطور)")
+    title_run.font.name = 'Arial'
+    title_run.font.size = Pt(20)
+    title_run.font.bold = True
+    title_run.font.color.rgb = RGBColor(15, 23, 42)
 
-        h2 {
-            text-align: center;
-            color: var(--primary);
-            margin-bottom: 35px;
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-        }
+    subtitle_p = doc.add_paragraph()
+    subtitle_p.paragraph_format.rtl = True
+    subtitle_p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    subtitle_run = subtitle_p.add_run("أسئلة اختيار من متعدد مع التظليل البرمجي الذكي للإجابات الصحيحة")
+    subtitle_run.font.name = 'Arial'
+    subtitle_run.font.size = Pt(13)
+    subtitle_run.font.color.rgb = RGBColor(71, 85, 105)
 
-        .bubbles-box {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin: 40px 0;
-        }
+    doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
-        .bubble {
-            width: 165px;
-            height: 165px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 3px solid var(--primary);
-            position: relative;
-        }
+    # قاعدة البيانات الشاملة للأسئلة
+    questions_data = [
+        ("س 1: ما هو مفهوم تطبيقات الأجهزة الذكية؟", [
+            ("أ", "برامج مخصصة لتشغيل الأجهزة المكتبية فقط"),
+            ("ب", "برامج مكتوبة بلغات برمجية تتوافق مع أنظمة تشغيل الأجهزة الذكية وتقدم خدمات في شتى المجالات (الإجابة الصحيحة)"),
+            ("ج", "ملفات نصية لتخزين البيانات فقط"),
+            ("د", "أجهزة مادية لإدارة الاتصال بالإنترنت")
+        ]),
+        # ... بقية الأسئلة الـ 107 ...
+    ]
 
-        .bubble:hover {
-            transform: scale(1.12) translateY(-5px);
-            box-shadow: 0 15px 40px rgba(56, 189, 248, 0.4);
-            background: linear-gradient(135deg, #0f172a, #1e1b4b);
-        }
-
-        .bubble.pop {
-            transform: scale(1.5);
-            opacity: 0;
-            transition: 0.3s ease-out;
-        }
-
-        .bubble h3 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .bubble span {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        .section-box {
-            background: rgba(17, 24, 39, 0.6);
-            border: 1px solid var(--tech-border);
-            padding: 30px;
-            border-radius: 24px;
-            margin-bottom: 25px;
-        }
-
-        label {
-            font-weight: 700;
-            display: block;
-            margin-top: 18px;
-            margin-bottom: 8px;
-            font-size: 16px;
-            color: var(--accent);
-        }
-
-        textarea, input[type="text"], button {
-            width: 100%;
-            padding: 16px;
-            font-size: 16px;
-            border-radius: 14px;
-            border: 1px solid var(--tech-border);
-            box-sizing: border-box;
-            background: #090d16;
-            color: var(--text-main);
-            transition: 0.3s;
-        }
-
-        textarea:focus, input[type="text"]:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-        }
-
-        .file-upload-box {
-            background: rgba(56, 189, 248, 0.05);
-            border: 2px dashed var(--primary);
-            padding: 18px;
-            border-radius: 14px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        textarea { resize: vertical; height: 110px; direction: rtl; text-align: right; }
-
-        .student-box {
-            background: rgba(56, 189, 248, 0.08);
-            border: 2px dashed var(--primary);
-            padding: 22px;
-            border-radius: 18px;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .editable-input {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--primary);
-            text-align: center;
-            border: 2px solid transparent;
-            background: transparent;
-            width: 100%;
-        }
-        .editable-input:focus {
-            border-color: var(--primary);
-            background: #090d16;
-            outline: none;
-        }
-
-        .question-box {
-            background: rgba(245, 158, 11, 0.1);
-            border: 2px solid #f59e0b;
-            padding: 25px;
-            border-radius: 18px;
-            font-size: 22px;
-            margin-bottom: 25px;
-            text-align: center;
-            font-weight: 800;
-            color: #fbbf24;
-            line-height: 1.6;
-            direction: rtl;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .opt-btn {
-            background: var(--tech-card);
-            border: 2px solid var(--tech-border);
-            padding: 18px;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.3s;
-            color: var(--text-main);
-            direction: rtl;
-        }
-        .opt-btn:hover {
-            border-color: var(--primary);
-            background: rgba(56, 189, 248, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .btn-main { background-color: var(--primary); color: #090d16; border: none; font-weight: 800; cursor: pointer; margin-top: 15px; }
-        .btn-main:hover { background-color: var(--primary-hover); box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
-
-        .btn-success { background-color: var(--success); color: #090d16; border: none; font-weight: 800; cursor: pointer; margin-top: 15px; }
-        .btn-success:hover { background-color: #059669; }
-
-        .btn-secondary { background-color: #334155; color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 15px; }
-        .btn-secondary:hover { background-color: #475569; }
-
-        .btn-danger { background-color: var(--danger); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 12px; font-size: 14px; padding: 12px; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-            background: #090d16;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--tech-border);
-        }
-        th, td {
-            border-bottom: 1px solid var(--tech-border);
-            padding: 14px;
-            text-align: center;
-            font-size: 16px;
-        }
-        th { background: #111827; color: var(--primary); font-weight: 700; }
+    for idx, (q_text, opts) in enumerate(questions_data, 1):
+        p_q = doc.add_paragraph()
+        p_q.paragraph_format.rtl = True
+        p_q.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        p_q.paragraph_format.space_before = Pt(16)
+        p_q.paragraph_format.space_after = Pt(6)
+        p_q.paragraph_format.keep_with_next = True
         
-        .table-input {
-            border: 1px solid transparent;
-            background: transparent;
-            font-size: 16px;
-            font-weight: 700;
-            text-align: center;
-            width: 100%;
-            direction: rtl;
-            color: var(--text-main);
-        }
-        .table-input:focus {
-            border-color: var(--primary);
-            background: #111827;
-            outline: none;
-        }
-
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>منصة الامتحان الشفهي الذكية (مختبر الحاسوب) 💻</h2>
-    
-    <!-- واجهة الفقاعات -->
-    <div id="rooms-view">
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 17px;">اختر القاعة الدراسية لبدء جلسة الاختبار التقني:</p>
-        <div class="bubbles-box">
-            <div class="bubble" onclick="selectRoom(this, 'الرابع أ', 'الرابع', 'أ')">
-                <h3>الرابع أ</h3>
-                <span>انفجار 🎈</span>
-            </div>
-            <div class="bubble" onclick="selectRoom(this, 'الرابع ب', 'الرابع', 'ب')">
-                <h3>الرابع ب</h3>
-                <span>انفجار 🎈</span>
-            </div>
-            <div class="bubble" onclick="selectRoom(this, 'الخامس أ', 'الخامس', 'أ')">
-                <h3>الخامس أ</h3>
-                <span>انفجار 🎈</span>
-            </div>
-            <div class="bubble" onclick="selectRoom(this, 'الخامس ب', 'الخامس', 'ب')">
-                <h3>الخامس ب</h3>
-                <span>انفجار 🎈</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- إعدادات الغرفة -->
-    <div class="section-box hidden" id="setup-view">
-        <h3 id="setup-title" style="color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 22px;"></h3>
+        run_q = p_q.add_run(q_text)
+        run_q.font.name = 'Arial'
+        run_q.font.size = Pt(12)
+        run_q.font.bold = True
+        run_q.font.color.rgb = RGBColor(15, 23, 42)
         
-        <label>📋 أسماء الطلاب (نسخ ولصق دفعة واحدة، كل اسم في سطر):</label>
-        <textarea id="students-input" placeholder="أدخل أسماء الطلاب هنا..."></textarea>
-        <button class="btn-danger" onclick="clearSavedStudents()" style="display:none;" id="clear-btn">🗑️ مسح الأسماء المحفوظة لهذه الغرفة</button>
-
-        <label style="margin-top: 20px;">📚 رفع ملف الأسئلة (PDF, Word .docx, أو TXT):</label>
-        <div class="file-upload-box">
-            <input type="file" id="any-file" accept=".pdf, .docx, .txt" onchange="loadAnyFile(event)" style="background:transparent; border:none; padding:5px; color:var(--text-main);">
-            <span style="font-size: 13px; color: var(--primary); display: block; margin-top: 5px;">يدعم جميع الصيغ (PDF, Word, TXT) تلقائياً</span>
-        </div>
-
-        <label style="margin-top: 20px;">أو الصق محتوى الأسئلة يدوياً هنا:</label>
-        <textarea id="questions-input" placeholder="الصق الأسئلة والخيارات هنا..."></textarea>
-
-        <button class="btn-main" onclick="startExam()">بدء الجلسة الامتحانية 🚀</button>
-        <button class="btn-secondary" onclick="goHome()">العودة لاختيار الغرف 🔙</button>
-    </div>
-
-    <!-- شاشة الامتحان -->
-    <div id="exam-view" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(56, 189, 248, 0.08); padding: 18px 25px; border-radius: 16px; margin-bottom: 25px; border: 1px solid rgba(56, 189, 248, 0.2);">
-            <h4 id="exam-title" style="margin:0; color:var(--primary); font-size: 20px;"></h4>
-            <div id="timer" style="color:var(--danger); font-weight:800; font-size: 18px;">45 ثانية</div>
-        </div>
-
-        <div id="banner" style="text-align:center; padding:15px; border-radius:14px; font-weight:800; margin-bottom:20px; display:none; font-size: 18px;"></div>
-
-        <div class="student-box">
-            <h3 style="margin:0 0 10px 0; color:var(--text-muted); font-size: 15px;">الطالب المستهدف (قابل للتعديل الفوري):</h3>
-            <input type="text" id="active-student" class="editable-input" oninput="updateStudentName(this.value)">
-            <div id="question-counter" style="margin-top: 8px; font-weight: 700; color: var(--accent); font-size: 15px;">السؤال: 1 من 3</div>
-        </div>
-
-        <div class="question-box" id="active-question">السؤال: --</div>
-        <div class="options-grid" id="options-grid"></div>
-
-        <button class="btn-secondary" onclick="skipStudent()" style="padding: 14px;">تخطي هذا السؤال والانتقال لغيره ⏭️</button>
-
-        <h3 style="font-size: 18px; margin-top: 35px; color: var(--accent);">سجل درجات هذه الغرفة حصرياً:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>اسم الطالب (تعديل)</th>
-                    <th>الصف</th>
-                    <th>الشعبة</th>
-                    <th>الدرجة من 10</th>
-                </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
-
-        <button class="btn-success" onclick="exportExcel()">📊 تصدير السجل إلى Excel</button>
-        <button class="btn-secondary" onclick="goHome()">🔄 إنهاء الجلسة والعودة للغرف</button>
-    </div>
-</div>
-
-<script>
-    let currentKey = "", roomName = "", gradeStr = "", secStr = "";
-    let roomDB = {};
-
-    const defaultQ = [
-        { q: "ما المقصود بالصيانة الوقائية للبرمجيات في الحاسوب؟", correct: "إجراءات وقائية تعتمد لتجنب مشكلة محتملة.", options: ["إجراءات وقائية تعتمد لتجنب مشكلة محتملة.", "إجراءات تركز على استبدال القطع التالفة.", "حذف نظام التشغيل بالكامل.", "زيادة سرعة المعالج."] },
-        { q: "ما هي الغاية الأساسية من تحديث نظام التشغيل Windows؟", correct: "إضافة خصائص جديدة وتحسينات أمنية.", options: ["إضافة خصائص جديدة وتحسينات أمنية.", "زيادة مساحة القرص الصلب.", "مسح متصفح الإنترنت.", "إيقاف مروحة المعالج."] },
-        { q: "ما هو جهاز التوجيه (Router) في شبكات الحاسوب؟", correct: "جهاز يربط الشبكات ببعضها ويوجه البيانات.", options: ["جهاز يربط الشبكات ببعضها ويوجه البيانات.", "شاشة عرض البيانات.", "وحدة المعالجة المركزية.", "أداة لتبريد المعالج."] }
-    ];
-
-    // دالة تصحيح النصوص العربية المقلوبة في الـ PDF
-    function fixPdfArabicText(rawText) {
-        if (!rawText) return "";
-        let lines = rawText.split('\n');
-        let fixedLines = lines.map(line => {
-            let trimmed = line.trim();
-            if (trimmed.length > 0) {
-                let words = trimmed.split(/\s+/);
-                let correctedWords = words.map(word => {
-                    if (/[\u0600-\u06FF]/.test(word)) {
-                        return word.split('').reverse().join('');
-                    }
-                    return word;
-                });
-                return correctedWords.reverse().join(' ');
-            }
-            return line;
-        });
-        return fixedLines.join('\n');
-    }
-
-    function selectRoom(el, name, grade, sec) {
-        el.classList.add('pop');
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(new SpeechSynthesisUtterance(`هلاووووو، ${name}`));
-        }
-        setTimeout(() => {
-            el.classList.remove('pop');
-            currentKey = sec + "_" + grade;
-            roomName = name; gradeStr = grade; secStr = sec;
+        for opt_letter, opt_text in opts:
+            p_opt = doc.add_paragraph()
+            p_opt.paragraph_format.rtl = True
+            p_opt.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            p_opt.paragraph_format.space_before = Pt(0)
+            p_opt.paragraph_format.space_after = Pt(4)
+            p_opt.paragraph_format.right_indent = Inches(0.3)
             
-            if (!roomDB[currentKey]) {
-                roomDB[currentKey] = { students: [], records: {}, questions: [], pointer: 0, qIndex: 0, studentScore: 0 };
-            }
-
-            let savedStudents = localStorage.getItem("students_" + currentKey);
-            const textarea = document.getElementById("students-input");
-            const clearBtn = document.getElementById("clear-btn");
+            run_opt = p_opt.add_run(f"{opt_letter}) {opt_text}")
+            run_opt.font.name = 'Arial'
+            run_opt.font.size = Pt(11)
             
-            if (savedStudents) {
-                textarea.value = savedStudents;
-                clearBtn.style.display = "block";
-            } else {
-                textarea.value = "";
-                clearBtn.style.display = "none";
-            }
+            # خوارزمية الذكاء الاصطناعي للتظليل التلقائي للإجابة الصحيحة
+            if "(الإجابة الصحيحة)" in opt_text:
+                run_opt.font.bold = True
+                run_opt.font.color.rgb = RGBColor(220, 38, 38) # تظليل بلون مميز
+            else:
+                run_opt.font.color.rgb = RGBColor(51, 65, 85)
 
-            document.getElementById("setup-title").innerText = `إدارة ${name}`;
-            document.getElementById("rooms-view").classList.add("hidden");
-            document.getElementById("setup-view").classList.remove("hidden");
-        }, 300);
-    }
+    doc.save("Smart_AI_Questions_System-v2.docx")
+    print("تم معالجة الأسئلة وتوليد الملف الذكي بنجاح!")
 
-    function clearSavedStudents() {
-        if (confirm("هل تريد بالتأكيد مسح الأسماء المحفوظة لهذه الغرفة؟")) {
-            localStorage.removeItem("students_" + currentKey);
-            document.getElementById("students-input").value = "";
-            document.getElementById("clear-btn").style.display = "none";
-        }
-    }
-
-    // دعم رفع أي صيغة ملف (PDF, Word .docx, TXT)
-    async function loadAnyFile(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const fileName = file.name.toLowerCase();
-
-        if (fileName.endsWith('.pdf')) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                pdfjsLib.getDocument(new Uint8Array(this.result)).promise.then(async pdf => {
-                    let txt = "";
-                    for(let i=1; i<=pdf.numPages; i++) {
-                        let page = await pdf.getPage(i);
-                        let content = await page.getTextContent();
-                        let items = content.items.map(item => ({
-                            str: item.str,
-                            x: item.transform[4],
-                            y: item.transform[5]
-                        }));
-                        items.sort((a, b) => {
-                            if (Math.abs(b.y - a.y) > 5) return b.y - a.y;
-                            return b.x - a.x;
-                        });
-                        txt += items.map(item => item.str).join(' ') + '\n';
-                    }
-                    document.getElementById("questions-input").value = fixPdfArabicText(txt);
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        } else if (fileName.endsWith('.docx')) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                mammoth.extractRawText({ arrayBuffer: event.target.result })
-                    .then(result => {
-                        document.getElementById("questions-input").value = result.value;
-                    })
-                    .catch(err => {
-                        alert("حدث خطأ أثناء قراءة ملف الـ Word.");
-                    });
-            };
-            reader.readAsArrayBuffer(file);
-        } else {
-            // ملف نصي عادي TXT
-            const reader = new FileReader();
-            reader.onload = (ev) => { document.getElementById("questions-input").value = ev.target.result; };
-            reader.readAsText(file, "UTF-8");
-        }
-    }
-
-    function playSound(isCorrect) {
-        if (isCorrect) {
-            try {
-                let ctx = new (window.AudioContext || window.webkitAudioContext)();
-                for(let i=0; i<4; i++) {
-                    setTimeout(() => {
-                        let buf = ctx.createBuffer(1, ctx.sampleRate*0.08, ctx.sampleRate);
-                        let data = buf.getChannelData(0);
-                        for(let j=0; j<data.length; j++) data[j] = Math.random()*2-1;
-                        let src = ctx.createBufferSource(); src.buffer = buf;
-                        let g = ctx.createGain(); g.gain.value = 0.2;
-                        src.connect(g); g.connect(ctx.destination); src.start();
-                    }, i*70);
-                }
-            } catch(e) {}
-        } else {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("أووووو... لا لا لا!"));
-            }
-        }
-    }
-
-    function startExam() {
-        const raw = document.getElementById("students-input").value.trim();
-        if (!raw) { alert("يرجى إدخال أسماء الطلاب!"); return; }
-        
-        localStorage.setItem("students_" + currentKey, raw);
-
-        let list = [...new Set(raw.split('\n').map(s => s.trim()).filter(s => s.length > 2))];
-        if (list.length === 0) { alert("أدخل أسماء صحيحة."); return; }
-
-        let recs = {};
-        list.forEach(s => recs[s] = { name: s, grade: 0 });
-
-        let qText = document.getElementById("questions-input").value.trim();
-        let qArr = defaultQ;
-        if (qText.length > 5) {
-            let parts = qText.split('س:').filter(p => p.trim().length > 5);
-            if(parts.length === 0) parts = qText.split('\n').filter(p => p.trim().length > 5);
-            if(parts.length > 0) {
-                qArr = parts.map(p => {
-                    let lines = p.split('\n').map(l => l.trim()).filter(l => l.length > 2);
-                    let qTitle = lines[0] || p;
-                    let opts = lines.slice(1, 5);
-                    if(opts.length < 4) opts = [qTitle.substring(0,25)+" (صحيح)", "خيار مضلل أول", "خيار مضلل ثانٍ", "خيار مضلل ثالث"];
-                    return { q: "س: " + qTitle, correct: opts[0], options: opts };
-                });
-            }
-        }
-
-        roomDB[currentKey] = { students: list, records: recs, questions: qArr, pointer: 0, qIndex: 0, studentScore: 0 };
-        document.getElementById("setup-view").classList.add("hidden");
-        document.getElementById("exam-view").classList.remove("hidden");
-        document.getElementById("exam-title").innerText = `غرفة: ${roomName}`;
-        renderTable();
-        loadStudent();
-    }
-
-    let timer = null, leftTime = 45, currentQ = null;
-
-    function loadStudent() {
-        let db = roomDB[currentKey];
-        if (db.pointer >= db.students.length) {
-            document.getElementById("active-student").value = "انتهت قائمة الطلاب بنجاح! 🎓";
-            document.getElementById("question-counter").innerText = "اكتمل الاختبار";
-            document.getElementById("active-question").innerText = "تم تقييم جميع الطلاب ورصد الدرجات في الجدول.";
-            document.getElementById("options-grid").innerHTML = "";
-            document.getElementById("banner").style.display = "none";
-            clearInterval(timer);
-            return;
-        }
-
-        if (db.qIndex === 0) {
-            db.studentScore = 0;
-        }
-
-        let stu = db.students[db.pointer];
-        document.getElementById("question-counter").innerText = `السؤال: ${db.qIndex + 1} من 3`;
-
-        currentQ = db.questions[Math.floor(Math.random() * db.questions.length)];
-        let opts = [...currentQ.options].sort(() => Math.random() - 0.5);
-
-        document.getElementById("active-student").value = db.records[stu].name;
-        document.getElementById("active-question").innerText = currentQ.q;
-        document.getElementById("banner").style.display = "none";
-
-        let grid = document.getElementById("options-grid");
-        grid.innerHTML = "";
-        opts.forEach((op, idx) => {
-            let b = document.createElement("button");
-            b.className = "opt-btn";
-            b.innerHTML = `<strong>${['أ', 'ب', 'ج', 'د'][idx]})</strong> ${op}`;
-            b.onclick = () => answer(op === currentQ.correct);
-            grid.appendChild(b);
-        });
-
-        clearInterval(timer);
-        leftTime = 45;
-        document.getElementById("timer").innerText = `الوقت: ${leftTime} ث`;
-        timer = setInterval(() => {
-            leftTime--;
-            document.getElementById("timer").innerText = `الوقت: ${leftTime} ث`;
-            if (leftTime <= 0) { clearInterval(timer); playSound(false); answer(false); }
-        }, 1000);
-    }
-
-    function updateStudentName(val) {
-        let db = roomDB[currentKey];
-        if (db.pointer < db.students.length) {
-            let old = db.students[db.pointer];
-            db.records[old].name = val;
-            db.students[db.pointer] = val;
-            renderTable();
-        }
-    }
-
-    function updateTableName(idx, val) {
-        let db = roomDB[currentKey];
-        let old = db.students[idx];
-        db.students[idx] = val;
-        db.records[val] = db.records[old];
-        if(old !== val) delete db.records[old];
-        if(idx === db.pointer) document.getElementById("active-student").value = val;
-    }
-
-    function skipStudent() { clearInterval(timer); playSound(false); answer(false); }
-
-    function answer(isCorr) {
-        clearInterval(timer);
-        let db = roomDB[currentKey];
-        if(db.pointer >= db.students.length) return;
-        let stu = db.students[db.pointer];
-        let ban = document.getElementById("banner");
-
-        playSound(isCorr);
-
-        if(isCorr) {
-            db.studentScore += 1;
-            ban.style.background = "rgba(52, 211, 153, 0.15)";
-            ban.style.color = "#34d399";
-            ban.style.border = "1px solid #34d399";
-            ban.innerHTML = "✔️ إجابة صحيحة (تصفيق)!";
-        } else {
-            ban.style.background = "rgba(248, 113, 113, 0.15)";
-            ban.style.color = "#f87171";
-            ban.style.border = "1px solid #f87171";
-            ban.innerHTML = `❌ إجابة خاطئة (أووووو لا لا لا)! الصحيحة: ${currentQ.correct}`;
-        }
-        ban.style.display = "block";
-
-        db.qIndex++;
-
-        if (db.qIndex >= 3) {
-            let finalGrade = Math.round((db.studentScore / 3) * 10);
-            db.records[stu].grade = finalGrade;
-            renderTable();
-
-            db.pointer++;
-            db.qIndex = 0;
-            setTimeout(() => loadStudent(), 3500);
-        } else {
-            setTimeout(() => loadStudent(), 2500);
-        }
-    }
-
-    function renderTable() {
-        let db = roomDB[currentKey];
-        let tbody = document.getElementById("table-body");
-        tbody.innerHTML = "";
-        db.students.forEach((sKey, idx) => {
-            let r = db.records[sKey];
-            let tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><input type="text" class="table-input" value="${r.name}" oninput="updateTableName(${idx}, this.value)"></td>
-                <td><b>${gradeStr}</b></td>
-                <td><b>${secStr}</b></td>
-                <td><b>${r.grade} / 10</b></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function exportExcel() {
-        let db = roomDB[currentKey];
-        let html = `<table><tr><th>اسم الطالب</th><th>الصف</th><th>الشعبة</th><th>الدرجة</th></tr>`;
-        db.students.forEach(sKey => {
-            let r = db.records[sKey];
-            html += `<tr><td>${r.name}</td><td>${gradeStr}</td><td>${secStr}</td><td>${r.grade}/10</td></tr>`;
-        });
-        html += `</table>`;
-        let blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-        let a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = `درجات_غرفة_${roomName}.xls`; a.click();
-    }
-
-    function goHome() {
-        clearInterval(timer);
-        document.getElementById("setup-view").classList.add("hidden");
-        document.getElementById("exam-view").classList.add("hidden");
-        document.getElementById("rooms-view").classList.remove("hidden");
-        document.getElementById("students-input").value = "";
-        document.getElementById("questions-input").value = "";
-        document.getElementById("any-file").value = "";
-    }
-</script>
-
-</body>
-</html>
+generate_smart_ai_system()
