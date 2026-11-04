@@ -618,26 +618,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v44') || "";
-    let fileName5 = localStorage.getItem('fileName5_v44') || "";
+    let fileName4 = localStorage.getItem('fileName4_v45') || "";
+    let fileName5 = localStorage.getItem('fileName5_v45') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v44');
+        const saved = localStorage.getItem('schoolAppData_v45');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v44')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v45')) || [];
 
-    if(localStorage.getItem('q4_text_v44')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v44');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v44') || "[]");
+    if(localStorage.getItem('q4_text_v45')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v45');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v45') || "[]");
     }
-    if(localStorage.getItem('q5_text_v44')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v44');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v44') || "[]");
+    if(localStorage.getItem('q5_text_v45')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v45');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v45') || "[]");
     }
 
     let currentStudent = "";
@@ -673,15 +673,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v44', JSON.stringify(appData));
-            localStorage.setItem('examResults_v44', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v44', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v44', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v44', fileName4);
+            localStorage.setItem('schoolAppData_v45', JSON.stringify(appData));
+            localStorage.setItem('examResults_v45', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v45', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v45', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v45', fileName4);
 
-            localStorage.setItem('q5_text_v44', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v44', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v44', fileName5);
+            localStorage.setItem('q5_text_v45', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v45', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v45', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -814,8 +814,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v44'); localStorage.removeItem('q4_text_v44'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v44'); localStorage.removeItem('q5_text_v44'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v45'); localStorage.removeItem('q4_text_v45'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v45'); localStorage.removeItem('q5_text_v45'); }
             saveData();
             updateInfoDisplays();
         }
@@ -889,6 +889,7 @@
         alert(`💾 تم حفظ بنك أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'} دائمياً على الجهاز (${grade === '4' ? questions4.length : questions5.length} سؤال تم التعرف عليها بنجاح)!`);
     }
 
+    // خوارزمية مطورة ومحسنة كلياً لمنع دخول السؤال ضمن الاختيارات
     function parseQuestions(text, grade) {
         let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         let parsed = [];
@@ -899,23 +900,27 @@
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
             
-            let isQuestion = line.includes('؟') || line.includes('?') || 
-                             /^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?|\d+[\.\-)]\s*)/.test(line);
+            // تحقق صارم هل السطر الحالي هو سؤال جديد (يبدأ بـ س، السؤال، أو رقم مع نقطة أو قوس ويحتوي غالباً على علامة استفهام أو نص استفهامي)
+            let isQuestion = /^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?|\d+[\.\-)]\s*)/.test(line) || line.includes('؟') || line.includes('?');
+            
+            // تحقق هل السطر هو خيار (يبدأ بحروف أو أرقام خيارات مثل أ، ب، ج، د أو 1، 2، 3 أو رموز دلالية)
+            let isOption = /^([أبدجأ-ي][\)\-\.\:]|\d+[\)\-\.\:]|[أبجدهم][\s\-])/.test(line);
 
-            if (isQuestion && currentQ !== "" && currentOpts.length > 0) {
+            // إذا كان السطر الحالي يعتبر سؤالاً جديداً ولديك سؤال قيد المعالجة تم اكتمال خياراته سابقاً
+            if (isQuestion && !isOption && currentQ !== "" && currentOpts.length > 0) {
                 parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
                 currentQ = "";
                 currentOpts = [];
                 correctIdx = 0;
             }
 
-            if (isQuestion && currentQ === "") {
+            if ((isQuestion && !isOption && currentQ === "") || (currentQ === "" && !isOption)) {
                 currentQ = line.replace(/^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?|\d+[\.\-)]\s*)\s*/, '').trim();
                 currentOpts = [];
                 correctIdx = 0;
             } else if (currentQ !== "") {
                 if (line.includes('الاجابة الصحيحة') || line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
-                    correctIdx = currentOpts.length;
+                    correctIdx = currentOpts.length > 0 ? currentOpts.length - 1 : 0;
                 }
                 
                 let cleanLine = line.replace(/\(الاجابة الصحيحة\)/g, '')
@@ -937,10 +942,6 @@
                     currentOpts = [];
                     correctIdx = 0;
                 }
-            } else {
-                currentQ = line;
-                currentOpts = [];
-                correctIdx = 0;
             }
         }
 
