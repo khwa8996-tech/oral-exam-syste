@@ -245,7 +245,7 @@
         .delete-btn:hover { background: var(--danger); color: #fff; }
         .file-info { margin-top: 10px; font-weight: 700; color: var(--success); font-size: 13px; }
 
-        /* نافذة الامتحان المتجاورة والملائمة لجميع الشاشات */
+        /* نافذة الامتحان وغرفة النتائج المتجاورة */
         #examModal { 
             display: none; 
             position: fixed; 
@@ -326,6 +326,21 @@
         }
         .timer-display.warning { background: #fee2e2; color: #dc2626; border-color: #fecaca; animation: pulse 0.5s infinite alternate; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.03); } }
+
+        /* صندوق معاينة الطالب التالي */
+        .next-preview-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #bbf7d0;
+            padding: 15px 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
 
         /* جدول غرفة النتائج */
         .results-header { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; flex-wrap: wrap; gap: 10px; }
@@ -484,19 +499,27 @@
         
         <div id="setupExamDiv" style="margin-bottom: 20px; background: #f8fafc; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
             <label style="font-weight: 700; margin-left: 10px;">اختر الشعبة للاختبار:</label>
-            <select id="examSectionSelect" style="padding: 10px 14px; font-size: 14px; font-family: 'Cairo', sans-serif; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; margin-left: 10px; background: #fff;">
+            <select id="examSectionSelect" onchange="previewNextStudent()" style="padding: 10px 14px; font-size: 14px; font-family: 'Cairo', sans-serif; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; margin-left: 10px; background: #fff;">
                 <option value="4a">الرابع (أ) - يعتمد أسئلة الرابع</option>
                 <option value="4b">الرابع (ب) - يعتمد أسئلة الرابع</option>
                 <option value="5a">الخامس (أ) - يعتمد أسئلة الخامس</option>
                 <option value="5b">الخامس (ب) - يعتمد أسئلة الخامس</option>
             </select>
-            <button class="action-btn add-btn" type="button" onclick="startStudentExam()" style="padding: 11px 20px; margin-top: 10px;">🎯 بدء امتحان طالب عشوائي (3 أسئلة)</button>
+            
+            <!-- صندوق معاينة الطالب التالي (لا يبدأ الامتحان إلا بالضغط أدناه) -->
+            <div class="next-preview-box">
+                <span style="font-weight: 700; color: #166534; font-size: 14px;">🎓 الطالب المرشح التالي (معاينة فقط):</span>
+                <span id="previewStudentName" style="font-weight: 900; color: #047857; font-size: 16px;">-- اضغط تجهيز --</span>
+                <button class="action-btn" type="button" style="background: #0284c7; padding: 6px 12px; font-size: 12px;" onclick="previewNextStudent()">🔄 سحب اسم آخر</button>
+            </div>
+
+            <button class="action-btn add-btn" type="button" onclick="startStudentExam()" style="padding: 14px 25px; margin-top: 5px; width: 100%; justify-content: center; font-size: 16px;">🎯 بدء امتحان الطالب الظاهر في المعاينة (3 أسئلة)</button>
         </div>
 
         <div id="activeExamArea" style="display: none;">
             <!-- حقل التعديل المباشر على اسم الطالب أثناء الامتحان -->
             <div class="edit-student-box">
-                <label for="currentStudentNameInput">🎓 اسم الطالب (قابل للتعديل قبل الاعتماد):</label>
+                <label for="currentStudentNameInput">🎓 اسم الطالب الحالي (قابل للتعديل قبل الاعتماد):</label>
                 <input type="text" id="currentStudentNameInput" placeholder="أدخل أو عدّل اسم الطالب...">
             </div>
 
@@ -595,26 +618,26 @@
 
     let questions4 = [];
     let questions5 = [];
-    let fileName4 = localStorage.getItem('fileName4_v40') || "";
-    let fileName5 = localStorage.getItem('fileName5_v40') || "";
+    let fileName4 = localStorage.getItem('fileName4_v44') || "";
+    let fileName5 = localStorage.getItem('fileName5_v44') || "";
 
     let appData;
     try {
-        const saved = localStorage.getItem('schoolAppData_v40');
+        const saved = localStorage.getItem('schoolAppData_v44');
         appData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultData));
     } catch (e) {
         appData = JSON.parse(JSON.stringify(defaultData));
     }
 
-    let examResults = JSON.parse(localStorage.getItem('examResults_v40')) || [];
+    let examResults = JSON.parse(localStorage.getItem('examResults_v44')) || [];
 
-    if(localStorage.getItem('q4_text_v40')) {
-        document.getElementById('text4').value = localStorage.getItem('q4_text_v40');
-        questions4 = JSON.parse(localStorage.getItem('q4_bank_v40') || "[]");
+    if(localStorage.getItem('q4_text_v44')) {
+        document.getElementById('text4').value = localStorage.getItem('q4_text_v44');
+        questions4 = JSON.parse(localStorage.getItem('q4_bank_v44') || "[]");
     }
-    if(localStorage.getItem('q5_text_v40')) {
-        document.getElementById('text5').value = localStorage.getItem('q5_text_v40');
-        questions5 = JSON.parse(localStorage.getItem('q5_bank_v40') || "[]");
+    if(localStorage.getItem('q5_text_v44')) {
+        document.getElementById('text5').value = localStorage.getItem('q5_text_v44');
+        questions5 = JSON.parse(localStorage.getItem('q5_bank_v44') || "[]");
     }
 
     let currentStudent = "";
@@ -626,7 +649,7 @@
     let studentCorrectAnswers = 0;
 
     let timerInterval = null;
-    let timeLeft = 25; // مضبوط تماماً على 25 ثانية
+    let timeLeft = 25; // المؤقت مضبوط تماماً على 25 ثانية
 
     function playAlarmSound() {
         try {
@@ -650,15 +673,15 @@
 
     function saveData() {
         try {
-            localStorage.setItem('schoolAppData_v40', JSON.stringify(appData));
-            localStorage.setItem('examResults_v40', JSON.stringify(examResults));
-            localStorage.setItem('q4_text_v40', document.getElementById('text4').value);
-            localStorage.setItem('q4_bank_v40', JSON.stringify(questions4));
-            localStorage.setItem('fileName4_v40', fileName4);
+            localStorage.setItem('schoolAppData_v44', JSON.stringify(appData));
+            localStorage.setItem('examResults_v44', JSON.stringify(examResults));
+            localStorage.setItem('q4_text_v44', document.getElementById('text4').value);
+            localStorage.setItem('q4_bank_v44', JSON.stringify(questions4));
+            localStorage.setItem('fileName4_v44', fileName4);
 
-            localStorage.setItem('q5_text_v40', document.getElementById('text5').value);
-            localStorage.setItem('q5_bank_v40', JSON.stringify(questions5));
-            localStorage.setItem('fileName5_v40', fileName5);
+            localStorage.setItem('q5_text_v44', document.getElementById('text5').value);
+            localStorage.setItem('q5_bank_v44', JSON.stringify(questions5));
+            localStorage.setItem('fileName5_v44', fileName5);
         } catch (e) {
             alert('تعذر الحفظ المحلي.');
         }
@@ -791,8 +814,8 @@
     function clearBox(grade) {
         if(confirm(`هل أنت متأكد من مسح محتوى أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'}؟`)) {
             document.getElementById(`text${grade}`).value = '';
-            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v40'); localStorage.removeItem('q4_text_v40'); }
-            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v40'); localStorage.removeItem('q5_text_v40'); }
+            if(grade === '4') { questions4 = []; fileName4 = ""; localStorage.removeItem('q4_bank_v44'); localStorage.removeItem('q4_text_v44'); }
+            else { questions5 = []; fileName5 = ""; localStorage.removeItem('q5_bank_v44'); localStorage.removeItem('q5_text_v44'); }
             saveData();
             updateInfoDisplays();
         }
@@ -863,7 +886,7 @@
         
         saveData();
         updateInfoDisplays();
-        alert(`💾 تم حفظ بنك أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'} دائمياً على الجهاز بدون إنترنت!`);
+        alert(`💾 تم حفظ بنك أسئلة الصف ${grade === '4' ? 'الرابع' : 'الخامس'} دائمياً على الجهاز (${grade === '4' ? questions4.length : questions5.length} سؤال تم التعرف عليها بنجاح)!`);
     }
 
     function parseQuestions(text, grade) {
@@ -873,43 +896,55 @@
         let currentOpts = [];
         let correctIdx = 0;
 
-        for(let line of lines) {
-            if(line.includes('؟') || line.includes('?') || line.startsWith('س:') || line.startsWith('السؤال')) {
-                if(currentQ !== "" && currentOpts.length > 0) {
-                    parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
-                }
-                currentQ = line.replace(/^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?)\s*/, '').trim();
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            
+            let isQuestion = line.includes('؟') || line.includes('?') || 
+                             /^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?|\d+[\.\-)]\s*)/.test(line);
+
+            if (isQuestion && currentQ !== "" && currentOpts.length > 0) {
+                parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
+                currentQ = "";
                 currentOpts = [];
                 correctIdx = 0;
-            } else {
-                if(currentQ !== "") {
-                    // الفحص الشامل والدقيق لاكتشاف عبارة الإجابة الصحيحة أو النجمات بكل صيغها
-                    if(line.includes('الاجابة الصحيحة') || line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
-                        correctIdx = currentOpts.length;
-                    }
-                    
-                    // تنظيف النص تماماً وإزالة كافة أشكال عبارات الإجابة الصحيحة لكي لا يراها الطالب نهائياً
-                    let cleanLine = line.replace(/\(الاجابة الصحيحة\)/g, '')
-                                        .replace(/الاجابة الصحيحة/g, '')
-                                        .replace(/\(الإجابة الصحيحة\)/g, '')
-                                        .replace(/الإجابة الصحيحة/g, '')
-                                        .replace(/\(\*\)/g, '')
-                                        .replace(/\*/g, '')
-                                        .replace(/\(\s*\)/g, '')
-                                        .trim();
+            }
 
-                    currentOpts.push(cleanLine);
-                    
-                    if(currentOpts.length === 3) {
-                        parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
-                        currentQ = "";
-                        currentOpts = [];
-                        correctIdx = 0;
-                    }
+            if (isQuestion && currentQ === "") {
+                currentQ = line.replace(/^(س\s*\d*[:\.-]?|السؤال\s*\d*[:\.-]?|\d+[\.\-)]\s*)\s*/, '').trim();
+                currentOpts = [];
+                correctIdx = 0;
+            } else if (currentQ !== "") {
+                if (line.includes('الاجابة الصحيحة') || line.includes('الإجابة الصحيحة') || line.includes('*') || line.includes('(*)')) {
+                    correctIdx = currentOpts.length;
                 }
+                
+                let cleanLine = line.replace(/\(الاجابة الصحيحة\)/g, '')
+                                    .replace(/الاجابة الصحيحة/g, '')
+                                    .replace(/\(الإجابة الصحيحة\)/g, '')
+                                    .replace(/الإجابة الصحيحة/g, '')
+                                    .replace(/\(\*\)/g, '')
+                                    .replace(/\*/g, '')
+                                    .replace(/\(\s*\)/g, '')
+                                    .trim();
+
+                if (cleanLine.length > 0) {
+                    currentOpts.push(cleanLine);
+                }
+
+                if (currentOpts.length === 3) {
+                    parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
+                    currentQ = "";
+                    currentOpts = [];
+                    correctIdx = 0;
+                }
+            } else {
+                currentQ = line;
+                currentOpts = [];
+                correctIdx = 0;
             }
         }
-        if(currentQ !== "" && currentOpts.length > 0) {
+
+        if (currentQ !== "" && currentOpts.length > 0) {
             parsed.push({ q: currentQ, options: [...currentOpts], correct: correctIdx });
         }
 
@@ -932,14 +967,28 @@
         else info5.innerHTML = `⚠️ لم يتم حفظ أسئلة للخامس بعد.`;
     }
 
+    // دالة معاينة الطالب التالي في القائمة دون بدء الامتحان
+    function previewNextStudent() {
+        const secKey = document.getElementById('examSectionSelect').value;
+        const students = appData[secKey];
+        if(!students || students.length === 0) {
+            document.getElementById('previewStudentName').innerText = "لا يوجد طلاب في هذه الشعبة";
+            return;
+        }
+        let randomStudent = students[Math.floor(Math.random() * students.length)];
+        document.getElementById('previewStudentName').innerText = randomStudent;
+    }
+
     function openExamModal() {
-        // عند فتح النافذة، نقوم بعمل إعادة تحليل سريعة وتطهير لضمان عدم بقاء أي نص قديم في الذاكرة
         if(document.getElementById('text4').value.trim()) parseQuestions(document.getElementById('text4').value, '4');
         if(document.getElementById('text5').value.trim()) parseQuestions(document.getElementById('text5').value, '5');
 
         document.getElementById('examModal').style.display = 'flex';
         document.getElementById('setupExamDiv').style.display = 'block';
         document.getElementById('activeExamArea').style.display = 'none';
+        
+        // جلب معاينة أول طالب فور فتح النافذة
+        previewNextStudent();
         renderResultsTable();
     }
 
@@ -977,7 +1026,10 @@
             return;
         }
 
-        currentStudent = students[Math.floor(Math.random() * students.length)];
+        // اعتماد اسم الطالب الذي ظهر في المعاينة أو اختيار اسم جديد عشوائي
+        const previewName = document.getElementById('previewStudentName').innerText;
+        currentStudent = (previewName && previewName !== "-- اضغط تجهيز --" && !previewName.includes("لا يوجد")) ? previewName : students[Math.floor(Math.random() * students.length)];
+        
         currentSectionKey = secKey;
         currentSectionName = secKey === '4a' ? 'الرابع (أ)' : secKey === '4b' ? 'الرابع (ب)' : secKey === '5a' ? 'الخامس (أ)' : 'الخامس (ب)';
         
@@ -1042,14 +1094,13 @@
 
     function startTimer() {
         clearInterval(timerInterval);
-        timeLeft = 25; // المؤقت مضبوط تماماً على 25 ثانية
+        timeLeft = 25; // العداد مضبوط تماماً على 25 ثانية
         updateTimerDisplay();
 
         timerInterval = setInterval(() => {
             timeLeft--;
             updateTimerDisplay();
 
-            // تفعيل صوت الإنذار والوميض عندما يصل العداد إلى 10 ثوانٍ أو أقل
             if (timeLeft <= 10 && timeLeft >= 0) {
                 playAlarmSound();
             }
@@ -1113,9 +1164,12 @@
         saveData();
         renderResultsTable();
 
-        alert(`انتهى امتحان الطالب: ${updatedName}\nالنتيجة: ${studentCorrectAnswers} إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nسيتم الآن الانتقال تلقائياً لطالب جديد.`);
+        alert(`انتهى امتحان الطالب: ${updatedName}\nالنتيجة: ${studentCorrectAnswers} إجابات صحيحة.\nالدرجة النهائية: ${finalGrade} من 10.\n\nتم حفظ النتيجة. يظهر لك الآن اسم الطالب التالي في شاشة التجهيز، ولن يبدأ امتحانه إلا عندما تضغط على زر البدء.`);
 
-        startStudentExam();
+        // العودة لشاشة الاختيار وتوليد معاينة الطالب التالي فوراً ليصبح جاهزاً للضغط متى شئت
+        document.getElementById('setupExamDiv').style.display = 'block';
+        document.getElementById('activeExamArea').style.display = 'none';
+        previewNextStudent();
     }
 
     function deleteResult(index) {
@@ -1156,7 +1210,6 @@
     }
 
     window.onload = function() {
-        // عند فتح الصفحة، نقوم بإجراء إعادة تحليل فورية لضمان إزالة أي عبارات إجابة صحيحة مخزنة سابقاً
         if(document.getElementById('text4').value.trim()) parseQuestions(document.getElementById('text4').value, '4');
         if(document.getElementById('text5').value.trim()) parseQuestions(document.getElementById('text5').value, '5');
         saveData();
